@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 180" fill="none">
+  <defs>
+    <linearGradient id="type-bg" x1="0" y1="0" x2="1200" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0A0720"/>
+      <stop offset="100%" stop-color="#0F0B2C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="180" fill="url(#type-bg)" rx="12"/>
+
+  <!-- Section label -->
+  <text x="40" y="36" fill="#A9A4C4" font-family="system-ui, sans-serif" font-weight="600" font-size="11" letter-spacing="1.5">TYPOGRAPHY</text>
+
+  <!-- Display -->
+  <text x="40" y="85" fill="#F0EEFF" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="36" letter-spacing="-1.2">
+    Plus Jakarta Sans
+    <animate attributeName="opacity" values="0;1" dur="0.8s" fill="freeze"/>
+  </text>
+  <text x="460" y="85" fill="#44415A" font-family="system-ui, sans-serif" font-weight="400" font-size="14">Display / Headings / 800</text>
+
+  <!-- Body -->
+  <text x="40" y="122" fill="#A9A4C4" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="20">
+    DM Sans — Body text and descriptions
+  </text>
+  <text x="530" y="122" fill="#44415A" font-family="system-ui, sans-serif" font-weight="400" font-size="14">Body / 400</text>
+
+  <!-- Mono -->
+  <text x="40" y="155" fill="#8B6CD4" font-family="monospace" font-weight="500" font-size="16">
+    JetBrains Mono — $1,234.56 | +2.34% | 1.2B vol
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+  </text>
+  <text x="560" y="155" fill="#44415A" font-family="system-ui, sans-serif" font-weight="400" font-size="14">Data / Prices / 500</text>
+</svg>
