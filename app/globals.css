@@ -1,0 +1,350 @@
+@import "tailwindcss";
+
+/* ── CMM MarketIQ Design Tokens — Dense Direction ── */
+
+:root {
+  /* Backgrounds */
+  --bg: #FAFAFD;
+  --bg-alt: #F4F2FA;
+  --white: #FFFFFF;
+
+  /* Foregrounds */
+  --fg: #0C0A1D;
+  --fg-2: #44415A;
+  --fg-3: #7A7793;
+
+  /* Surfaces */
+  --surface: #F0EEF7;
+  --surface-el: #EAE8F3;
+  --surface-down: #FCFBFE;
+
+  /* Borders */
+  --border: #DDDBE8;
+  --border-s: #EDEBF5;
+
+  /* Brand */
+  --brand: #3E149C;
+  --brand-h: #2E0F75;
+  --brand-l: #6B4CC0;
+  --brand-m: rgba(62, 20, 156, 0.07);
+  --brand-t: #FFFFFF;
+
+  /* Semantic */
+  --signal: #FCA311;
+  --signal-h: #E89200;
+  --signal-m: rgba(252, 163, 17, 0.1);
+  --pos: #059669;
+  --pos-t: #065F46;
+  --pos-m: rgba(5, 150, 105, 0.08);
+  --neg: #DC2626;
+  --neg-t: #991B1B;
+  --neg-m: rgba(220, 38, 38, 0.08);
+  --info: #0891B2;
+  --info-m: rgba(8, 145, 178, 0.08);
+
+  /* Category Colors */
+  --cat-markets: #3E149C;
+  --cat-companies: #0891B2;
+  --cat-sectors: #059669;
+  --cat-insights: #D97706;
+  --cat-ai: #7C3AED;
+
+  /* Shadows (brand-tinted purple) */
+  --shadow-xs: 0 1px 2px rgba(62, 20, 156, 0.04);
+  --shadow-sm: 0 2px 4px rgba(62, 20, 156, 0.06);
+  --shadow-md: 0 4px 12px rgba(62, 20, 156, 0.08);
+  --shadow-lg: 0 8px 24px rgba(62, 20, 156, 0.1);
+  --shadow-xl: 0 16px 40px rgba(62, 20, 156, 0.12);
+  --shadow-brand: 0 4px 16px rgba(62, 20, 156, 0.2);
+  --shadow-signal: 0 4px 16px rgba(252, 163, 17, 0.2);
+
+  /* Radius Scale */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-full: 9999px;
+
+  /* Duration */
+  --dur: 300ms;
+  --dur-f: 150ms;
+
+  /* Easing */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Header */
+  --header-blur: rgba(250, 250, 253, 0.88);
+
+  /* Gradient Tokens */
+  --grad-brand: linear-gradient(135deg, #3E149C 0%, #4A1AAF 100%);
+  --grad-signal: linear-gradient(135deg, #FCA311 0%, #FDBA3B 100%);
+
+  /* Dense Direction — Component Tokens */
+  --card-r: 4px;
+  --card-bg: var(--white);
+  --card-bd: 1px solid var(--border);
+  --card-p: 14px;
+  --card-shadow: var(--shadow-xs);
+  --card-img-r: 2px;
+  --card-hover-y: 0px;
+  --card-hover-shadow: var(--shadow-sm);
+  --card-hover-bd: 1px solid var(--brand-l);
+  --card-title-s: 0.9375rem;
+
+  --badge-r: 2px;
+  --badge-px: 6px;
+  --badge-py: 2px;
+  --badge-w: 700;
+  --badge-tt: uppercase;
+  --badge-ls: 0.06em;
+  --badge-s: 0.5625rem;
+
+  --btn-r: 4px;
+  --btn-h: 34px;
+
+  --grid-gap: 12px;
+  --grid-cols: 4;
+  --sect-gap: 32px;
+
+  --nav-active-bd: none;
+  --nav-active-bg: var(--surface);
+
+  /* Widget */
+  --w-bg: var(--white);
+  --w-bd: 1px solid var(--border);
+  --w-r: 4px;
+  --w-p: 14px;
+  --w-shadow: var(--shadow-xs);
+  --w-head-bg: var(--bg-alt);
+  --w-head-bd: 1px solid var(--border-s);
+  --w-head-p: 10px 14px;
+
+  /* Table */
+  --t-head-bg: var(--bg-alt);
+  --t-head-bd: 1px solid var(--border);
+  --t-row-h: 38px;
+  --t-hover: var(--brand-m);
+
+  /* Tabs */
+  --tab-r: 4px;
+
+  /* Fonts */
+  --font-d: var(--font-plus-jakarta-sans), system-ui, sans-serif;
+  --font-b: var(--font-dm-sans), system-ui, sans-serif;
+  --font-m: var(--font-jetbrains-mono), monospace;
+
+  /* ── Typography Scale — 15px base, 1.25 Major Third ── */
+  --text-xs: 0.6875rem;    /* 11px — labels, meta, captions */
+  --text-sm: 0.8125rem;    /* 13px — secondary text, table cells */
+  --text-base: 0.9375rem;  /* 15px — body text */
+  --text-md: 1.125rem;     /* 18px — card titles, subheadings */
+  --text-lg: 1.25rem;      /* 20px — section titles */
+  --text-xl: 1.5rem;       /* 24px — page subtitles */
+  --text-2xl: 2rem;        /* 32px — page titles */
+  --text-3xl: 2.5rem;      /* 40px — section heroes */
+  --text-4xl: 3.5rem;      /* 56px — hero display */
+
+  /* Letter spacing */
+  --ls-hero: -0.035em;
+  --ls-tight: -0.025em;
+  --ls-heading: -0.02em;
+  --ls-normal: 0;
+  --ls-badge: 0.06em;
+  --ls-label: 0.08em;
+  --ls-caps: 0.1em;
+
+  /* Line heights */
+  --lh-hero: 1.06;
+  --lh-display: 1.12;
+  --lh-heading: 1.2;
+  --lh-body: 1.6;
+  --lh-relaxed: 1.7;
+}
+
+@theme inline {
+  /* Map CSS vars to Tailwind tokens */
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-surface: var(--surface);
+  --color-surface-el: var(--surface-el);
+  --color-border: var(--border);
+  --color-border-s: var(--border-s);
+  --color-brand: var(--brand);
+  --color-brand-h: var(--brand-h);
+  --color-brand-l: var(--brand-l);
+  --color-brand-m: var(--brand-m);
+  --color-signal: var(--signal);
+  --color-signal-h: var(--signal-h);
+  --color-pos: var(--pos);
+  --color-neg: var(--neg);
+  --color-info: var(--info);
+  --color-cat-markets: var(--cat-markets);
+  --color-cat-companies: var(--cat-companies);
+  --color-cat-sectors: var(--cat-sectors);
+  --color-cat-insights: var(--cat-insights);
+  --color-cat-ai: var(--cat-ai);
+  --color-white: var(--white);
+  --color-brand-t: var(--brand-t);
+  --color-signal-m: var(--signal-m);
+  --color-pos-t: var(--pos-t);
+  --color-pos-m: var(--pos-m);
+  --color-neg-t: var(--neg-t);
+  --color-neg-m: var(--neg-m);
+  --color-info-m: var(--info-m);
+  --color-surface-down: var(--surface-down);
+
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius-DEFAULT: var(--r);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-full: var(--r-full);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-brand: var(--shadow-brand);
+  --shadow-signal: var(--shadow-signal);
+
+  --font-display: var(--font-d);
+  --font-body: var(--font-b);
+  --font-mono: var(--font-m);
+
+  /* Type scale */
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-md: var(--text-md);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
+
+  /* Letter spacing */
+  --tracking-hero: var(--ls-hero);
+  --tracking-tight: var(--ls-tight);
+  --tracking-heading: var(--ls-heading);
+  --tracking-normal: var(--ls-normal);
+  --tracking-badge: var(--ls-badge);
+  --tracking-label: var(--ls-label);
+  --tracking-caps: var(--ls-caps);
+
+  /* Line heights */
+  --leading-hero: var(--lh-hero);
+  --leading-display: var(--lh-display);
+  --leading-heading: var(--lh-heading);
+  --leading-body: var(--lh-body);
+  --leading-relaxed: var(--lh-relaxed);
+}
+
+/* ── Dark Mode ── */
+[data-mode="dark"] {
+  --bg: #0A0720;
+  --bg-alt: #0F0B2C;
+  --fg: #F0EEFF;
+  --fg-2: #A9A4C4;
+  --fg-3: #7A7793;
+  --surface: #141038;
+  --surface-el: #1C1648;
+  --surface-down: #0C0826;
+  --white: #141038;
+  --border: rgba(240, 238, 255, 0.1);
+  --border-s: rgba(240, 238, 255, 0.05);
+  --brand: #8B6CD4;
+  --brand-h: #A58BE0;
+  --brand-l: #5B25C9;
+  --brand-m: rgba(139, 108, 212, 0.12);
+  --brand-t: #0A0720;
+  --signal-m: rgba(252, 163, 17, 0.12);
+  --pos: #34D399;
+  --pos-t: #34D399;
+  --pos-m: rgba(52, 211, 153, 0.12);
+  --neg: #F87171;
+  --neg-t: #F87171;
+  --neg-m: rgba(248, 113, 113, 0.12);
+  --info: #22D3EE;
+  --info-m: rgba(34, 211, 238, 0.12);
+  --cat-markets: #8B6CD4;
+  --cat-companies: #22D3EE;
+  --cat-sectors: #34D399;
+  --cat-insights: #FBBF24;
+  --cat-ai: #A78BFA;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.6);
+  --shadow-brand: 0 4px 16px rgba(139, 108, 212, 0.3);
+  --header-blur: rgba(10, 7, 32, 0.88);
+  --grad-brand: linear-gradient(135deg, #6B4CC0 0%, #7B5CD0 100%);
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--brand);
+  color: var(--brand-t);
+}
+
+/* ── Base ── */
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-b);
+  font-size: var(--text-base);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Headings ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-d);
+  letter-spacing: var(--ls-heading);
+  line-height: var(--lh-heading);
+}
+
+h1 { font-size: var(--text-2xl); font-weight: 800; letter-spacing: var(--ls-tight); }
+h2 { font-size: var(--text-xl); font-weight: 700; }
+h3 { font-size: var(--text-lg); font-weight: 700; }
+h4 { font-size: var(--text-md); font-weight: 600; }
+h5 { font-size: var(--text-base); font-weight: 600; }
+h6 { font-size: var(--text-sm); font-weight: 600; }
+
+/* ── Labels & Mono ── */
+.label {
+  font-family: var(--font-m);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  color: var(--brand);
+}
+
+/* ── Hero Display ── */
+.hero-title {
+  font-family: var(--font-d);
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  line-height: var(--lh-hero);
+  letter-spacing: var(--ls-hero);
+}
+
+.hero-sub {
+  font-size: 1.0625rem;
+  color: var(--fg-2);
+  line-height: 1.65;
+}
+
+/* ── Gradients ── */
+.gradient-brand { background: linear-gradient(135deg, #3E149C, #5B25C9); }
+.gradient-accent { background: linear-gradient(135deg, #3E149C, #7B4FD6, #FCA311); }
+.gradient-signal { background: linear-gradient(135deg, #FCA311, #FFD166); }
+.gradient-surface { background: linear-gradient(180deg, #FAFAFD, #F4F2FA); }
+.gradient-pro { background: linear-gradient(160deg, #0A0720, #1A1048, #3E149C); }
