@@ -26,9 +26,9 @@ export function Hero() {
           <Link href="/directory" className="btn btn-primary">
             Browse Directory
           </Link>
-          <button className="btn btn-secondary" type="button">
+          <Link href="/insights" className="btn btn-secondary no-underline">
             Start Research
-          </button>
+          </Link>
         </div>
       </div>
 

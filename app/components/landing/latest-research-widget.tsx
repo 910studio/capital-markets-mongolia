@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/app/lib/cn";
 
 type ResearchBadgeVariant = "guide" | "article" | "update";
@@ -7,6 +8,7 @@ interface ResearchItem {
   variant: ResearchBadgeVariant;
   title: string;
   date: string;
+  href: string;
 }
 
 const BADGE_STYLES: Record<ResearchBadgeVariant, string> = {
@@ -21,24 +23,28 @@ const RESEARCH_ITEMS: ResearchItem[] = [
     variant: "guide",
     title: "Mongolia's Mining Sector: Q1 2026 Performance Review",
     date: "Apr 1",
+    href: "/insights/mongolia-mining-sector-2026-outlook",
   },
   {
     badge: "Article",
     variant: "article",
     title: "Khan Bank Reports 23% Revenue Growth in Latest Earnings",
     date: "Mar 28",
+    href: "/insights/khan-resources-uranium",
   },
   {
     badge: "Update",
     variant: "update",
     title: "MIF 2026 Preview: What Global Investors Need to Know",
     date: "Mar 25",
+    href: "/insights/mse-monthly-march-2026",
   },
   {
     badge: "Article",
     variant: "article",
     title: "Erdene Resource: Bayan Khundii Project Technical Update",
     date: "Mar 20",
+    href: "/insights/erdene-resource-q4-2025",
   },
 ];
 
@@ -47,19 +53,20 @@ export function LatestResearchWidget() {
     <div className="widget">
       <div className="widget-header">
         <span>Latest Research</span>
-        <a
-          href="#"
-          className="font-mono text-[10px] font-medium text-brand transition-colors hover:text-brand-h"
+        <Link
+          href="/insights"
+          className="font-mono text-[10px] font-medium text-brand transition-colors hover:text-brand-h no-underline"
         >
           View All &rarr;
-        </a>
+        </Link>
       </div>
 
       <div>
         {RESEARCH_ITEMS.map((item) => (
-          <div
+          <Link
             key={item.title}
-            className="flex cursor-pointer items-center gap-3 border-b border-border-s px-5 py-3 transition-colors last:border-b-0 hover:bg-brand-m"
+            href={item.href}
+            className="flex items-center gap-3 border-b border-border-s px-5 py-3 transition-colors last:border-b-0 hover:bg-brand-m no-underline text-fg"
           >
             <span
               className={cn(
@@ -75,7 +82,7 @@ export function LatestResearchWidget() {
             <span className="shrink-0 whitespace-nowrap font-mono text-[10px] text-fg-2">
               {item.date}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

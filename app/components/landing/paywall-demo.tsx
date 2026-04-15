@@ -101,13 +101,13 @@ export function PaywallDemo() {
             capital markets.
           </p>
 
-          <Link href="#" className="btn btn-primary mb-2.5 text-xs">
+          <Link href="/sign-in" className="btn btn-primary mb-2.5 text-xs no-underline">
             Create Free Account
           </Link>
 
           <div className="text-[11px] text-fg-2">
             Already have an account?{" "}
-            <Link href="#" className="font-semibold text-brand">
+            <Link href="/sign-in" className="font-semibold text-brand no-underline">
               Sign in
             </Link>
           </div>

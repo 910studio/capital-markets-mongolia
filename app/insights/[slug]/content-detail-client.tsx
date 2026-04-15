@@ -268,7 +268,6 @@ export function ContentDetailClient({ slug }: { slug: string }) {
           <ArticleSidebar
             toc={TOC_ITEMS}
             entities={RELATED_ENTITIES}
-            activeSection="s-executive"
           />
 
           <PdfBar

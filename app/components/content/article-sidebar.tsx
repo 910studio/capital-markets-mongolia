@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { cn } from "@/app/lib/cn";
 
 /* ── Types ─────────────────────────────── */
@@ -19,7 +20,6 @@ interface RelatedEntity {
 interface ArticleSidebarProps {
   toc: TocItem[];
   entities: RelatedEntity[];
-  activeSection?: string;
 }
 
 /* ── SidebarWidget wrapper ─────────────── */
@@ -32,7 +32,7 @@ function SidebarWidget({
   children: React.ReactNode;
 }) {
   return (
-    <div className="widget mb-5">
+    <div className="widget">
       <div className="widget-header">
         <span>{title}</span>
       </div>
@@ -41,13 +41,49 @@ function SidebarWidget({
   );
 }
 
+/* ── Scroll-tracking hook ────────────────── */
+
+function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState(ids[0] ?? "");
+
+  useEffect(() => {
+    const validIds = ids.filter((id) => document.getElementById(id));
+    if (!validIds.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the topmost visible section
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        if (visible.length > 0) {
+          setActive(visible[0]!.target.id);
+        }
+      },
+      {
+        rootMargin: "-80px 0px -60% 0px",
+        threshold: 0,
+      },
+    );
+
+    validIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [ids]);
+
+  return active;
+}
+
 /* ── ArticleSidebar ────────────────────── */
 
-export function ArticleSidebar({
-  toc,
-  entities,
-  activeSection,
-}: ArticleSidebarProps) {
+export function ArticleSidebar({ toc, entities }: ArticleSidebarProps) {
+  const sectionIds = toc.filter((t) => !t.locked).map((t) => t.id);
+  const activeSection = useActiveSection(sectionIds);
+
   return (
     <div>
       {/* Table of Contents */}
@@ -64,13 +100,14 @@ export function ArticleSidebar({
                 item.locked && "opacity-40 pointer-events-none",
                 item.id === activeSection
                   ? "text-brand font-semibold"
-                  : "text-fg-3 hover:text-fg"
+                  : "text-fg-3 hover:text-fg",
               )}
             >
               <span
                 className={cn(
-                  "w-[2px] h-full rounded-[1px] shrink-0 self-stretch",
-                  item.id === activeSection ? "bg-brand" : "bg-border-s"
+                  "w-[2px] rounded-[1px] shrink-0 self-stretch min-h-[16px]",
+                  "transition-colors duration-[200ms]",
+                  item.id === activeSection ? "bg-brand" : "bg-border-s",
                 )}
               />
               {item.label}

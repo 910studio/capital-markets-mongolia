@@ -63,7 +63,7 @@ export function TopMoversWidget() {
 
       {/* Featured entity */}
       <Link
-        href="/entity/erdene-resource"
+        href="/directory/erdene-resource"
         className="flex items-center gap-4 border-t border-border-s px-5 py-5 transition-colors hover:bg-brand-m"
       >
         <div
