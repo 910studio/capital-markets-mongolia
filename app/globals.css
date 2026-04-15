@@ -1,35 +1,37 @@
 @import "tailwindcss";
 
-/* ── CMM MarketIQ Design Tokens — Dense Direction ── */
+/* ═══════════════════════════════════════════════════════════════
+   CMM MarketIQ — Design System
+   Direction: Dense (primary, client-approved)
+   Dense = tight radii, compact padding, sharp badges, zero lift.
+   Data-first. Koyfin energy. The platform is a tool, not a brochure.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Design Tokens ───────────────────────────────────────── */
 
 :root {
-  /* Backgrounds */
+  /* —— Palette —— */
   --bg: #FAFAFD;
   --bg-alt: #F4F2FA;
   --white: #FFFFFF;
 
-  /* Foregrounds */
   --fg: #0C0A1D;
   --fg-2: #44415A;
   --fg-3: #7A7793;
 
-  /* Surfaces */
   --surface: #F0EEF7;
   --surface-el: #EAE8F3;
   --surface-down: #FCFBFE;
 
-  /* Borders */
   --border: #DDDBE8;
   --border-s: #EDEBF5;
 
-  /* Brand */
   --brand: #3E149C;
   --brand-h: #2E0F75;
   --brand-l: #6B4CC0;
   --brand-m: rgba(62, 20, 156, 0.07);
   --brand-t: #FFFFFF;
 
-  /* Semantic */
   --signal: #FCA311;
   --signal-h: #E89200;
   --signal-m: rgba(252, 163, 17, 0.1);
@@ -42,14 +44,14 @@
   --info: #0891B2;
   --info-m: rgba(8, 145, 178, 0.08);
 
-  /* Category Colors */
+  /* Category colors */
   --cat-markets: #3E149C;
   --cat-companies: #0891B2;
   --cat-sectors: #059669;
   --cat-insights: #D97706;
   --cat-ai: #7C3AED;
 
-  /* Shadows (brand-tinted purple) */
+  /* —— Shadows (brand-tinted purple) —— */
   --shadow-xs: 0 1px 2px rgba(62, 20, 156, 0.04);
   --shadow-sm: 0 2px 4px rgba(62, 20, 156, 0.06);
   --shadow-md: 0 4px 12px rgba(62, 20, 156, 0.08);
@@ -58,7 +60,7 @@
   --shadow-brand: 0 4px 16px rgba(62, 20, 156, 0.2);
   --shadow-signal: 0 4px 16px rgba(252, 163, 17, 0.2);
 
-  /* Radius Scale */
+  /* —— Radius —— */
   --r-xs: 4px;
   --r-sm: 6px;
   --r: 8px;
@@ -66,33 +68,76 @@
   --r-xl: 16px;
   --r-full: 9999px;
 
-  /* Duration */
+  /* —— Motion —— */
   --dur: 300ms;
   --dur-f: 150ms;
-
-  /* Easing */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Header */
+  /* —— Layout —— */
+  --header-h: 56px;
   --header-blur: rgba(250, 250, 253, 0.88);
+  --content-max: 1200px;
+  --sidebar-w: 260px;
+  --body-narrow: 720px;
 
-  /* Gradient Tokens */
-  --grad-brand: linear-gradient(135deg, #3E149C 0%, #4A1AAF 100%);
+  /* —— Gradients —— */
+  --grad-brand: linear-gradient(135deg, #3E149C 0%, #5B25C9 100%);
+  --grad-accent: linear-gradient(135deg, #3E149C, #7B4FD6, #FCA311);
   --grad-signal: linear-gradient(135deg, #FCA311 0%, #FDBA3B 100%);
+  --grad-surface: linear-gradient(180deg, #FAFAFD, #F4F2FA);
+  --grad-pro: linear-gradient(160deg, #0A0720, #1A1048, #3E149C);
 
-  /* Dense Direction — Component Tokens */
+  /* —— Fonts —— */
+  --font-d: var(--font-plus-jakarta-sans), system-ui, sans-serif;
+  --font-b: var(--font-dm-sans), system-ui, sans-serif;
+  --font-m: var(--font-jetbrains-mono), monospace;
+
+  /* —— Type Scale — 15px base, Major Third —— */
+  --text-xs: 0.6875rem;    /* 11px */
+  --text-sm: 0.8125rem;    /* 13px */
+  --text-base: 0.9375rem;  /* 15px */
+  --text-md: 1.125rem;     /* 18px */
+  --text-lg: 1.25rem;      /* 20px */
+  --text-xl: 1.5rem;       /* 24px */
+  --text-2xl: 2rem;        /* 32px */
+  --text-3xl: 2.5rem;      /* 40px */
+  --text-4xl: 3.5rem;      /* 56px */
+
+  /* Letter spacing */
+  --ls-hero: -0.035em;
+  --ls-tight: -0.025em;
+  --ls-heading: -0.02em;
+  --ls-normal: 0;
+  --ls-badge: 0.06em;
+  --ls-label: 0.08em;
+  --ls-caps: 0.1em;
+
+  /* Line heights */
+  --lh-hero: 1.06;
+  --lh-display: 1.12;
+  --lh-heading: 1.2;
+  --lh-body: 1.6;
+  --lh-relaxed: 1.7;
+
+  /* ══════════════════════════════════════════════════════════
+     DENSE DIRECTION — Component Tokens
+     These are the production values. Every component should
+     reference these, not hardcode its own radii/padding.
+     ══════════════════════════════════════════════════════════ */
+
+  /* Card */
   --card-r: 4px;
   --card-bg: var(--white);
   --card-bd: 1px solid var(--border);
   --card-p: 14px;
   --card-shadow: var(--shadow-xs);
   --card-img-r: 2px;
-  --card-hover-y: 0px;
   --card-hover-shadow: var(--shadow-sm);
   --card-hover-bd: 1px solid var(--brand-l);
   --card-title-s: 0.9375rem;
 
+  /* Badge */
   --badge-r: 2px;
   --badge-px: 6px;
   --badge-py: 2px;
@@ -101,13 +146,17 @@
   --badge-ls: 0.06em;
   --badge-s: 0.5625rem;
 
+  /* Button */
   --btn-r: 4px;
   --btn-h: 34px;
+  --btn-px: 14px;
 
+  /* Grid */
   --grid-gap: 12px;
   --grid-cols: 4;
   --sect-gap: 32px;
 
+  /* Nav */
   --nav-active-bd: none;
   --nav-active-bg: var(--surface);
 
@@ -126,45 +175,23 @@
   --t-head-bd: 1px solid var(--border);
   --t-row-h: 38px;
   --t-hover: var(--brand-m);
+  --t-cell-px: 12px;
 
   /* Tabs */
   --tab-r: 4px;
 
-  /* Fonts */
-  --font-d: var(--font-plus-jakarta-sans), system-ui, sans-serif;
-  --font-b: var(--font-dm-sans), system-ui, sans-serif;
-  --font-m: var(--font-jetbrains-mono), monospace;
-
-  /* ── Typography Scale — 15px base, 1.25 Major Third ── */
-  --text-xs: 0.6875rem;    /* 11px — labels, meta, captions */
-  --text-sm: 0.8125rem;    /* 13px — secondary text, table cells */
-  --text-base: 0.9375rem;  /* 15px — body text */
-  --text-md: 1.125rem;     /* 18px — card titles, subheadings */
-  --text-lg: 1.25rem;      /* 20px — section titles */
-  --text-xl: 1.5rem;       /* 24px — page subtitles */
-  --text-2xl: 2rem;        /* 32px — page titles */
-  --text-3xl: 2.5rem;      /* 40px — section heroes */
-  --text-4xl: 3.5rem;      /* 56px — hero display */
-
-  /* Letter spacing */
-  --ls-hero: -0.035em;
-  --ls-tight: -0.025em;
-  --ls-heading: -0.02em;
-  --ls-normal: 0;
-  --ls-badge: 0.06em;
-  --ls-label: 0.08em;
-  --ls-caps: 0.1em;
-
-  /* Line heights */
-  --lh-hero: 1.06;
-  --lh-display: 1.12;
-  --lh-heading: 1.2;
-  --lh-body: 1.6;
-  --lh-relaxed: 1.7;
+  /* Input */
+  --input-h: 36px;
+  --input-r: 4px;
+  --input-bd: 1px solid var(--border);
+  --input-px: 10px;
+  --input-focus-ring: 0 0 0 3px var(--brand-m);
 }
 
+/* ── 2. Tailwind v4 Theme Mapping ───────────────────────────── */
+
 @theme inline {
-  /* Map CSS vars to Tailwind tokens */
+  /* Colors */
   --color-bg: var(--bg);
   --color-bg-alt: var(--bg-alt);
   --color-fg: var(--fg);
@@ -172,32 +199,33 @@
   --color-fg-3: var(--fg-3);
   --color-surface: var(--surface);
   --color-surface-el: var(--surface-el);
+  --color-surface-down: var(--surface-down);
+  --color-white: var(--white);
   --color-border: var(--border);
   --color-border-s: var(--border-s);
   --color-brand: var(--brand);
   --color-brand-h: var(--brand-h);
   --color-brand-l: var(--brand-l);
   --color-brand-m: var(--brand-m);
+  --color-brand-t: var(--brand-t);
   --color-signal: var(--signal);
   --color-signal-h: var(--signal-h);
+  --color-signal-m: var(--signal-m);
   --color-pos: var(--pos);
+  --color-pos-t: var(--pos-t);
+  --color-pos-m: var(--pos-m);
   --color-neg: var(--neg);
+  --color-neg-t: var(--neg-t);
+  --color-neg-m: var(--neg-m);
   --color-info: var(--info);
+  --color-info-m: var(--info-m);
   --color-cat-markets: var(--cat-markets);
   --color-cat-companies: var(--cat-companies);
   --color-cat-sectors: var(--cat-sectors);
   --color-cat-insights: var(--cat-insights);
   --color-cat-ai: var(--cat-ai);
-  --color-white: var(--white);
-  --color-brand-t: var(--brand-t);
-  --color-signal-m: var(--signal-m);
-  --color-pos-t: var(--pos-t);
-  --color-pos-m: var(--pos-m);
-  --color-neg-t: var(--neg-t);
-  --color-neg-m: var(--neg-m);
-  --color-info-m: var(--info-m);
-  --color-surface-down: var(--surface-down);
 
+  /* Radius */
   --radius-xs: var(--r-xs);
   --radius-sm: var(--r-sm);
   --radius-DEFAULT: var(--r);
@@ -205,6 +233,7 @@
   --radius-xl: var(--r-xl);
   --radius-full: var(--r-full);
 
+  /* Shadows */
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
@@ -213,6 +242,7 @@
   --shadow-brand: var(--shadow-brand);
   --shadow-signal: var(--shadow-signal);
 
+  /* Fonts */
   --font-display: var(--font-d);
   --font-body: var(--font-b);
   --font-mono: var(--font-m);
@@ -228,7 +258,7 @@
   --text-3xl: var(--text-3xl);
   --text-4xl: var(--text-4xl);
 
-  /* Letter spacing */
+  /* Tracking */
   --tracking-hero: var(--ls-hero);
   --tracking-tight: var(--ls-tight);
   --tracking-heading: var(--ls-heading);
@@ -237,15 +267,21 @@
   --tracking-label: var(--ls-label);
   --tracking-caps: var(--ls-caps);
 
-  /* Line heights */
+  /* Leading */
   --leading-hero: var(--lh-hero);
   --leading-display: var(--lh-display);
   --leading-heading: var(--lh-heading);
   --leading-body: var(--lh-body);
   --leading-relaxed: var(--lh-relaxed);
+
+  /* Animation */
+  --animate-skeleton: skeleton 1.5s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.6s var(--ease) both;
+  --animate-fade-in: fade-in 0.3s ease both;
 }
 
-/* ── Dark Mode ── */
+/* ── 3. Dark Mode ───────────────────────────────────────────── */
+
 [data-mode="dark"] {
   --bg: #0A0720;
   --bg-alt: #0F0B2C;
@@ -277,6 +313,7 @@
   --cat-sectors: #34D399;
   --cat-insights: #FBBF24;
   --cat-ai: #A78BFA;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
@@ -284,15 +321,55 @@
   --shadow-brand: 0 4px 16px rgba(139, 108, 212, 0.3);
   --header-blur: rgba(10, 7, 32, 0.88);
   --grad-brand: linear-gradient(135deg, #6B4CC0 0%, #7B5CD0 100%);
+  --grad-accent: linear-gradient(135deg, #6B4CC0, #A78BFA, #FCA311);
+  --grad-surface: linear-gradient(180deg, #0A0720, #0F0B2C);
 }
 
-/* ── Selection ── */
+/* ── 4. Keyframes ───────────────────────────────────────────── */
+
+@keyframes skeleton {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── 5. Base Resets ─────────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+}
+
 ::selection {
   background: var(--brand);
   color: var(--brand-t);
 }
 
-/* ── Base ── */
+*:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ── 6. Typography Base ─────────────────────────────────────── */
+
 body {
   background: var(--bg);
   color: var(--fg);
@@ -303,7 +380,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Headings ── */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-d);
   letter-spacing: var(--ls-heading);
@@ -317,7 +393,256 @@ h4 { font-size: var(--text-md); font-weight: 600; }
 h5 { font-size: var(--text-base); font-weight: 600; }
 h6 { font-size: var(--text-sm); font-weight: 600; }
 
-/* ── Labels & Mono ── */
+/* ── 7. Dense Component Base Styles ───────────────────────────
+   These enforce Dense defaults on all components.
+   Override with Tailwind utilities when you need exceptions.
+   ──────────────────────────────────────────────────────────── */
+
+/* Cards */
+.card {
+  background: var(--card-bg);
+  border: var(--card-bd);
+  border-radius: var(--card-r);
+  padding: var(--card-p);
+  box-shadow: var(--card-shadow);
+  transition: border-color var(--dur-f) ease, box-shadow var(--dur-f) ease;
+}
+
+.card:hover {
+  border-color: var(--brand-l);
+  box-shadow: var(--card-hover-shadow);
+}
+
+.card-img {
+  border-radius: var(--card-img-r);
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--badge-r);
+  padding: var(--badge-py) var(--badge-px);
+  font-family: var(--font-d);
+  font-size: var(--badge-s);
+  font-weight: var(--badge-w);
+  text-transform: var(--badge-tt);
+  letter-spacing: var(--badge-ls);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Muted (default — entity badges, landing widgets) */
+.badge-markets   { background: rgba(62, 20, 156, 0.08);  color: var(--cat-markets); }
+.badge-companies { background: var(--info-m);             color: var(--cat-companies); }
+.badge-sectors   { background: var(--pos-m);              color: var(--cat-sectors); }
+.badge-insights  { background: rgba(217, 119, 6, 0.08);  color: var(--cat-insights); }
+.badge-ai        { background: rgba(124, 58, 237, 0.08); color: var(--cat-ai); }
+.badge-signal    { background: var(--signal-m);           color: var(--signal-h); }
+.badge-pos       { background: var(--pos-m);              color: var(--pos-t); }
+.badge-neg       { background: var(--neg-m);              color: var(--neg-t); }
+
+/* Solid (content type badges — article grid, article headers) */
+.badge-solid-research  { background: var(--cat-insights);  color: #fff; }
+.badge-solid-article   { background: var(--cat-companies); color: #fff; }
+.badge-solid-deal      { background: var(--cat-sectors);   color: #fff; }
+.badge-solid-update    { background: var(--cat-markets);   color: #fff; }
+.badge-solid-teaser    { background: var(--info);          color: #fff; }
+.badge-solid-press     { background: var(--fg-3);          color: #fff; }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--btn-h);
+  padding: 0 var(--btn-px);
+  border-radius: var(--btn-r);
+  font-family: var(--font-d);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--dur-f) ease;
+  white-space: nowrap;
+  border: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: var(--brand-t);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--brand-h);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-el);
+  border-color: var(--brand-l);
+}
+
+.btn-signal {
+  background: var(--signal);
+  color: var(--fg);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-signal:hover {
+  background: var(--signal-h);
+  box-shadow: var(--shadow-signal);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--fg-2);
+}
+
+.btn-ghost:hover {
+  background: var(--surface);
+  color: var(--fg);
+}
+
+/* Widgets */
+.widget {
+  background: var(--w-bg);
+  border: var(--w-bd);
+  border-radius: var(--w-r);
+  box-shadow: var(--w-shadow);
+  overflow: hidden;
+}
+
+.widget-header {
+  background: var(--w-head-bg);
+  border-bottom: var(--w-head-bd);
+  padding: var(--w-head-p);
+  font-family: var(--font-d);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.widget-body {
+  padding: var(--w-p);
+}
+
+/* Data Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table thead {
+  background: var(--t-head-bg);
+}
+
+.data-table th {
+  font-family: var(--font-d);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  color: var(--fg-2);
+  text-align: left;
+  padding: 8px var(--t-cell-px);
+  border-bottom: var(--t-head-bd);
+  white-space: nowrap;
+}
+
+.data-table td {
+  font-size: var(--text-sm);
+  padding: 0 var(--t-cell-px);
+  height: var(--t-row-h);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-s);
+}
+
+.data-table tbody tr {
+  transition: background var(--dur-f) ease;
+}
+
+.data-table tbody tr:hover {
+  background: var(--t-hover);
+}
+
+/* Mono numbers — right-aligned in tables */
+.data-table td.num {
+  font-family: var(--font-m);
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Inputs */
+.input {
+  height: var(--input-h);
+  padding: 0 var(--input-px);
+  border: var(--input-bd);
+  border-radius: var(--input-r);
+  font-family: var(--font-b);
+  font-size: var(--text-sm);
+  background: var(--white);
+  color: var(--fg);
+  transition: border-color var(--dur-f) ease, box-shadow var(--dur-f) ease;
+  width: 100%;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: var(--input-focus-ring);
+}
+
+.input::placeholder {
+  color: var(--fg-3);
+}
+
+/* Tabs */
+.tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--tab-r);
+  font-family: var(--font-d);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--fg-2);
+  cursor: pointer;
+  transition: all var(--dur-f) ease;
+}
+
+.tab:hover {
+  color: var(--fg);
+  background: var(--surface);
+}
+
+.tab-active {
+  color: var(--fg);
+  background: var(--nav-active-bg);
+  font-weight: 600;
+}
+
+/* ── 8. Typography Utilities ────────────────────────────────── */
+
 .label {
   font-family: var(--font-m);
   font-size: var(--text-xs);
@@ -327,7 +652,6 @@ h6 { font-size: var(--text-sm); font-weight: 600; }
   color: var(--brand);
 }
 
-/* ── Hero Display ── */
 .hero-title {
   font-family: var(--font-d);
   font-size: var(--text-4xl);
@@ -342,9 +666,197 @@ h6 { font-size: var(--text-sm); font-weight: 600; }
   line-height: 1.65;
 }
 
-/* ── Gradients ── */
-.gradient-brand { background: linear-gradient(135deg, #3E149C, #5B25C9); }
-.gradient-accent { background: linear-gradient(135deg, #3E149C, #7B4FD6, #FCA311); }
-.gradient-signal { background: linear-gradient(135deg, #FCA311, #FFD166); }
-.gradient-surface { background: linear-gradient(180deg, #FAFAFD, #F4F2FA); }
-.gradient-pro { background: linear-gradient(160deg, #0A0720, #1A1048, #3E149C); }
+.section-title {
+  font-family: var(--font-d);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: var(--ls-heading);
+  line-height: var(--lh-heading);
+}
+
+.data-value {
+  font-family: var(--font-m);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-pos { color: var(--pos-t); }
+.data-neg { color: var(--neg-t); }
+
+/* ── 9. Layout Utilities ────────────────────────────────────── */
+
+.content-max {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.grid-dense {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), 1fr);
+  gap: var(--grid-gap);
+}
+
+.section-gap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sect-gap);
+}
+
+/* ── 10. Gradient Utilities ─────────────────────────────────── */
+
+.gradient-brand   { background: var(--grad-brand); }
+.gradient-accent  { background: var(--grad-accent); }
+.gradient-signal  { background: var(--grad-signal); }
+.gradient-surface { background: var(--grad-surface); }
+.gradient-pro     { background: var(--grad-pro); }
+
+/* ── 11. State Patterns ─────────────────────────────────────── */
+
+/* Skeleton loading */
+.skeleton {
+  background: var(--surface);
+  animation: skeleton 1.5s ease-in-out infinite;
+  border-radius: var(--r-xs);
+}
+
+/* Paywall blur mask */
+.paywall-mask {
+  position: relative;
+  overflow: hidden;
+}
+
+.paywall-mask::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg) 90%);
+  pointer-events: none;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--fg-3);
+  font-size: var(--text-sm);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  animation: slide-in-right 0.3s var(--ease) both;
+}
+
+/* ── 12. Landing Page — Hero Chart + Live Indicator ────────── */
+
+/* Live indicator dot */
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pos);
+  animation: pulse-dot 2s ease infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Hero chart — draw animation */
+.hcc-chart .line {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hcc-chart .fill {
+  fill: url(#chartGrad);
+  opacity: 0;
+  transition: opacity 0.8s ease 0.6s;
+}
+
+.hcc-chart.drawn .line {
+  stroke-dashoffset: 0;
+}
+
+.hcc-chart.drawn .fill {
+  opacity: 1;
+}
+
+/* ── 13. Scrollbar ──────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--r-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg-3);
+}
+
+/* ── 14. Responsive — Dense scales down ─────────────────────── */
+
+@media (max-width: 1024px) {
+  :root {
+    --grid-cols: 3;
+    --grid-gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --grid-cols: 2;
+    --card-p: 12px;
+    --w-p: 12px;
+    --grid-gap: 8px;
+    --sect-gap: 24px;
+    --text-4xl: 2.5rem;
+    --text-3xl: 2rem;
+    --text-2xl: 1.5rem;
+    --header-h: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --grid-cols: 1;
+    --card-p: 10px;
+    --w-p: 10px;
+    --btn-h: 38px;
+    --input-h: 40px;
+  }
+
+  .content-max {
+    padding: 0 16px;
+  }
+}
+
+/* ── Reduced Motion ────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

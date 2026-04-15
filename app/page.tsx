@@ -1,14 +1,45 @@
+import { Hero } from "./components/landing/hero";
+import { TopMoversWidget } from "./components/landing/top-movers-widget";
+import { MarketFeedWidget } from "./components/landing/market-feed-widget";
+import { SectorsWidget } from "./components/landing/sectors-widget";
+import { StatsWidget } from "./components/landing/stats-widget";
+import { LatestResearchWidget } from "./components/landing/latest-research-widget";
+import { EventCard } from "./components/landing/event-card";
+import { PaywallDemo } from "./components/landing/paywall-demo";
+import { CtaBanner } from "./components/landing/cta-banner";
+
 export default function Home() {
   return (
-    <div className="flex flex-1 items-center justify-center">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-extrabold tracking-tight text-fg">
-          MarketIQ
-        </h1>
-        <p className="mt-2 text-sm text-fg-2">
-          Capital Markets Mongolia
-        </p>
+    <>
+      {/* Hero */}
+      <Hero />
+
+      {/* Divider */}
+      <div className="content-max">
+        <div className="h-px bg-border" />
       </div>
-    </div>
+
+      {/* Content Grid: Movers | Feed | Sectors+Stats */}
+      <div className="content-max grid gap-5 py-8 lg:grid-cols-[1fr_300px_260px]">
+        <TopMoversWidget />
+        <MarketFeedWidget />
+        <div className="flex flex-col gap-5">
+          <SectorsWidget />
+          <StatsWidget />
+        </div>
+      </div>
+
+      {/* Research + Event row */}
+      <div className="content-max grid gap-5 pb-8 pt-0 lg:grid-cols-[1fr_340px]">
+        <LatestResearchWidget />
+        <EventCard />
+      </div>
+
+      {/* Paywall Demo */}
+      <PaywallDemo />
+
+      {/* CTA Banner */}
+      <CtaBanner />
+    </>
   );
 }

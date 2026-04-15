@@ -14,15 +14,7 @@ This section covers what you publish, how you categorize it, and what rules to f
 ---
 
 ## Why This Matters
-
-The content taxonomy defines every content type that lives in MarketIQ's Insights section. It determines:
-
-- How content is categorized, filtered, and discovered by users
-- How the CMS is set up (each type may have different fields and publishing workflows)
-- Which content types have downloadable PDFs (PDF downloads require free registration, making them a conversion tool)
-- What migrates from the current site (153 items across 11 legacy categories)
-- What the editorial calendar looks like post-launch
-
+ 
 Get this wrong and we either confuse users with too many buckets, or lose specificity by collapsing everything into "Article."
 
 ---

@@ -96,6 +96,69 @@ signal: 0 4px 16px rgba(252, 163, 17, 0.2)
 
 ---
 
+## Component Direction: Dense (Primary)
+
+**Client chose Dense as the primary component personality.** This overrides any softer Atlas defaults from the v1 design brief. Dense = tight radii, compact padding, sharp badges, zero decorative lift. Data-first, Koyfin energy. The platform should feel like a tool, not a brochure.
+
+All values below are the production values. If a spec in the v1 design brief conflicts with this section, Dense wins.
+
+### Cards
+- Radius: `4px` (not 12px)
+- Background: `#FFFFFF` (white)
+- Border: `1px solid var(--border)`
+- Padding: `14px`
+- Image radius: `2px`
+- Shadow: `shadow-xs` (barely there)
+- Hover: border → `brand-light`, shadow → `shadow-sm`, **no vertical lift** (`translateY: 0`)
+- Title size: `0.9375rem` (15px — same as body, weight carries the hierarchy)
+
+### Badges
+- Radius: `2px` (razor sharp)
+- Padding: `2px 6px`
+- Font: `0.5625rem` (9px), weight `700`, `uppercase`
+- Letter spacing: `0.06em`
+- Style: muted bg + category color text
+
+### Buttons
+- Radius: `4px`
+- Height: `34px` (compact)
+- Primary: brand bg → white text
+- Secondary: surface bg → 1px border
+- Active: `scale(0.97)`
+
+### Grid
+- Gap: `12px` (tight)
+- Default columns: `4`
+- Section gap: `32px`
+
+### Navigation
+- Active state: `surface` background fill (no underline indicator)
+
+### Widgets
+- Background: `#FFFFFF`
+- Border: `1px solid var(--border)`
+- Radius: `4px`
+- Padding: `14px`
+- Shadow: `shadow-xs`
+- Header: `bg-alt` background, `1px solid var(--border-s)`, padding `10px 14px`
+
+### Data Tables
+- Header: `bg-alt` background, `1px solid var(--border)` bottom
+- Row height: `38px` (compact)
+- Hover: `brand-muted` background
+
+### Tabs
+- Radius: `4px`
+
+### Why Dense Works for MarketIQ
+- Institutional users want information density, not whitespace
+- 4-column grids show more entities per viewport — directory browsing is faster
+- Sharp radii read as "serious tool" not "consumer app"
+- Compact padding lets data tables and widgets breathe just enough without wasting screen real estate
+- Zero hover-lift keeps the interface grounded — motion comes from micro-interactions (press scale, tab slides, scroll reveals), not decorative lifts
+
+---
+
 ## Imagery & Aesthetic
 
 - **Mood:** Light, warm-professional, colorful-with-purpose, modern, branded, balanced density
@@ -110,7 +173,7 @@ signal: 0 4px 16px rgba(252, 163, 17, 0.2)
 |---------|-----------|----------|--------|
 | Page sections | Fade-up on scroll | 600ms | `cubic-bezier(0.22, 1, 0.36, 1)` |
 | Buttons | Scale 0.92 on press, spring return | 150ms down, 400ms up | `cubic-bezier(0.34, 1.56, 0.64, 1)` |
-| Cards | TranslateY(-3px) + shadow grow on hover | 300ms | ease-out |
+| Cards | Border → brand-light + shadow-sm on hover (no lift) | 300ms | ease-out |
 | Data counters | Count-up animation | 1200-1500ms | Cubic ease-out |
 | Stagger lists | 80ms offset between items | 400ms per item | ease-out |
 | Tab indicators | Sliding underline | 300ms | ease-out |
@@ -120,18 +183,18 @@ signal: 0 4px 16px rgba(252, 163, 17, 0.2)
 
 ## Three-Tier Access Strategy
 
-The access hierarchy IS the design scaling strategy. Same brand, same system — density scales with commitment.
+Dense is the baseline component system across all tiers. Tiers differ in **what's visible**, not in component personality. Same tight cards, same sharp badges, same compact tables everywhere — the access level controls content depth, not visual style.
 
-| Tier | Vibe | Density | What's Visible |
-|------|------|---------|----------------|
-| **Public** | Attractive, editorial, "come in" | Low-medium | Hero pricing, basic company info, blurred advanced data with CTA |
-| **Registered** | Data-forward, guided | Medium | Full profiles, basic charts, financial summaries, blurred AI insights |
-| **Paid** | Dense, Bloomberg energy | High | Everything. AI insights, dense data rows, export, alerts, multi-column layouts |
+| Tier | Vibe | What's Visible |
+|------|------|----------------|
+| **Public** | Dense but inviting — editorial hero, then data | Hero section, basic company info, blurred advanced data with CTA |
+| **Registered** | Dense, data-forward | Full profiles, basic charts, financial summaries, blurred AI insights |
+| **Paid** | Dense, full Bloomberg | Everything. AI insights, dense data rows, export, alerts, multi-column layouts |
 
 ### Visual Differentiation
-- **Public:** Generous whitespace, gradient accents, larger type, marketing-grade layouts. The "pretty" tier.
-- **Registered:** Tighter spacing, data cards, mini charts. Functional but breathable.
-- **Paid:** Dense multi-metric rows, compact stat grids, AI insight panels. Bloomberg energy with CMM brand.
+- **Public:** Same Dense components. Hero section gets more breathing room (larger type, gradient accents). Below the fold, density is the same as other tiers — just with fewer data points visible.
+- **Registered:** Full Dense system. More data surfaces unlocked. Charts and financial summaries appear.
+- **Paid:** Full Dense system. Maximum data: AI insight panels, multi-metric rows, export controls. No component style change — just more content rendered.
 
 ---
 
