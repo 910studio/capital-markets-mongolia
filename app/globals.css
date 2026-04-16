@@ -687,8 +687,12 @@ h6 { font-size: var(--text-sm); font-weight: 600; }
 
 .content-max {
   max-width: var(--content-max);
-  margin: 0 auto;
-  padding: 0 24px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .grid-dense {

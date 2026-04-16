@@ -43,7 +43,7 @@ export default function RootLayout({
         <FeedbackProvider config={{ projectId: "cmm-fe", accentColor: "#7B4FD6" }}>
           <div className="min-h-screen flex flex-col">
             <Header />
-            <main className="pt-[var(--header-h)] flex-1">
+            <main className="pt-[var(--header-h)] flex-1 w-full">
               {children}
             </main>
             <Footer />

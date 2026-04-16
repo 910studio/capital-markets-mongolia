@@ -118,7 +118,7 @@ const RELATED_RESEARCH = [
 
 export function ContentDetailClient({ slug }: { slug: string }) {
   return (
-    <div className="content-max">
+    <div className="content-max mx-auto">
       <Breadcrumb />
 
       <ArticleHeader

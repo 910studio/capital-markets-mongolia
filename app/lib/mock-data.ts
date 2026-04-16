@@ -12,17 +12,48 @@ export interface MockArticle {
   coverImage?: string;
 }
 
+/* ── Directory Types ─────────────────────── */
+
+export type EntityType = "public_company" | "private_company" | "project" | "service_provider";
+
+export const ENTITY_TYPE_LABELS: Record<EntityType, string> = {
+  public_company: "Public Company",
+  private_company: "Private Company",
+  project: "Project",
+  service_provider: "Service Provider",
+};
+
+export const ENTITY_TYPE_FILTERS = [
+  { label: "All", value: "all" },
+  { label: "Public Companies", value: "public_company" },
+  { label: "Private Companies", value: "private_company" },
+  { label: "Projects", value: "project" },
+  { label: "Service Providers", value: "service_provider" },
+] as const;
+
+export const SECTOR_LIST = [
+  "Mining & Resources",
+  "Banking & Finance",
+  "Energy",
+  "Technology",
+  "Real Estate & Infrastructure",
+  "Capital Markets",
+  "Agriculture",
+  "Professional Services",
+] as const;
+
 export interface MockEntity {
   slug: string;
   name: string;
   ticker?: string;
   sector: string;
-  type: "public" | "private" | "soe" | "fund";
+  type: EntityType;
   description: string;
   marketCap?: string;
   price?: number;
   change?: number;
   changePercent?: number;
+  isRaising?: boolean;
 }
 
 export const MOCK_ARTICLES: MockArticle[] = [
@@ -154,7 +185,7 @@ export const MOCK_ENTITIES: MockEntity[] = [
     name: "Khan Bank",
     ticker: "KHAN",
     sector: "Banking & Finance",
-    type: "public",
+    type: "public_company",
     description: "Mongolia's largest commercial bank by assets and branch network. Serves 80%+ of the population.",
     marketCap: "MNT 3.2T",
     price: 48200,
@@ -164,30 +195,31 @@ export const MOCK_ENTITIES: MockEntity[] = [
   {
     slug: "erdenet-mining",
     name: "Erdenet Mining Corporation",
-    ticker: "—",
     sector: "Mining & Resources",
-    type: "soe",
+    type: "public_company",
     description: "Mongolia's largest copper-molybdenum mining company. State-owned, IPO pending for 2026.",
     marketCap: "est. MNT 15T+",
+    isRaising: true,
   },
   {
     slug: "tdb",
     name: "Trade and Development Bank",
     ticker: "TDB",
     sector: "Banking & Finance",
-    type: "public",
+    type: "public_company",
     description: "Mongolia's largest bank by total assets. Major international correspondent relationships.",
     marketCap: "MNT 2.8T",
     price: 32500,
     change: -450,
     changePercent: -1.37,
+    isRaising: true,
   },
   {
     slug: "ard-financial-group",
     name: "Ard Financial Group",
     ticker: "AARD",
     sector: "Banking & Finance",
-    type: "public",
+    type: "public_company",
     description: "Fintech-first financial conglomerate. Insurance, credit, securities, and Mongolia's leading super-app.",
     marketCap: "MNT 1.9T",
     price: 1850,
@@ -199,31 +231,30 @@ export const MOCK_ENTITIES: MockEntity[] = [
     name: "Mongolian Stock Exchange",
     ticker: "MSE",
     sector: "Capital Markets",
-    type: "soe",
+    type: "public_company",
     description: "Mongolia's primary securities exchange. ~200 listed companies, market cap ~MNT 10T.",
   },
   {
     slug: "oyu-tolgoi",
     name: "Oyu Tolgoi LLC",
-    ticker: "—",
     sector: "Mining & Resources",
-    type: "private",
+    type: "private_company",
     description: "One of the world's largest known copper-gold deposits. 66% Rio Tinto, 34% Government of Mongolia.",
   },
   {
     slug: "and-global",
     name: "AND Global",
-    ticker: "—",
     sector: "Technology",
-    type: "private",
+    type: "private_company",
     description: "Digital infrastructure and smart city development company focused on Mongolia and Central Asia.",
+    isRaising: true,
   },
   {
     slug: "golomt-bank",
     name: "Golomt Bank",
     ticker: "GLMT",
     sector: "Banking & Finance",
-    type: "public",
+    type: "public_company",
     description: "Mongolia's second-largest bank. Strong corporate banking and trade finance franchise.",
     marketCap: "MNT 1.6T",
     price: 28900,
@@ -235,7 +266,7 @@ export const MOCK_ENTITIES: MockEntity[] = [
     name: "SouthGobi Resources",
     ticker: "SGQ",
     sector: "Mining & Resources",
-    type: "public",
+    type: "public_company",
     description: "Coal mining company operating the Ovoot Tolgoi mine in southern Mongolia. TSX and HKEX listed.",
     marketCap: "CAD $180M",
     price: 0.42,
@@ -245,10 +276,122 @@ export const MOCK_ENTITIES: MockEntity[] = [
   {
     slug: "mcs-group",
     name: "MCS Group",
-    ticker: "—",
     sector: "Real Estate & Infrastructure",
-    type: "private",
+    type: "private_company",
     description: "Mongolia's largest private conglomerate. Energy, property, mining services, FMCG, and logistics.",
+  },
+  /* ── Additional entities for directory coverage ── */
+  {
+    slug: "tavan-tolgoi",
+    name: "Tavan Tolgoi JSC",
+    ticker: "TTL",
+    sector: "Mining & Resources",
+    type: "public_company",
+    description: "Operates Mongolia's largest coking coal deposit. Strategic supplier to Chinese and Japanese steel mills.",
+    marketCap: "MNT 8.2T",
+    price: 182400,
+    change: 3600,
+    changePercent: 2.01,
+  },
+  {
+    slug: "aspire-mining",
+    name: "Aspire Mining",
+    ticker: "AKM",
+    sector: "Mining & Resources",
+    type: "public_company",
+    description: "Developing the Ovoot Coking Coal Project in northern Mongolia. ASX listed.",
+    marketCap: "AUD $95M",
+    price: 0.085,
+    change: 0.005,
+    changePercent: 6.25,
+    isRaising: true,
+  },
+  {
+    slug: "petrovis",
+    name: "Petrovis LLC",
+    sector: "Energy",
+    type: "private_company",
+    description: "Mongolia's leading petroleum importer and distributor. 200+ fuel stations nationwide.",
+  },
+  {
+    slug: "newcom-group",
+    name: "Newcom Group",
+    sector: "Technology",
+    type: "private_company",
+    description: "Diversified tech and telecoms holding. Operates Unitel, Mongolia's second-largest mobile network.",
+  },
+  {
+    slug: "tsakhia-solar",
+    name: "Tsakhia Solar Park",
+    sector: "Energy",
+    type: "project",
+    description: "100MW utility-scale solar project in Dundgobi province. Part of Mongolia's 30% renewables target by 2030.",
+    isRaising: true,
+  },
+  {
+    slug: "khanbogd-copper",
+    name: "Khanbogd Copper Project",
+    sector: "Mining & Resources",
+    type: "project",
+    description: "Early-stage copper-gold porphyry project 40km west of Oyu Tolgoi. Exploration-phase with JORC-compliant resource.",
+    isRaising: true,
+  },
+  {
+    slug: "mandal-insurance",
+    name: "Mandal Insurance",
+    ticker: "MNDL",
+    sector: "Banking & Finance",
+    type: "public_company",
+    description: "Third-largest insurer in Mongolia by gross written premiums. Life, non-life, and reinsurance.",
+    marketCap: "MNT 42B",
+    price: 520,
+    change: -8,
+    changePercent: -1.52,
+  },
+  {
+    slug: "baker-mckenzie-mongolia",
+    name: "Baker McKenzie Mongolia",
+    sector: "Professional Services",
+    type: "service_provider",
+    description: "Leading international law firm with Mongolia practice. Mining, M&A, project finance, and regulatory advisory.",
+  },
+  {
+    slug: "kpmg-mongolia",
+    name: "KPMG Mongolia",
+    sector: "Professional Services",
+    type: "service_provider",
+    description: "Audit, tax, and advisory services. Covers mining, banking, and public sector engagements in Mongolia.",
+  },
+  {
+    slug: "gobi-cashmere",
+    name: "Gobi Cashmere",
+    ticker: "GOBI",
+    sector: "Agriculture",
+    type: "public_company",
+    description: "Mongolia's largest vertically integrated cashmere manufacturer. From herder cooperatives to international retail.",
+    marketCap: "MNT 280B",
+    price: 3450,
+    change: 120,
+    changePercent: 3.60,
+  },
+  {
+    slug: "hunnu-air",
+    name: "Hunnu Air",
+    sector: "Real Estate & Infrastructure",
+    type: "private_company",
+    description: "Mongolia's second airline. Regional routes connecting Ulaanbaatar to mining hubs and East Asian cities.",
+  },
+  {
+    slug: "darkhan-steel",
+    name: "Darkhan Metallurgical Plant",
+    sector: "Mining & Resources",
+    type: "public_company",
+    description: "Mongolia's only integrated steel producer. Located in Darkhan, supplies domestic construction and infrastructure.",
+    ticker: "DARK",
+    marketCap: "MNT 85B",
+    price: 1240,
+    change: 15,
+    changePercent: 1.22,
   },
 ];
 
