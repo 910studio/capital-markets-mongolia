@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { InsightsGrid } from "@/app/components/insights/insights-grid";
 import type { Article } from "@/app/components/insights/insights-grid";
-import { Pagination } from "@/app/components/ui/pagination";
 import { PaywallCounter } from "@/app/components/ui/paywall-counter";
 import { cn } from "@/app/lib/cn";
 
@@ -29,6 +28,7 @@ const TOPICS = [
   "Real Estate",
 ];
 
+
 interface InsightsControlsProps {
   articles: Article[];
 }
@@ -36,7 +36,7 @@ interface InsightsControlsProps {
 export function InsightsControls({ articles }: InsightsControlsProps) {
   const [filter, setFilter] = useState("all");
   const [topic, setTopic] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const filtered = useMemo(() => {
     let result = articles;
@@ -48,177 +48,190 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
 
   const total = filtered.length;
   const hasFilters = filter !== "all" || topic !== null;
+  const activeCount = (filter !== "all" ? 1 : 0) + (topic ? 1 : 0);
+
+  // Lock body scroll when drawer open
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [drawerOpen]);
+
+  const handleBadgeClick = useCallback((variant: string) => {
+    setFilter(variant);
+    window.scrollTo({ top: 0 });
+  }, []);
 
   return (
-    <div className="grid grid-cols-[220px_1fr] gap-10 items-start max-lg:grid-cols-1">
-      {/* Sidebar */}
-      <aside className="sticky top-[80px] max-h-[calc(100vh-100px)] overflow-y-auto scrollbar-none hidden lg:block">
-        <PaywallCounter used={2} total={3} className="py-2.5 px-3 bg-bg-alt rounded-[var(--card-r)] mb-6" />
-
-        <div className="widget mb-5">
-          <div className="widget-header">
-            <span>Type</span>
-          </div>
-          <div className="widget-body">
-            <div className="flex flex-col gap-0.5">
-              {CONTENT_FILTERS.map((f) => (
-                <button
-                  key={f.value}
-                  onClick={() => { setFilter(f.value); setPage(1); }}
-                  className={cn(
-                    "text-left px-2.5 py-1.5 rounded-[var(--btn-r)] text-xs font-medium cursor-pointer",
-                    "transition-all duration-[200ms] border-none",
-                    f.value === filter
-                      ? "bg-brand-m text-brand font-semibold"
-                      : "bg-transparent text-fg-2 hover:bg-surface hover:text-fg"
-                  )}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="widget">
-          <div className="widget-header">
-            <span>Topics</span>
-          </div>
-          <div className="widget-body">
-            <div className="flex flex-col gap-0.5">
-              {TOPICS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => { setTopic(topic === t ? null : t); setPage(1); }}
-                  className={cn(
-                    "flex items-center gap-2 text-left px-2.5 py-1.5 rounded-[var(--btn-r)] text-xs font-medium cursor-pointer",
-                    "transition-all duration-[200ms] border-none",
-                    topic === t
-                      ? "bg-brand-m text-brand font-semibold"
-                      : "bg-transparent text-fg-2 hover:text-brand"
-                  )}
-                >
-                  <span className={cn(
-                    "w-1.5 h-1.5 rounded-full shrink-0 transition-colors",
-                    topic === t ? "bg-brand" : "bg-fg-3"
-                  )} />
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {hasFilters && (
-          <button
-            onClick={() => { setFilter("all"); setTopic(null); setPage(1); }}
-            className="mt-4 text-xs text-brand-l font-medium hover:text-brand cursor-pointer bg-transparent border-none w-full text-left px-2.5"
-          >
-            Clear all filters
-          </button>
+    <>
+      {/* Slide-in drawer + backdrop */}
+      {drawerOpen && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/30"
+          onClick={() => setDrawerOpen(false)}
+        />
+      )}
+      <div
+        className={cn(
+          "fixed top-0 left-0 z-[61] h-full w-[340px] max-w-[85vw] bg-[var(--white)] border-r border-border shadow-xl",
+          "flex flex-col",
+          "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          drawerOpen ? "translate-x-0" : "-translate-x-full"
         )}
-      </aside>
-
-      {/* Mobile filters (shown below lg) */}
-      <div className="lg:hidden mb-6">
-        <PaywallCounter used={2} total={3} className="py-2.5 px-4 bg-bg-alt rounded-[var(--card-r)] mb-4" />
-
-        {/* Horizontal scroll type filters */}
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-3 -mx-6 px-6">
-          {CONTENT_FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => { setFilter(f.value); setPage(1); }}
-              className={cn(
-                "font-display font-semibold text-xs py-1.5 px-3 rounded-[var(--btn-r)] border cursor-pointer transition-all duration-[200ms] whitespace-nowrap shrink-0",
-                f.value === filter
-                  ? "bg-brand-m border-brand-l text-brand"
-                  : "bg-[var(--white)] border-border text-fg-2"
-              )}
-            >
-              {f.label}
-            </button>
-          ))}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border-s shrink-0">
+          <span className="font-display font-bold text-base">Filters</span>
+          <button
+            onClick={() => setDrawerOpen(false)}
+            className="w-8 h-8 rounded-[var(--btn-r)] grid place-items-center cursor-pointer border-none bg-transparent text-fg-3 hover:bg-surface hover:text-fg transition-colors"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
-        {/* Collapsible topics */}
-        <details className="group border border-border rounded-[var(--btn-r)] overflow-hidden">
-          <summary className="flex items-center justify-between py-2.5 px-3 cursor-pointer text-xs font-display font-semibold text-fg list-none bg-[var(--white)]">
-            <span>{topic ?? "Filter by topic"}</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-fg-3 transition-transform group-open:rotate-180">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </summary>
-          <div className="flex flex-col border-t border-border bg-[var(--white)]">
+        <div className="flex-1 overflow-y-auto scrollbar-none p-5">
+          <span className="font-display font-bold text-xs uppercase tracking-[0.08em] text-fg-3 mb-3 block">Type</span>
+          <div className="flex flex-col gap-0.5 mb-8">
+            {CONTENT_FILTERS.map((f) => (
+              <button
+                key={f.value}
+                onClick={() => { setFilter(f.value); }}
+                className={cn(
+                  "text-left px-3 py-2 rounded-[var(--btn-r)] text-sm font-medium cursor-pointer transition-all duration-[200ms] border-none",
+                  f.value === filter
+                    ? "bg-brand-m text-brand font-semibold"
+                    : "bg-transparent text-fg-2 hover:bg-surface hover:text-fg"
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          <span className="font-display font-bold text-xs uppercase tracking-[0.08em] text-fg-3 mb-3 block">Topics</span>
+          <div className="flex flex-col gap-0.5">
             {TOPICS.map((t) => (
               <button
                 key={t}
-                onClick={(e) => {
-                  setTopic(topic === t ? null : t);
-                  setPage(1);
-                  (e.currentTarget.closest("details") as HTMLDetailsElement).open = false;
-                }}
+                onClick={() => { setTopic(topic === t ? null : t); }}
                 className={cn(
-                  "text-left px-3 py-2 text-xs font-medium cursor-pointer border-none transition-all duration-[200ms]",
+                  "flex items-center gap-2 text-left px-3 py-2 rounded-[var(--btn-r)] text-sm font-medium cursor-pointer transition-all duration-[200ms] border-none",
                   topic === t
                     ? "bg-brand-m text-brand font-semibold"
-                    : "bg-transparent text-fg-2 hover:bg-surface"
+                    : "bg-transparent text-fg-2 hover:text-brand"
                 )}
               >
+                <span className={cn(
+                  "w-1.5 h-1.5 rounded-full shrink-0 transition-colors",
+                  topic === t ? "bg-brand" : "bg-fg-3"
+                )} />
                 {t}
               </button>
             ))}
           </div>
-        </details>
+        </div>
 
         {hasFilters && (
-          <button
-            onClick={() => { setFilter("all"); setTopic(null); setPage(1); }}
-            className="text-xs text-brand-l font-medium hover:text-brand cursor-pointer bg-transparent border-none mt-1"
-          >
-            Clear all filters
-          </button>
-        )}
-      </div>
-
-      {/* Content grid */}
-      <div>
-        {filtered.length > 0 ? (
-          <>
-            <InsightsGrid articles={filtered} />
-
-            <div className="flex items-center justify-between mt-10 pt-6 border-t border-border-s">
-              <span className="text-sm text-fg-3">
-                Showing {Math.min(total, 12)} of {total} results
-              </span>
-              <Pagination
-                total={total}
-                current={page}
-                perPage={12}
-                onChange={setPage}
-              />
-            </div>
-          </>
-        ) : (
-          <div className="py-20 text-center">
-            <div className="w-12 h-12 rounded-[var(--card-r)] bg-surface grid place-items-center mx-auto mb-4">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="text-fg-3">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-            </div>
-            <p className="font-display font-bold text-base mb-1">No results found</p>
-            <p className="text-sm text-fg-3 mb-5">Try adjusting your filters or search a different topic.</p>
+          <div className="px-5 py-4 border-t border-border-s shrink-0">
             <button
-              onClick={() => { setFilter("all"); setTopic(null); setPage(1); }}
-              className="btn btn-secondary text-sm"
+              onClick={() => { setFilter("all"); setTopic(null); }}
+              className="btn btn-secondary w-full text-sm"
             >
-              Clear Filters
+              Clear all filters
             </button>
           </div>
         )}
       </div>
 
-    </div>
+      {/* Page title — dynamic */}
+      <div className="pt-8 pb-6">
+        <div className="flex items-center gap-3">
+          <h1 className="font-display font-extrabold text-2xl tracking-tight">
+            {filter !== "all"
+              ? CONTENT_FILTERS.find(f => f.value === filter)?.label ?? "Insights"
+              : "Latest Insights"}
+          </h1>
+          {filter !== "all" && (
+            <button
+              onClick={() => setFilter("all")}
+              className="font-display font-semibold text-sm text-fg-3 hover:text-brand cursor-pointer bg-transparent border-none leading-none mt-px"
+            >
+              ← All
+            </button>
+          )}
+        </div>
+        <p className="text-base text-fg-2 mt-1">
+          Research &amp; analysis on Mongolia&apos;s capital markets
+        </p>
+      </div>
+
+      {/* Top bar */}
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-[var(--btn-r)] border text-sm font-display font-semibold cursor-pointer transition-all duration-[200ms]",
+              hasFilters
+                ? "border-brand bg-brand-m text-brand"
+                : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
+            )}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+              <line x1="4" y1="6" x2="20" y2="6" />
+              <line x1="4" y1="12" x2="14" y2="12" />
+              <line x1="4" y1="18" x2="10" y2="18" />
+            </svg>
+            Filters
+            {activeCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-brand text-white text-[10px] font-bold grid place-items-center">
+                {activeCount}
+              </span>
+            )}
+          </button>
+
+          {filter !== "all" && (
+            <span className="flex items-center gap-1.5 text-xs font-medium text-brand bg-brand-m px-2.5 py-1 rounded-[var(--btn-r)]">
+              {CONTENT_FILTERS.find(f => f.value === filter)?.label}
+              <button onClick={() => setFilter("all")} className="text-brand hover:text-brand-h cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
+            </span>
+          )}
+          {topic && (
+            <span className="flex items-center gap-1.5 text-xs font-medium text-brand bg-brand-m px-2.5 py-1 rounded-[var(--btn-r)]">
+              {topic}
+              <button onClick={() => setTopic(null)} className="text-brand hover:text-brand-h cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-fg-3 font-mono">{total} results</span>
+          <PaywallCounter used={2} total={3} />
+        </div>
+      </div>
+
+      {/* Content grid */}
+      {filtered.length > 0 ? (
+        <InsightsGrid articles={filtered} onBadgeClick={handleBadgeClick} activeFilter={filter} />
+      ) : (
+        <div className="py-20 text-center">
+          <div className="w-12 h-12 rounded-[var(--card-r)] bg-surface grid place-items-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="text-fg-3">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </div>
+          <p className="font-display font-bold text-base mb-1">No results found</p>
+          <p className="text-sm text-fg-3 mb-5">Try adjusting your filters.</p>
+          <button
+            onClick={() => { setFilter("all"); setTopic(null); }}
+            className="btn btn-secondary text-sm"
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
+    </>
   );
 }

@@ -4,6 +4,7 @@ import "./globals.css";
 import { FeedbackProvider } from "@910studio/feedback-widget";
 import { Header } from "./components/layout/header";
 import { Footer } from "./components/layout/footer";
+import { OfflineScreen } from "./components/layout/offline-screen";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen">
         <FeedbackProvider config={{ projectId: "cmm-fe", accentColor: "#7B4FD6" }}>
+          <OfflineScreen />
           <div className="min-h-screen flex flex-col">
             <Header />
             <main className="pt-[var(--header-h)] flex-1 w-full">

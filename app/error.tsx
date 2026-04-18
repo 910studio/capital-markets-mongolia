@@ -15,7 +15,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="content-max flex flex-1 items-center justify-center py-24">
+    <div className="content-max flex min-h-screen items-center justify-center py-24">
       <div className="text-center">
         {/* Icon */}
         <div
@@ -57,12 +57,6 @@ export default function Error({
           </Link>
         </div>
 
-        {/* Digest for debugging */}
-        {error.digest && (
-          <div className="mt-10 font-mono text-xs text-fg-3">
-            REF: {error.digest}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export function Header() {
   return (
     <header
       className="fixed top-0 left-0 right-0 z-50 h-[var(--header-h)] border-b border-border"
-      style={{ background: "var(--header-blur)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+      style={{ background: "var(--bg)" }}
     >
       <div className="content-max h-full flex items-center justify-between">
         {/* Left: logo + nav */}
@@ -55,21 +55,21 @@ export function Header() {
         {/* Right: search + hamburger (mobile) + sign in */}
         <div className="flex items-center gap-2">
           <button
-            className="btn btn-ghost w-[34px] h-[34px] p-0"
+            className="btn btn-ghost w-[44px] h-[44px] p-0"
             aria-label="Search"
           >
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
           </button>
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden btn btn-ghost w-[34px] h-[34px] p-0"
+            className="btn btn-ghost w-[44px] h-[44px] p-0 !hidden max-[440px]:!inline-flex"
             aria-label="Menu"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
               {mobileOpen ? (
                 <path d="M18 6 6 18M6 6l12 12" />
               ) : (
@@ -87,8 +87,8 @@ export function Header() {
       {/* Mobile nav dropdown */}
       {mobileOpen && (
         <nav
-          className="md:hidden border-t border-border"
-          style={{ background: "var(--header-blur)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}
+          className="hidden max-[440px]:block border-t border-border"
+          style={{ background: "var(--bg)" }}
         >
           <div className="content-max flex flex-col py-2">
             {NAV_LINKS.map((link) => {

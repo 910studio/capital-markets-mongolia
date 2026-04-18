@@ -48,15 +48,6 @@ const ARTICLES: Article[] = MOCK_ARTICLES.map((a, i) => ({
 export default function InsightsPage() {
   return (
     <div className="max-w-[var(--content-max)] mx-auto px-6 w-full">
-      <div className="pt-8 pb-6">
-        <h1 className="font-display font-extrabold text-2xl tracking-tight mb-1">
-          Insights
-        </h1>
-        <p className="text-base text-fg-2">
-          Research & analysis on Mongolia&apos;s capital markets
-        </p>
-      </div>
-
       <InsightsControls articles={ARTICLES} />
     </div>
   );

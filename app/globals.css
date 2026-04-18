@@ -127,7 +127,7 @@
      ══════════════════════════════════════════════════════════ */
 
   /* Card */
-  --card-r: 4px;
+  --card-r: 2px;
   --card-bg: var(--white);
   --card-bd: 1px solid var(--border);
   --card-p: 14px;
@@ -138,7 +138,7 @@
   --card-title-s: 1rem;
 
   /* Badge */
-  --badge-r: 2px;
+  --badge-r: 1px;
   --badge-px: 6px;
   --badge-py: 2px;
   --badge-w: 700;
@@ -147,7 +147,7 @@
   --badge-s: 0.5625rem;
 
   /* Button */
-  --btn-r: 4px;
+  --btn-r: 2px;
   --btn-h: 34px;
   --btn-px: 14px;
 
@@ -163,7 +163,7 @@
   /* Widget */
   --w-bg: var(--white);
   --w-bd: 1px solid var(--border);
-  --w-r: 4px;
+  --w-r: 2px;
   --w-p: 14px;
   --w-shadow: var(--shadow-xs);
   --w-head-bg: var(--bg-alt);
@@ -178,11 +178,11 @@
   --t-cell-px: 12px;
 
   /* Tabs */
-  --tab-r: 4px;
+  --tab-r: 2px;
 
   /* Input */
   --input-h: 36px;
-  --input-r: 4px;
+  --input-r: 2px;
   --input-bd: 1px solid var(--border);
   --input-px: 10px;
   --input-focus-ring: 0 0 0 3px var(--brand-m);

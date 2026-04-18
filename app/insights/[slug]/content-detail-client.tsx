@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArticleHeader } from "@/app/components/content/article-header";
@@ -11,10 +11,11 @@ import {
   Pullquote,
   KeyMetricBox,
 } from "@/app/components/content/article-body";
+import { EntityChip } from "@/app/components/content/entity-chip";
 import { ArticleSidebar } from "@/app/components/content/article-sidebar";
 import { PdfBar } from "@/app/components/content/pdf-bar";
 import { PaywallWall } from "@/app/components/content/paywall-wall";
-import { MOCK_ARTICLES, MOCK_CONTRIBUTORS } from "@/app/lib/mock-data";
+import { MOCK_ARTICLES, MOCK_CONTRIBUTORS, MOCK_ENTITIES } from "@/app/lib/mock-data";
 
 /* ── Badge mapping ─────────────────────── */
 
@@ -42,8 +43,37 @@ const AUTHOR_SLUG_MAP: Record<string, string> = {
 
 /* ── ContentDetailClient ───────────────── */
 
+function LinkedExcerpt({ text, entities }: { text: string; entities: { name: string; href: string }[] }) {
+  if (!entities.length) return <>{text}</>;
+
+  // Sort by name length descending so longer names match first
+  const sorted = [...entities].sort((a, b) => b.name.length - a.name.length);
+
+  // Only include entities whose name actually appears in the text
+  const matched = sorted.filter(e => text.toLowerCase().includes(e.name.toLowerCase()));
+  if (!matched.length) return <>{text}</>;
+
+  const pattern = new RegExp(`(${matched.map(e => e.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`, "gi");
+
+  const parts = text.split(pattern);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        const entity = matched.find(e => e.name.toLowerCase() === part.toLowerCase());
+        if (entity) {
+          return <EntityChip key={i} name={entity.name} href={entity.href} />;
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 export function ContentDetailClient({ slug }: { slug: string }) {
   const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => { window.scrollTo({ top: 0 }); }, [slug]);
 
   const article = MOCK_ARTICLES.find((a) => a.slug === slug);
   if (!article) return <div className="content-max py-20 text-center text-fg-3">Article not found.</div>;
@@ -52,6 +82,12 @@ export function ContentDetailClient({ slug }: { slug: string }) {
   const authorSlug = AUTHOR_SLUG_MAP[article.author];
   const contributor = MOCK_CONTRIBUTORS.find((c) => c.slug === authorSlug);
   const authorInitials = contributor?.initials ?? article.author.split(/[\s.]+/).map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+
+  const mentionedEntities = article.entityRefs
+    .map((ref) => MOCK_ENTITIES.find((e) => e.slug === ref))
+    .filter(Boolean)
+    .map((e) => ({ name: e!.name, href: `/directory/${e!.slug}` }))
+    .filter((e) => article.excerpt.toLowerCase().includes(e.name.toLowerCase()));
 
   const related = MOCK_ARTICLES
     .filter((a) => a.slug !== slug)
@@ -76,21 +112,32 @@ export function ContentDetailClient({ slug }: { slug: string }) {
       </button>
 
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-xs text-fg-3 pt-6 pb-4">
-        <Link href="/insights" className="text-brand-l no-underline font-medium hover:text-brand">
+      <nav className="flex items-center gap-2 text-sm pt-6 pb-4">
+        <Link href="/insights" className="text-fg-3 no-underline font-medium hover:text-brand transition-colors">
           Insights
         </Link>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-fg-3 shrink-0 opacity-50">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-fg-3 shrink-0 opacity-40">
           <path d="m9 18 6-6-6-6" />
         </svg>
-        <span>{badge.label}</span>
+        <Link href={`/insights?type=${badge.variant}`} className="text-fg-3 no-underline font-medium hover:text-brand transition-colors">
+          {badge.label}
+        </Link>
+        {article.topics[0] && (
+          <>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-fg-3 shrink-0 opacity-40">
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+            <Link href={`/insights?topic=${encodeURIComponent(article.topics[0])}`} className="text-fg no-underline font-semibold hover:text-brand transition-colors">
+              {article.topics[0]}
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* Article header */}
       <ArticleHeader
         badges={[badge]}
         title={article.title}
-        subtitle={article.excerpt}
         author={{
           name: article.author,
           initials: authorInitials,
@@ -117,10 +164,12 @@ export function ContentDetailClient({ slug }: { slug: string }) {
       )}
 
       {/* Two-column layout */}
-      <div className="grid grid-cols-[720px_380px] gap-14 justify-between items-start pt-8 px-12 max-lg:grid-cols-1 max-lg:px-0">
+      <div className="grid grid-cols-[1fr_280px] gap-32 items-start pt-8 mx-auto max-w-[1120px] max-xl:gap-12 max-xl:max-w-none max-xl:px-6 max-lg:grid-cols-1 max-lg:max-w-none max-lg:gap-0 max-lg:px-0">
         <ArticleBody className="min-w-0 pb-16">
           <SectionHeading id="s-overview">Overview</SectionHeading>
-          <Paragraph>{article.excerpt}</Paragraph>
+          <Paragraph>
+            <LinkedExcerpt text={article.excerpt} entities={mentionedEntities} />
+          </Paragraph>
 
           <SectionHeading id="s-analysis">Analysis</SectionHeading>
           <Paragraph>
@@ -183,7 +232,10 @@ export function ContentDetailClient({ slug }: { slug: string }) {
 
         {/* Sidebar */}
         <aside className="hidden lg:flex flex-col gap-5 sticky top-[80px] max-h-[calc(100vh-100px)] overflow-y-auto scrollbar-none">
-          <ArticleSidebar toc={loggedIn ? tocItems.map(t => ({ ...t, locked: false })) : tocItems} />
+          <ArticleSidebar
+            toc={loggedIn ? tocItems.map(t => ({ ...t, locked: false })) : tocItems}
+            entities={mentionedEntities}
+          />
           <PdfBar
             fileSize="2.4 MB"
             pageCount={article.readTime > 15 ? 24 : 8}
@@ -206,7 +258,7 @@ export function ContentDetailClient({ slug }: { slug: string }) {
                       <Image src={item.coverImage} alt={item.title} fill className="object-cover" sizes="400px" />
                     </div>
                   )}
-                  <span className={`badge badge-solid-${itemBadge.variant}`}>{itemBadge.label}</span>
+                  <span className={`badge badge-${itemBadge.variant === "article" ? "companies" : itemBadge.variant === "deal" ? "sectors" : itemBadge.variant === "update" ? "markets" : itemBadge.variant === "teaser" ? "companies" : itemBadge.variant === "press" ? "markets" : "insights"}`}>{itemBadge.label}</span>
                   <div className="font-display font-bold text-sm leading-[1.4] mt-2 mb-2 line-clamp-2">{item.title}</div>
                   <span className="font-mono text-xs text-fg-3">
                     {new Date(item.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
