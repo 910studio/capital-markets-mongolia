@@ -104,7 +104,7 @@ export function ContentDetailClient({ slug }: { slug: string }) {
 
       {/* Cover image */}
       {article.coverImage && (
-        <div className="mb-8 rounded-[var(--card-r)] overflow-hidden border border-border-s relative aspect-[21/9]">
+        <div className="mb-8 rounded-[var(--card-r)] overflow-hidden border border-border-s relative aspect-[21/9] max-[440px]:aspect-[4/3] max-[440px]:-mx-6 max-[440px]:rounded-none max-[440px]:border-x-0">
           <Image
             src={article.coverImage}
             alt={article.title}
@@ -117,7 +117,7 @@ export function ContentDetailClient({ slug }: { slug: string }) {
       )}
 
       {/* Two-column layout */}
-      <div className="grid grid-cols-[1fr_200px] gap-14 items-start pt-8 px-12 max-lg:grid-cols-1 max-lg:px-0">
+      <div className="grid grid-cols-[720px_380px] gap-14 justify-between items-start pt-8 px-12 max-lg:grid-cols-1 max-lg:px-0">
         <ArticleBody className="min-w-0 pb-16">
           <SectionHeading id="s-overview">Overview</SectionHeading>
           <Paragraph>{article.excerpt}</Paragraph>
