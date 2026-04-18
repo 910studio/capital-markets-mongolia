@@ -135,7 +135,7 @@
   --card-img-r: 2px;
   --card-hover-shadow: var(--shadow-sm);
   --card-hover-bd: 1px solid var(--brand-l);
-  --card-title-s: 0.9375rem;
+  --card-title-s: 1rem;
 
   /* Badge */
   --badge-r: 2px;
