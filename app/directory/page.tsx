@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function DirectoryPage() {
   return (
-    <div className="content-max mx-auto">
+    <div className="max-w-[var(--content-max)] mx-auto px-6 w-full">
       <div className="pt-8 pb-6">
         <h1 className="font-display font-extrabold text-2xl tracking-tight mb-1">
           Directory

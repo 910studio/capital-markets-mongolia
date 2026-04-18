@@ -39,12 +39,12 @@ export function EntityCard({ entity }: { entity: MockEntity }) {
   return (
     <Link
       href={`/directory/${entity.slug}`}
-      className="card block no-underline group"
+      className="card block no-underline group overflow-hidden min-w-0"
     >
       {/* Top: initials + name + ticker */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 min-w-0">
         <div
-          className="w-10 h-10 min-w-10 rounded-[var(--card-r)] flex items-center justify-center font-display font-bold text-sm text-brand-l"
+          className="w-10 h-10 shrink-0 rounded-[var(--card-r)] flex items-center justify-center font-display font-bold text-sm text-brand-l"
           style={{
             background:
               "linear-gradient(135deg, var(--brand-m), var(--surface-el))",

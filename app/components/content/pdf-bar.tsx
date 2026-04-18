@@ -2,16 +2,12 @@
 
 import { cn } from "@/app/lib/cn";
 
-/* ── Types ─────────────────────────────── */
-
 interface PdfBarProps {
   fileSize: string;
   pageCount: number;
   requiresAuth?: boolean;
   onDownload?: () => void;
 }
-
-/* ── PdfBar ────────────────────────────── */
 
 export function PdfBar({
   fileSize,
@@ -20,7 +16,7 @@ export function PdfBar({
   onDownload,
 }: PdfBarProps) {
   return (
-    <div className="widget mb-5">
+    <div className="widget">
       <button
         onClick={onDownload}
         className={cn(

@@ -93,13 +93,13 @@
   --font-b: var(--font-dm-sans), system-ui, sans-serif;
   --font-m: var(--font-jetbrains-mono), monospace;
 
-  /* —— Type Scale — 15px base, Major Third —— */
-  --text-xs: 0.6875rem;    /* 11px */
-  --text-sm: 0.8125rem;    /* 13px */
-  --text-base: 0.9375rem;  /* 15px */
-  --text-md: 1.125rem;     /* 18px */
-  --text-lg: 1.25rem;      /* 20px */
-  --text-xl: 1.5rem;       /* 24px */
+  /* —— Type Scale — 16px base, divisible by 4 —— */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-md: 1.25rem;      /* 20px */
+  --text-lg: 1.5rem;       /* 24px */
+  --text-xl: 1.75rem;      /* 28px */
   --text-2xl: 2rem;        /* 32px */
   --text-3xl: 2.5rem;      /* 40px */
   --text-4xl: 3.5rem;      /* 56px */
@@ -686,9 +686,9 @@ h6 { font-size: var(--text-sm); font-weight: 600; }
 /* ── 9. Layout Utilities ────────────────────────────────────── */
 
 .content-max {
-  max-width: var(--content-max);
-  margin-left: auto;
-  margin-right: auto;
+  max-width: var(--content-max) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
   padding-left: 24px;
   padding-right: 24px;
   width: 100%;

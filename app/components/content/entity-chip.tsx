@@ -17,17 +17,15 @@ export function EntityChip({ name, ticker, href, className }: EntityChipProps) {
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center gap-1 py-[1px] px-[7px]",
-        "rounded-[2px] bg-surface text-brand",
-        "font-display font-semibold text-xs",
-        "no-underline cursor-pointer whitespace-nowrap",
-        "transition-all duration-[200ms]",
-        "hover:bg-brand-m align-baseline",
+        "inline",
+        "text-brand font-semibold underline decoration-brand underline-offset-2",
+        "cursor-pointer whitespace-nowrap",
+        "transition-colors duration-[200ms]",
+        "hover:text-brand-h hover:decoration-brand-h",
         className
       )}
     >
-      <span className="inline-block w-1 h-1 rounded-full bg-brand shrink-0" />
-      {ticker ?? name}
+{ticker ?? name}
     </Link>
   );
 }

@@ -212,7 +212,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
   await params;
 
   return (
-    <div className="content-max mx-auto py-0">
+    <div className="max-w-[var(--content-max)] mx-auto px-6 w-full py-0">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-fg-3 pt-8 pb-5">
         <Link
