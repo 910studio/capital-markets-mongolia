@@ -68,7 +68,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 18,
     isPremium: true,
     entityRefs: ["khan-bank", "golomt-bank", "tdb", "ard-financial-group", "mandal-insurance"],
-    coverImage: "/insights/mongolia-equities-2025.jpg",
+    coverImage: "/insights/mongolia-equities-2025.webp",
   },
   {
     slug: "mongolia-steel-complex-international-tender",
@@ -81,7 +81,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 6,
     isPremium: false,
     entityRefs: ["darkhan-steel"],
-    coverImage: "/insights/steel-complex.jpg",
+    coverImage: "/insights/steel-complex.webp",
   },
   {
     slug: "monthly-market-update-march-2026",
@@ -94,7 +94,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 15,
     isPremium: false,
     entityRefs: ["mse"],
-    coverImage: "/insights/mmu-march-2026.png",
+    coverImage: "/insights/mmu-march-2026.webp",
   },
   {
     slug: "mongolia-new-cabinet-assembled",
@@ -107,7 +107,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 8,
     isPremium: false,
     entityRefs: ["oyu-tolgoi"],
-    coverImage: "/insights/new-cabinet.png",
+    coverImage: "/insights/new-cabinet.webp",
   },
   {
     slug: "three-prime-ministers-whats-next",
@@ -120,7 +120,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 7,
     isPremium: false,
     entityRefs: [],
-    coverImage: "/insights/three-pms.png",
+    coverImage: "/insights/three-pms.webp",
   },
   {
     slug: "china-energy-transition-mongolia-strategic-role",
@@ -133,7 +133,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 10,
     isPremium: false,
     entityRefs: ["oyu-tolgoi"],
-    coverImage: "/insights/china-energy-transition.jpg",
+    coverImage: "/insights/china-energy-transition.webp",
   },
   {
     slug: "tsetsens-mining-300m-bond",
@@ -146,7 +146,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 12,
     isPremium: true,
     entityRefs: ["golomt-bank"],
-    coverImage: "/insights/tsetsens-bond.png",
+    coverImage: "/insights/tsetsens-bond.webp",
   },
   {
     slug: "mining-royalty-rates-reform",
@@ -159,7 +159,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 9,
     isPremium: false,
     entityRefs: ["oyu-tolgoi"],
-    coverImage: "/insights/mining-royalty.png",
+    coverImage: "/insights/mining-royalty.webp",
   },
   {
     slug: "mongolia-critical-minerals-moment",
@@ -185,7 +185,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 30,
     isPremium: true,
     entityRefs: ["tdb", "golomt-bank", "khan-bank"],
-    coverImage: "/insights/dealbook-2025.jpg",
+    coverImage: "/insights/dealbook-2025.webp",
   },
   {
     slug: "year-copper-saved-mongolia-economy",
@@ -198,7 +198,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 10,
     isPremium: false,
     entityRefs: ["oyu-tolgoi"],
-    coverImage: "/insights/copper-saved-mongolia.png",
+    coverImage: "/insights/copper-saved-mongolia.webp",
   },
   {
     slug: "erdene-25m-bought-deal-placement",
@@ -211,7 +211,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 3,
     isPremium: false,
     entityRefs: [],
-    coverImage: "/insights/erdene-placement.png",
+    coverImage: "/insights/erdene-placement.webp",
   },
   {
     slug: "fmo-150m-green-finance",
@@ -224,7 +224,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 5,
     isPremium: false,
     entityRefs: ["khan-bank", "tdb"],
-    coverImage: "/insights/fmo-green-finance.png",
+    coverImage: "/insights/fmo-green-finance.webp",
   },
   {
     slug: "mongolia-coal-record-volumes-tough-prices",
@@ -237,7 +237,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 8,
     isPremium: false,
     entityRefs: ["tavan-tolgoi"],
-    coverImage: "/insights/coal-record-volumes.png",
+    coverImage: "/insights/coal-record-volumes.webp",
   },
   {
     slug: "em-frontier-mongolia-bonds-2026-outlook",
@@ -250,7 +250,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 18,
     isPremium: true,
     entityRefs: [],
-    coverImage: "/insights/bonds-2026-outlook.png",
+    coverImage: "/insights/bonds-2026-outlook.webp",
   },
   {
     slug: "5-key-investment-themes-mongolia-2026",
@@ -263,7 +263,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 12,
     isPremium: false,
     entityRefs: ["oyu-tolgoi", "khan-bank"],
-    coverImage: "/insights/5-themes-2026.png",
+    coverImage: "/insights/5-themes-2026.webp",
   },
   {
     slug: "how-governments-emerging-markets-unlock-potential",
@@ -276,7 +276,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 9,
     isPremium: false,
     entityRefs: [],
-    coverImage: "/insights/emerging-markets-dev.jpg",
+    coverImage: "/insights/emerging-markets-dev.webp",
   },
   {
     slug: "mbank-100m-debut-sgx",
@@ -289,7 +289,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 7,
     isPremium: true,
     entityRefs: [],
-    coverImage: "/insights/mbank-debut.png",
+    coverImage: "/insights/mbank-debut.webp",
   },
   {
     slug: "missing-piece-mongolia-energy-transition",
@@ -302,7 +302,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     readTime: 8,
     isPremium: false,
     entityRefs: [],
-    coverImage: "/insights/energy-transition.png",
+    coverImage: "/insights/energy-transition.webp",
   }
 ];
 
