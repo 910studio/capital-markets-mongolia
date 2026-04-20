@@ -26,15 +26,15 @@ interface ArticleHeaderProps {
   onTopicClick?: (topic: string) => void;
 }
 
-/* ── Badge color mapping (solid variants from design system) ── */
+/* ── Badge color mapping (muted variants) ── */
 
 const BADGE_COLORS: Record<BadgeVariant, string> = {
-  research: "badge-solid-research",
-  article: "badge-solid-article",
-  deal: "badge-solid-deal",
-  update: "badge-solid-update",
-  teaser: "badge-solid-teaser",
-  press: "badge-solid-press",
+  research: "badge-insights",
+  article: "badge-companies",
+  deal: "badge-sectors",
+  update: "badge-markets",
+  teaser: "badge-companies",
+  press: "badge-markets",
 };
 
 /* ── Dot separator ─────────────────────── */
@@ -58,7 +58,12 @@ export function ArticleHeader({
   onTopicClick,
 }: ArticleHeaderProps) {
   return (
-    <header className="pb-8 mb-8 border-b border-border-s">
+    <header className="pb-6 mb-6 border-b border-border-s">
+      {/* Title */}
+      <h1 className="font-display font-extrabold text-3xl tracking-[-0.03em] leading-[1.15] mb-3">
+        {title}
+      </h1>
+
       {/* Badges */}
       <div className="mb-4 flex gap-2">
         {badges.map((b) => (
@@ -67,11 +72,6 @@ export function ArticleHeader({
           </span>
         ))}
       </div>
-
-      {/* Title */}
-      <h1 className="font-display font-extrabold text-3xl tracking-[-0.03em] leading-[1.15] mb-4">
-        {title}
-      </h1>
 
       {/* Subtitle */}
       {subtitle && (

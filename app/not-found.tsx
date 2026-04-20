@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="content-max flex flex-1 items-center justify-center py-24">
+    <div className="content-max flex min-h-screen items-center justify-center py-24">
       <div className="text-center">
         {/* 404 number */}
         <div
@@ -35,10 +35,6 @@ export default function NotFound() {
           </Link>
         </div>
 
-        {/* Error code for support */}
-        <div className="mt-10 font-mono text-xs text-fg-3">
-          ERR_NOT_FOUND
-        </div>
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ interface ContentCardProps {
   showImage?: boolean;
   href: string;
   image?: React.ReactNode;
+  onBadgeClick?: (variant: string) => void;
 }
 
 /* ── Badge color mapping ── */
@@ -71,7 +72,18 @@ export function ContentCard({
   showImage,
   href,
   image,
+  onBadgeClick,
 }: ContentCardProps) {
+  function BadgeTag() {
+    return (
+      <span
+        className={cn("badge cursor-pointer hover:opacity-80 transition-opacity", BADGE_COLORS[badge.variant])}
+        onClick={onBadgeClick ? (e) => { e.preventDefault(); onBadgeClick(badge.variant); } : undefined}
+      >
+        {badge.label}
+      </span>
+    );
+  }
   /* ── Featured: full-width headline ── */
   if (featured) {
     return (
@@ -83,7 +95,6 @@ export function ContentCard({
             </div>
           )}
           <div className="flex flex-col gap-3 justify-center p-6 sm:p-8">
-            <span className={cn("badge", BADGE_COLORS[badge.variant])}>{badge.label}</span>
             <h3 className="font-display text-2xl font-extrabold leading-[1.15] tracking-[-0.02em]">{title}</h3>
             {excerpt && <p className="text-base text-fg-2 leading-[1.6] line-clamp-3">{excerpt}</p>}
             <Meta author={author} date={date} readTime={readTime} />
@@ -100,8 +111,7 @@ export function ContentCard({
         <div className="rounded-[var(--card-img-r)] overflow-hidden border border-border-s relative aspect-[16/9] -mx-[var(--card-p)] -mt-[var(--card-p)] mb-3">
           {image}
         </div>
-        <span className={cn("badge", BADGE_COLORS[badge.variant])}>{badge.label}</span>
-        <h3 className="font-display text-sm font-bold leading-[1.35] tracking-[-0.01em] mt-2 line-clamp-2">{title}</h3>
+        <h3 className="font-display text-sm font-bold leading-[1.35] tracking-[-0.01em] line-clamp-2">{title}</h3>
         {excerpt && <p className="text-xs text-fg-3 leading-[1.5] line-clamp-2 mt-1">{excerpt}</p>}
         <Meta author={author} date={date} readTime={readTime} />
       </Link>
@@ -112,7 +122,6 @@ export function ContentCard({
   return (
     <Link href={href} className="card block no-underline overflow-hidden min-w-0">
       <div className="flex flex-col gap-2">
-        <span className={cn("badge", BADGE_COLORS[badge.variant])}>{badge.label}</span>
         <h3 className="font-display text-[var(--card-title-s)] font-bold leading-[1.35] tracking-[-0.01em] line-clamp-2">{title}</h3>
         <Meta author={author} date={date} readTime={readTime} />
       </div>

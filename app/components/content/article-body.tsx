@@ -9,7 +9,7 @@ interface ArticleBodyProps {
 
 export function ArticleBody({ children, className }: ArticleBodyProps) {
   return (
-    <div className={cn("max-w-[var(--body-narrow)]", className)}>
+    <div className={cn("max-w-[var(--body-narrow)] max-lg:max-w-none", className)}>
       {children}
     </div>
   );
@@ -41,7 +41,7 @@ interface ParagraphProps {
 
 export function Paragraph({ children }: ParagraphProps) {
   return (
-    <p className="text-md leading-[1.8] text-fg-2 mb-5">
+    <p className="text-base leading-[1.8] text-fg-2 mb-5">
       {children}
     </p>
   );
@@ -56,7 +56,7 @@ interface PullquoteProps {
 
 export function Pullquote({ quote, cite }: PullquoteProps) {
   return (
-    <blockquote className="border-l-[3px] border-brand pl-5 py-4 my-8 bg-brand-m rounded-r-[var(--card-r)]">
+    <blockquote className="border border-dashed border-brand px-5 py-4 my-8 bg-brand-m">
       <p className="font-display font-bold text-[1.0625rem] leading-[1.55] tracking-[-0.01em] text-fg mb-2">
         &ldquo;{quote}&rdquo;
       </p>

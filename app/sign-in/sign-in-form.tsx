@@ -50,7 +50,7 @@ export function SignInForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="flex gap-0 border-2 border-border rounded-[var(--btn-r)] overflow-hidden transition-colors focus-within:border-brand">
+      <div className="flex gap-0 h-[44px] border-2 border-border rounded-[var(--btn-r)] overflow-hidden transition-colors focus-within:border-brand">
         <input
           type="email"
           value={email}
@@ -59,7 +59,7 @@ export function SignInForm() {
           required
           disabled={phase === "sending"}
           className={cn(
-            "flex-1 px-4 h-[44px] bg-[var(--white)] text-fg text-sm font-body",
+            "flex-1 px-4 h-full bg-[var(--white)] text-fg text-sm font-body",
             "border-none outline-none placeholder:text-fg-3",
             phase === "sending" && "opacity-50"
           )}
@@ -68,7 +68,7 @@ export function SignInForm() {
           type="submit"
           disabled={phase === "sending" || !email.trim()}
           className={cn(
-            "btn btn-primary h-[44px] px-5 rounded-none border-none shrink-0",
+            "btn btn-primary !h-full px-5 rounded-none border-none shrink-0",
             "font-display font-bold text-sm",
             phase === "sending" && "opacity-70 cursor-wait"
           )}

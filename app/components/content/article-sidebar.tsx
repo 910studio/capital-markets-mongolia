@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/app/lib/cn";
 
@@ -11,8 +12,14 @@ interface TocItem {
   locked?: boolean;
 }
 
+interface MentionedEntity {
+  name: string;
+  href: string;
+}
+
 interface ArticleSidebarProps {
   toc: TocItem[];
+  entities?: MentionedEntity[];
 }
 
 /* ── SidebarWidget wrapper ─────────────── */
@@ -72,7 +79,7 @@ function useActiveSection(ids: string[]) {
 
 /* ── ArticleSidebar ────────────────────── */
 
-export function ArticleSidebar({ toc }: ArticleSidebarProps) {
+export function ArticleSidebar({ toc, entities }: ArticleSidebarProps) {
   const sectionIds = toc.filter((t) => !t.locked).map((t) => t.id);
   const activeSection = useActiveSection(sectionIds);
 
@@ -87,7 +94,7 @@ export function ArticleSidebar({ toc }: ArticleSidebarProps) {
               href={item.locked ? undefined : `#${item.id}`}
               className={cn(
                 "flex items-start gap-2.5 py-[6px]",
-                "font-body text-xs no-underline cursor-pointer",
+                "font-body text-sm no-underline cursor-pointer",
                 "transition-all duration-[200ms]",
                 item.locked && "opacity-40 pointer-events-none",
                 item.id === activeSection
@@ -108,6 +115,23 @@ export function ArticleSidebar({ toc }: ArticleSidebarProps) {
         </div>
       </SidebarWidget>
 
+      {/* Mentioned entities */}
+      {entities && entities.length > 0 && (
+        <SidebarWidget title="Mentioned">
+          <div className="flex flex-col gap-[6px]">
+            {entities.map((entity) => (
+              <Link
+                key={entity.name}
+                href={entity.href}
+                className="font-body text-sm text-brand font-semibold underline decoration-brand/30 underline-offset-2 no-underline hover:decoration-brand transition-colors"
+                style={{ textDecoration: "underline", textDecorationColor: "rgba(99, 102, 241, 0.3)" }}
+              >
+                {entity.name}
+              </Link>
+            ))}
+          </div>
+        </SidebarWidget>
+      )}
     </div>
   );
 }
