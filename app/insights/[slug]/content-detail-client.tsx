@@ -21,12 +21,11 @@ import { MOCK_ARTICLES, MOCK_CONTRIBUTORS, MOCK_ENTITIES } from "@/app/lib/mock-
 
 const BADGE_MAP: Record<string, { label: string; variant: "research" | "article" | "deal" | "update" | "teaser" | "press" }> = {
   "article": { label: "Article", variant: "article" },
-  "monthly-update": { label: "Monthly Update", variant: "update" },
+  "market-brief": { label: "Market Brief", variant: "update" },
   "investment-teaser": { label: "Investment Teaser", variant: "teaser" },
   "deal-insight": { label: "Deal Insight", variant: "deal" },
   "research-report": { label: "Research Report", variant: "research" },
   "press-release": { label: "Press Release", variant: "press" },
-  "cmm-guide": { label: "CMM Guide", variant: "research" },
 };
 
 /* ── Author → contributor slug mapping ── */

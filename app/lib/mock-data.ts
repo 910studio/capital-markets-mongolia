@@ -2,8 +2,9 @@ export interface MockArticle {
   slug: string;
   title: string;
   excerpt: string;
-  contentType: "article" | "monthly-update" | "investment-teaser" | "deal-insight" | "research-report" | "press-release" | "cmm-guide";
+  contentType: "article" | "market-brief" | "investment-teaser" | "deal-insight" | "research-report" | "press-release";
   topics: string[];
+  series?: string;
   author: string;
   publishedAt: string;
   readTime: number;
@@ -75,7 +76,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "Mongolia Opens International Tender for Landmark Steel Complex",
     excerpt: "Mongolia launched an international tender for its $806M Steel Production Complex in Darkhan-Uul Province. The facility will produce a minimum of one million tons of steel annually, covering 60-70% of domestic needs.",
     contentType: "article",
-    topics: ["Mining & Resources", "Economy"],
+    topics: ["Mining & Resources", "Economy & Macro"],
     author: "Enkhjin A.",
     publishedAt: "2026-04-13",
     readTime: 6,
@@ -87,8 +88,9 @@ export const MOCK_ARTICLES: MockArticle[] = [
     slug: "monthly-market-update-march-2026",
     title: "Monthly Market Update — March, 2026",
     excerpt: "Key highlights: Bank of Mongolia keeps policy rate at 12%. Mongolia appoints 37th Prime Minister and cabinet. Commodity price shock analysis and forward-looking outlook for Q2.",
-    contentType: "monthly-update",
-    topics: ["Economy", "Capital Markets"],
+    contentType: "market-brief",
+    topics: ["Economy & Macro", "Capital Markets"],
+    series: "Monthly Market Update",
     author: "Enkhjin A.",
     publishedAt: "2026-04-08",
     readTime: 15,
@@ -101,7 +103,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "Mongolia's New Cabinet Is Assembled. Now Comes the Hard Part.",
     excerpt: "PM Uchral N. assembled a 19-minister cabinet at 2:24 AM on April 4. Ten ministers carry over from the previous administration. Key appointments in Mining, Finance, and Energy signal policy continuity with targeted reform.",
     contentType: "article",
-    topics: ["Politics & Government", "Economy"],
+    topics: ["Policy & Regulation", "Economy & Macro"],
     author: "Tselmeg E.",
     publishedAt: "2026-04-07",
     readTime: 8,
@@ -114,7 +116,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "Three Prime Ministers in Less Than a Year: What's Next for Mongolia?",
     excerpt: "Zandanshatar's resignation reflects internal MPP tensions over power concentration. Uchral's track record on the Orano uranium deal and market reforms positions him favorably for investors.",
     contentType: "article",
-    topics: ["Politics & Government", "Capital Markets"],
+    topics: ["Policy & Regulation", "Capital Markets"],
     author: "Zolbayar E.",
     publishedAt: "2026-03-30",
     readTime: 7,
@@ -166,7 +168,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "Geography is Not Destiny: Mongolia's Critical Minerals Moment",
     excerpt: "The 2026 Critical Minerals Ministerial in Washington convened 50+ nations. Mongolia possesses substantial copper, uranium, fluorspar, and rare earth deposits — but double-landlocked geography constrains autonomy.",
     contentType: "article",
-    topics: ["Mining & Resources", "Politics & Government"],
+    topics: ["Mining & Resources", "Policy & Regulation"],
     author: "Ariunzaya O.",
     publishedAt: "2026-02-10",
     readTime: 11,
@@ -180,6 +182,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     excerpt: "CMM's inaugural flagship report documenting Mongolia's private sector access to international capital. 40 completed transactions totaling USD 2.6 billion across 19 companies.",
     contentType: "research-report",
     topics: ["Capital Markets", "Banking & Finance"],
+    series: "DealBook",
     author: "CMM Research",
     publishedAt: "2026-01-26",
     readTime: 30,
@@ -192,7 +195,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "The Year Copper Saved Mongolia's Economy",
     excerpt: "Forces driving Mongolia's copper boom and what it means for investors. Oyu Tolgoi's underground ramp-up, record LME prices, and the structural shift in Mongolia's export composition.",
     contentType: "article",
-    topics: ["Mining & Resources", "Economy"],
+    topics: ["Mining & Resources", "Economy & Macro"],
     author: "Enkhjin A.",
     publishedAt: "2026-02-03",
     readTime: 10,
@@ -218,7 +221,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "FMO Mobilizes USD 150 Million to Strengthen Green Finance in Mongolia",
     excerpt: "Netherlands Development Finance Company (FMO) commits $150M in green finance facilities for Mongolian banks and NBFIs, targeting renewable energy and sustainable infrastructure lending.",
     contentType: "article",
-    topics: ["ESG & Sustainability", "Banking & Finance"],
+    topics: ["ESG & Climate", "Banking & Finance"],
     author: "CMM Research",
     publishedAt: "2026-01-22",
     readTime: 5,
@@ -231,7 +234,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "Mongolia's Coal: Record Volumes, Tough Prices",
     excerpt: "Mongolia exported 73M tonnes of coal in 2025 — a record — but depressed Chinese coking coal prices squeezed margins. The Gashuunsukhait corridor logistics improvements partially offset pricing pressure.",
     contentType: "article",
-    topics: ["Mining & Resources", "Economy"],
+    topics: ["Mining & Resources", "Economy & Macro"],
     author: "Enkhjin A.",
     publishedAt: "2026-01-19",
     readTime: 8,
@@ -257,7 +260,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "5 Key Investment Themes to Watch in Mongolia in 2026",
     excerpt: "Copper ramp-up at Oyu Tolgoi, banking sector consolidation, renewable energy capex, capital markets reform, and the critical minerals geopolitical play — the five themes shaping Mongolia's investment landscape.",
     contentType: "article",
-    topics: ["Capital Markets", "Economy"],
+    topics: ["Capital Markets", "Economy & Macro"],
     author: "Zolbayar E.",
     publishedAt: "2025-12-15",
     readTime: 12,
@@ -270,7 +273,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
     title: "How Governments in Emerging Markets Can Unlock Development Potential",
     excerpt: "Turning emerging market potential into performance. A framework for institutional reform, capital market development, and strategic positioning that applies directly to Mongolia's current trajectory.",
     contentType: "article",
-    topics: ["Economy", "Capital Markets"],
+    topics: ["Economy & Macro", "Capital Markets"],
     author: "Zolbayar E.",
     publishedAt: "2026-02-05",
     readTime: 9,
@@ -589,21 +592,27 @@ export const TOPIC_TAGS = [
   "Energy",
   "Banking & Finance",
   "Capital Markets",
-  "Economy",
-  "Politics & Government",
-  "ESG & Sustainability",
+  "Economy & Macro",
+  "Policy & Regulation",
+  "ESG & Climate",
   "Technology",
   "Real Estate & Infrastructure",
   "State-Owned Enterprises",
   "Ratings & Governance",
+  "Trade & Geopolitics",
 ] as const;
 
 export const CONTENT_TYPES = [
   { value: "article", label: "Article" },
-  { value: "monthly-update", label: "Monthly Update" },
+  { value: "market-brief", label: "Market Brief" },
   { value: "investment-teaser", label: "Investment Teaser" },
   { value: "deal-insight", label: "Deal Insight" },
   { value: "research-report", label: "Research Report" },
   { value: "press-release", label: "Press Release" },
-  { value: "cmm-guide", label: "CMM Guide" },
+] as const;
+
+export const SERIES = [
+  "Monthly Market Update",
+  "DealBook",
+  "Investor Guide to Mongolia",
 ] as const;
