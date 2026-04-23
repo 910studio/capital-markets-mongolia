@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cn } from "@/app/lib/cn";
 
 /* ── Types ─────────────────────────────── */
 
@@ -13,27 +12,19 @@ interface ContentCardBadge {
 interface ContentCardProps {
   title: string;
   excerpt?: string;
-  badge: ContentCardBadge;
+  badge?: ContentCardBadge;
   author: string;
   date: string;
   readTime?: string;
+  topics?: string[];
   featured?: boolean;
   showImage?: boolean;
+  /** Flanks a featured card — stretches to full height with richer content */
+  flankFeatured?: boolean;
   href: string;
   image?: React.ReactNode;
   onBadgeClick?: (variant: string) => void;
 }
-
-/* ── Badge color mapping ── */
-
-const BADGE_COLORS: Record<BadgeVariant, string> = {
-  research: "badge-insights",
-  article: "badge-companies",
-  deal: "badge-sectors",
-  update: "badge-markets",
-  teaser: "badge-companies",
-  press: "badge-markets",
-};
 
 /* ── Meta dot ── */
 
@@ -64,41 +55,69 @@ function Meta({ author, date, readTime }: { author: string; date: string; readTi
 export function ContentCard({
   title,
   excerpt,
-  badge,
   author,
   date,
   readTime,
+  topics,
   featured,
   showImage,
+  flankFeatured,
   href,
   image,
-  onBadgeClick,
 }: ContentCardProps) {
-  function BadgeTag() {
-    return (
-      <span
-        className={cn("badge cursor-pointer hover:opacity-80 transition-opacity", BADGE_COLORS[badge.variant])}
-        onClick={onBadgeClick ? (e) => { e.preventDefault(); onBadgeClick(badge.variant); } : undefined}
-      >
-        {badge.label}
-      </span>
-    );
-  }
-  /* ── Featured: full-width headline ── */
+  /* ── Featured: big card with image on top, larger text below ── */
   if (featured) {
     return (
-      <Link href={href} className="card block no-underline !p-0 overflow-hidden">
-        <div className="grid sm:grid-cols-[1.2fr_1fr] min-h-[280px]">
-          {image && (
-            <div className="relative min-h-[200px] sm:min-h-full">
-              {image}
-            </div>
+      <Link href={href} className="card block no-underline !p-0 overflow-hidden h-full flex flex-col">
+        {image && (
+          <div className="relative aspect-[16/10] w-full shrink-0">
+            {image}
+          </div>
+        )}
+        <div className="flex flex-col gap-3 p-6 sm:p-7 flex-1">
+          <h3 className="font-display text-2xl font-extrabold leading-[1.15] tracking-[-0.02em] max-sm:text-xl">
+            {title}
+          </h3>
+          {excerpt && (
+            <p className="text-base text-fg-2 leading-[1.6] line-clamp-3">{excerpt}</p>
           )}
-          <div className="flex flex-col gap-3 justify-center p-6 sm:p-8">
-            <h3 className="font-display text-2xl font-extrabold leading-[1.15] tracking-[-0.02em]">{title}</h3>
-            {excerpt && <p className="text-base text-fg-2 leading-[1.6] line-clamp-3">{excerpt}</p>}
+          <div className="mt-auto">
             <Meta author={author} date={date} readTime={readTime} />
           </div>
+        </div>
+      </Link>
+    );
+  }
+
+  /* ── Flank Featured: stretches to full height next to a featured card ── */
+  if (flankFeatured) {
+    return (
+      <Link href={href} className="card flex flex-col no-underline overflow-hidden min-w-0 h-full">
+        {image && (
+          <div className="rounded-[var(--card-img-r)] overflow-hidden border border-border-s relative aspect-[4/3] -mx-[var(--card-p)] -mt-[var(--card-p)] mb-4 shrink-0">
+            {image}
+          </div>
+        )}
+        <h3 className="font-display text-base font-bold leading-[1.3] tracking-[-0.01em] mb-2">
+          {title}
+        </h3>
+        {excerpt && (
+          <p className="text-sm text-fg-2 leading-[1.6] mb-3">{excerpt}</p>
+        )}
+        {topics && topics.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {topics.slice(0, 3).map((t) => (
+              <span
+                key={t}
+                className="font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="mt-auto pt-3 border-t border-border-s">
+          <Meta author={author} date={date} readTime={readTime} />
         </div>
       </Link>
     );
@@ -107,13 +126,15 @@ export function ContentCard({
   /* ── Image card: image on top ── */
   if (showImage && image) {
     return (
-      <Link href={href} className="card block no-underline overflow-hidden min-w-0">
-        <div className="rounded-[var(--card-img-r)] overflow-hidden border border-border-s relative aspect-[16/9] -mx-[var(--card-p)] -mt-[var(--card-p)] mb-3">
+      <Link href={href} className="card flex flex-col no-underline overflow-hidden min-w-0">
+        <div className="rounded-[var(--card-img-r)] overflow-hidden border border-border-s relative aspect-[16/9] -mx-[var(--card-p)] -mt-[var(--card-p)] mb-3 shrink-0">
           {image}
         </div>
         <h3 className="font-display text-sm font-bold leading-[1.35] tracking-[-0.01em] line-clamp-2">{title}</h3>
         {excerpt && <p className="text-xs text-fg-3 leading-[1.5] line-clamp-2 mt-1">{excerpt}</p>}
-        <Meta author={author} date={date} readTime={readTime} />
+        <div className="pt-2">
+          <Meta author={author} date={date} readTime={readTime} />
+        </div>
       </Link>
     );
   }

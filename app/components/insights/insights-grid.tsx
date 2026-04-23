@@ -14,6 +14,7 @@ export interface Article {
   readTime?: string;
   featured?: boolean;
   image?: React.ReactNode;
+  topics?: string[];
 }
 
 interface InsightsGridProps {
@@ -101,9 +102,12 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
   }
 
   // Default view: 1-3-4 hero grid + type sections below
-  const headline = articles[0];
-  const withImages = articles.slice(1, 4);
-  const restForGrid = articles.slice(4, 8);
+  /* Hero row: 3 cards, middle is the latest (index 0) and featured-large */
+  const featured = articles[0];
+  const leftFlank = articles[1];
+  const rightFlank = articles[2];
+  const withImages = articles.slice(3, 6);
+  const restForGrid = articles.slice(6, 10);
 
   // Group ALL articles by type for sections below
   const grouped = new Map<string, Article[]>();
@@ -115,21 +119,55 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 1 — Headline */}
-      {headline && (
-        <ContentCard
-          key={headline.slug}
-          title={headline.title}
-          excerpt={headline.excerpt}
-          badge={headline.badge}
-          author={headline.author}
-          date={headline.date}
-          readTime={headline.readTime}
-          featured
-          href={`/insights/${headline.slug}`}
-          image={headline.image}
-          onBadgeClick={onBadgeClick}
-        />
+      {/* Hero row — small / big / small, middle is the latest */}
+      {featured && (
+        <div className="grid grid-cols-[1fr_2fr_1fr] gap-4 items-stretch max-md:grid-cols-1 max-lg:grid-cols-1">
+          {leftFlank && (
+            <ContentCard
+              key={leftFlank.slug}
+              title={leftFlank.title}
+              excerpt={leftFlank.excerpt}
+              badge={leftFlank.badge}
+              author={leftFlank.author}
+              date={leftFlank.date}
+              readTime={leftFlank.readTime}
+              topics={leftFlank.topics}
+              flankFeatured
+              href={`/insights/${leftFlank.slug}`}
+              image={leftFlank.image}
+              onBadgeClick={onBadgeClick}
+            />
+          )}
+          <ContentCard
+            key={featured.slug}
+            title={featured.title}
+            excerpt={featured.excerpt}
+            badge={featured.badge}
+            author={featured.author}
+            date={featured.date}
+            readTime={featured.readTime}
+            featured
+            href={`/insights/${featured.slug}`}
+            image={featured.image}
+            onBadgeClick={onBadgeClick}
+          />
+          {rightFlank && (
+            <ContentCard
+              key={rightFlank.slug}
+              title={rightFlank.title}
+              excerpt={rightFlank.excerpt}
+              badge={rightFlank.badge}
+              author={rightFlank.author}
+              date={rightFlank.date}
+              readTime={rightFlank.readTime}
+              topics={rightFlank.topics}
+              flankFeatured
+              href={`/insights/${rightFlank.slug}`}
+              image={rightFlank.image}
+              onBadgeClick={onBadgeClick}
+            />
+          )}
+        </div>
       )}
 
       {/* 3 — Image cards */}
@@ -153,18 +191,21 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
         </div>
       )}
 
-      {/* 4 — Text-only cards */}
+      {/* 4 — Image cards (smaller) */}
       {restForGrid.length > 0 && (
         <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
           {restForGrid.map((article) => (
             <ContentCard
               key={article.slug}
               title={article.title}
+              excerpt={article.excerpt}
               badge={article.badge}
               author={article.author}
               date={article.date}
               readTime={article.readTime}
               href={`/insights/${article.slug}`}
+              image={article.image}
+              showImage={!!article.image}
               onBadgeClick={onBadgeClick}
             />
           ))}

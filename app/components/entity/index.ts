@@ -8,3 +8,8 @@ export { NewsWidget } from "./news-widget";
 export { DealActionWidget } from "./deal-action-widget";
 export { TechnicalSpecsWidget } from "./technical-specs-widget";
 export { QuickStatsWidget } from "./quick-stats-widget";
+export { SustainabilityWidget } from "./sustainability-widget";
+export { DealsTableWidget } from "./deals-table-widget";
+export { DownloadsWidget } from "./downloads-widget";
+export { RequestConnectionWidget } from "./request-connection-widget";
+export { ProfileBadgeWidget } from "./profile-badge-widget";

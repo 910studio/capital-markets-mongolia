@@ -1,16 +1,8 @@
 import Link from "next/link";
 import { cn } from "@/app/lib/cn";
-import type { MockEntity, EntityType } from "@/app/lib/mock-data";
-import { ENTITY_TYPE_LABELS } from "@/app/lib/mock-data";
+import type { MockEntity } from "@/app/lib/mock-data";
 
-/* ── Badge styling per entity type ────────── */
-
-const TYPE_BADGE: Record<EntityType, string> = {
-  public_company: "bg-brand text-brand-t",
-  private_company: "bg-cat-companies text-white",
-  project: "bg-cat-sectors text-white",
-  service_provider: "bg-fg-3 text-white",
-};
+/* ── Sector badge mapping (muted, standard) ── */
 
 const SECTOR_BADGE: Record<string, string> = {
   "Mining & Resources": "badge-sectors",
@@ -87,11 +79,8 @@ export function EntityCard({ entity }: { entity: MockEntity }) {
         {entity.description}
       </p>
 
-      {/* Badges */}
+      {/* Badges — sector + raising only (type comes from section context) */}
       <div className="flex gap-1 mt-2.5 flex-wrap">
-        <span className={cn("badge", TYPE_BADGE[entity.type])}>
-          {ENTITY_TYPE_LABELS[entity.type]}
-        </span>
         <span
           className={cn(
             "badge",

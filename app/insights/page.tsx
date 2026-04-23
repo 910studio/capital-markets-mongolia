@@ -30,6 +30,7 @@ const ARTICLES: Article[] = MOCK_ARTICLES.map((a, i) => ({
   author: a.author,
   date: new Date(a.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
   readTime: `${a.readTime} min read`,
+  topics: a.topics,
   featured: i === 0,
   image: a.coverImage ? (
     <Image

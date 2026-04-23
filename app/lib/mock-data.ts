@@ -43,6 +43,83 @@ export const SECTOR_LIST = [
   "Professional Services",
 ] as const;
 
+/* ── Rich entity spec (from Entity Fields Master, Apr 23) ── */
+
+export type DataSource = "AI-Generated" | "CMM Verified" | "Company Submitted";
+export type ListingLocation = "LOCAL" | "FOREIGN";
+export type ProjectStage = "Exploration" | "Feasibility" | "Construction" | "Operating" | "Expansion";
+
+export interface Person {
+  name: string;
+  title: string;
+  initials?: string;
+  photo?: string;
+  slug?: string;
+}
+
+export interface Shareholder {
+  name: string;
+  percentage: number;
+  controlling?: boolean;
+  slug?: string;
+}
+
+export interface Subsidiary {
+  name: string;
+  slug?: string;
+  status?: string; // "Operating", "Construction", etc.
+}
+
+export interface Deal {
+  date: string;
+  amount: string;
+  investors: string[];
+  fundingType: "Equity" | "Debt" | "Bond" | "Syndicated Loan" | "Other";
+  purpose: string;
+}
+
+export interface Download {
+  title: string;
+  url?: string;
+  fileSize?: string;
+  pages?: number;
+  date?: string;
+}
+
+export interface Certification {
+  name: string;
+  logo?: string;
+}
+
+export interface Sustainability {
+  /** Outcomes from Mongolia SDG Finance Taxonomy (12 categories) */
+  outcomes: string[];
+  /** UN SDGs 1-17 */
+  sdgs: number[];
+  esgPolicy: boolean;
+  disclosure: boolean;
+  transitionStrategy: boolean;
+  impactTracked: boolean;
+  impactVerified: boolean;
+  certifications: Certification[];
+}
+
+export interface SummaryRatios {
+  pe?: string;
+  pb?: string;
+  evEbitda?: string;
+  divYield?: string;
+  roe?: string;
+  marketCap?: string;
+}
+
+export interface FinancialYear {
+  year: string;
+  pl?: Record<string, string>;
+  balanceSheet?: Record<string, string>;
+  cashFlow?: Record<string, string>;
+}
+
 export interface MockEntity {
   slug: string;
   name: string;
@@ -50,11 +127,72 @@ export interface MockEntity {
   sector: string;
   type: EntityType;
   description: string;
+
+  /* Market data */
+  listingLocation?: ListingLocation;
+  exchange?: string;
   marketCap?: string;
   price?: number;
   change?: number;
   changePercent?: number;
+  volume?: string;
+  lastUpdated?: string;
+
+  /* Status */
   isRaising?: boolean;
+  isFeatured?: boolean;
+  dataSource?: DataSource;
+
+  /* Header */
+  logo?: string;
+  website?: string;
+
+  /* Financial — BLOCKED pending Zoloo/Namkhai structure */
+  summaryRatios?: SummaryRatios;
+  financials?: FinancialYear[];
+  financialBlocked?: boolean;
+
+  /* Sustainability */
+  sustainability?: Sustainability;
+
+  /* Ownership */
+  parentGroup?: { name: string; slug?: string };
+  shareholders?: Shareholder[];
+  subsidiaries?: Subsidiary[];
+
+  /* Project-specific */
+  sponsor?: { name: string; slug?: string; stake?: number };
+  sponsorRepresentative?: Person;
+  stage?: ProjectStage;
+  location?: string;
+  keyMetrics?: Record<string, string>; // flexible for Mining/Energy/Infra
+
+  /* Service Provider-specific */
+  yearEstablished?: number;
+  languages?: string[];
+  internationalAffiliations?: string[];
+  practiceAreas?: string[];
+  notableEngagements?: string[];
+  notableClients?: string[];
+  contactEmail?: string;
+  contactPhone?: string;
+  contactAddress?: string;
+
+  /* People */
+  ceo?: Person;
+  executives?: Person[];
+  boardMembers?: Person[];
+
+  /* Deals */
+  dealsSummary?: string;
+  deals?: Deal[];
+
+  /* Downloads */
+  reports?: Download[];
+  pitchDecks?: Download[];
+  sustainabilityDocs?: Download[];
+  investmentTeasers?: Download[];
+  operationalDocs?: Download[];
 }
 
 export const MOCK_ARTICLES: MockArticle[] = [
@@ -74,7 +212,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
   {
     slug: "mongolia-steel-complex-international-tender",
     title: "Mongolia Opens International Tender for Landmark Steel Complex",
-    excerpt: "Mongolia launched an international tender for its $806M Steel Production Complex in Darkhan-Uul Province. The facility will produce a minimum of one million tons of steel annually, covering 60-70% of domestic needs.",
+    excerpt: "Mongolia launched an international tender for its $806M Steel Production Complex in Darkhan-Uul Province. The facility targets one million tons of annual steel output, covering 60-70% of domestic demand and reducing import dependence on Russian and Chinese steel. The government has signaled strong preference for operators that commit to integrated value chain — from iron ore processing through to finished products — with first production targeted for Q4 2028.",
     contentType: "article",
     topics: ["Mining & Resources", "Economy & Macro"],
     author: "Enkhjin A.",
@@ -87,7 +225,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
   {
     slug: "monthly-market-update-march-2026",
     title: "Monthly Market Update — March, 2026",
-    excerpt: "Key highlights: Bank of Mongolia keeps policy rate at 12%. Mongolia appoints 37th Prime Minister and cabinet. Commodity price shock analysis and forward-looking outlook for Q2.",
+    excerpt: "Bank of Mongolia held the policy rate at 12%, citing persistent food-price inflation and tugrik pressure against the dollar. The month also delivered a 37th-cabinet transition under PM Uchral N. with ten ministers carrying over from the previous administration. Equity markets absorbed commodity price shocks on copper and coking coal, while MSE Top-20 finished the month flat on rotation from resources into banks. Our forward view for Q2 leans cautiously constructive.",
     contentType: "market-brief",
     topics: ["Economy & Macro", "Capital Markets"],
     series: "Monthly Market Update",
@@ -101,7 +239,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
   {
     slug: "mongolia-new-cabinet-assembled",
     title: "Mongolia's New Cabinet Is Assembled. Now Comes the Hard Part.",
-    excerpt: "PM Uchral N. assembled a 19-minister cabinet at 2:24 AM on April 4. Ten ministers carry over from the previous administration. Key appointments in Mining, Finance, and Energy signal policy continuity with targeted reform.",
+    excerpt: "PM Uchral N. assembled a 19-minister cabinet at 2:24 AM on April 4 — Mongolia's third premiership in nine months. Ten ministers carry over from Zandanshatar's administration, signaling a deliberate continuity-over-replacement strategy during what Uchral characterized as a 'triple crisis' of fuel prices, commodity swings, and political fragmentation. Appointments in Mining (Damdinnyam G.), Finance (Mendsaikhan Z.), and Energy (Naidalaa B.) preview where policy will move first — with Oyu Tolgoi renegotiation, a ₮3.3T fiscal deficit, and grid reliability all on the first-100-days docket.",
     contentType: "article",
     topics: ["Policy & Regulation", "Economy & Macro"],
     author: "Tselmeg E.",
@@ -114,7 +252,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
   {
     slug: "three-prime-ministers-whats-next",
     title: "Three Prime Ministers in Less Than a Year: What's Next for Mongolia?",
-    excerpt: "Zandanshatar's resignation reflects internal MPP tensions over power concentration. Uchral's track record on the Orano uranium deal and market reforms positions him favorably for investors.",
+    excerpt: "Zandanshatar's resignation caps a bruising nine months of MPP intra-party tensions over power concentration and cabinet turnover. Uchral arrives with a track record that investors should find constructive — he delivered the Orano uranium deal, championed capital markets reform, and has signaled openness to renegotiating mining stability agreements in ways that unlock stalled foreign capital. The question for 2026: can he sustain a majority long enough to execute?",
     contentType: "article",
     topics: ["Policy & Regulation", "Capital Markets"],
     author: "Zolbayar E.",
@@ -127,7 +265,7 @@ export const MOCK_ARTICLES: MockArticle[] = [
   {
     slug: "china-energy-transition-mongolia-strategic-role",
     title: "China's Energy Transition & Mongolia's Strategic Role",
-    excerpt: "Mongolia is evolving from a peripheral neighbor into a strategic energy corridor and supplier of critical minerals — copper and rare earths — essential for renewable energy infrastructure across Northeast Asia.",
+    excerpt: "Mongolia is quietly evolving from a peripheral neighbor into a strategic energy corridor and anchor supplier of critical minerals — copper, rare earths, uranium — essential for renewable energy infrastructure across Northeast Asia. As China accelerates its own transition, Mongolia's positioning between supply chain diversification mandates and its historical resource base creates a rare window. The question is whether Mongolia captures the value, or becomes a transit pass-through.",
     contentType: "article",
     topics: ["Energy", "Mining & Resources"],
     author: "Enkhtaivan B.",
@@ -417,11 +555,102 @@ export const MOCK_ENTITIES: MockEntity[] = [
     ticker: "TTL",
     sector: "Mining & Resources",
     type: "public_company",
-    description: "Operates Mongolia's largest coking coal deposit. Strategic supplier to Chinese and Japanese steel mills.",
+    description: "Tavan Tolgoi JSC operates Mongolia's largest coking coal deposit in the South Gobi region. Strategic supplier to Chinese and Japanese steel mills with rail logistics infrastructure along the southern corridor.",
+    listingLocation: "LOCAL",
+    exchange: "MSE",
     marketCap: "MNT 8.2T",
     price: 182400,
     change: 3600,
     changePercent: 2.01,
+    volume: "45,000 shares",
+    lastUpdated: "Apr 5, 2026",
+    isRaising: true,
+    isFeatured: true,
+    dataSource: "CMM Verified",
+    website: "https://tavantolgoi.mn",
+    /* Financial — BLOCKED */
+    financialBlocked: true,
+    summaryRatios: {
+      pe: "8.4x",
+      pb: "1.2x",
+      evEbitda: "4.1x",
+      divYield: "3.8%",
+      roe: "16.2%",
+      marketCap: "MNT 8.2T",
+    },
+    financials: [
+      {
+        year: "2023",
+        pl: { Revenue: "4,820", "Net Income": "812", EBITDA: "1,940" },
+        balanceSheet: { "Total Assets": "12,400", "Shareholders Equity": "5,820" },
+        cashFlow: { "Operating CF": "1,240", "Free Cash Flow": "680" },
+      },
+      {
+        year: "2024",
+        pl: { Revenue: "5,340", "Net Income": "980", EBITDA: "2,180" },
+        balanceSheet: { "Total Assets": "13,820", "Shareholders Equity": "6,540" },
+        cashFlow: { "Operating CF": "1,480", "Free Cash Flow": "820" },
+      },
+      {
+        year: "2025",
+        pl: { Revenue: "6,120", "Net Income": "1,180", EBITDA: "2,520" },
+        balanceSheet: { "Total Assets": "15,340", "Shareholders Equity": "7,380" },
+        cashFlow: { "Operating CF": "1,760", "Free Cash Flow": "1,020" },
+      },
+    ],
+    sustainability: {
+      outcomes: ["Pollution prevention and control", "Sustainable mining practices"],
+      sdgs: [8, 9, 13],
+      esgPolicy: true,
+      disclosure: true,
+      transitionStrategy: false,
+      impactTracked: true,
+      impactVerified: false,
+      certifications: [
+        { name: "GRI" },
+        { name: "TCFD" },
+      ],
+    },
+    parentGroup: { name: "Erdenes Mongol Group", slug: "erdenet-mining" },
+    shareholders: [
+      { name: "Erdenes Mongol", percentage: 80, controlling: true },
+      { name: "Free Float", percentage: 20 },
+    ],
+    subsidiaries: [
+      { name: "Tavan Tolgoi Coal Mine", status: "Operating" },
+      { name: "Tsankhi West Block", status: "Construction" },
+    ],
+    ceo: { name: "D. Batsuuri", title: "Chief Executive Officer", initials: "DB" },
+    executives: [
+      { name: "B. Enkhbayar", title: "Chief Financial Officer", initials: "BE" },
+      { name: "T. Gantulga", title: "Chief Operations Officer", initials: "TG" },
+    ],
+    boardMembers: [
+      { name: "B. Byambasaikhan", title: "Board Chair", initials: "BB" },
+      { name: "T. Enkhtuvshin", title: "Independent Director", initials: "TE" },
+      { name: "O. Dorjkhand", title: "Director", initials: "OD" },
+    ],
+    dealsSummary: "Total funding: $515M across 5 rounds",
+    deals: [
+      { date: "2025-Q4", amount: "$180M", investors: ["Mongolia Mining Corp"], fundingType: "Bond", purpose: "Tsankhi West expansion" },
+      { date: "2024-Q3", amount: "$120M", investors: ["Sumitomo", "JBIC"], fundingType: "Syndicated Loan", purpose: "Rail infrastructure upgrade" },
+      { date: "2024-Q1", amount: "$85M", investors: ["Erdenes Mongol"], fundingType: "Equity", purpose: "Working capital" },
+    ],
+    reports: [
+      { title: "Mongolia Coal Sector Outlook 2026", fileSize: "2.4 MB", pages: 32, date: "Mar 2026" },
+    ],
+    pitchDecks: [
+      { title: "TTL Investor Presentation Q1 2026", fileSize: "8.1 MB", pages: 24, date: "Feb 2026" },
+    ],
+    sustainabilityDocs: [
+      { title: "TTL ESG Report 2025", fileSize: "5.6 MB", pages: 48, date: "Jan 2026" },
+    ],
+    investmentTeasers: [
+      { title: "TTL Investment Teaser — Tsankhi West", fileSize: "1.2 MB", pages: 8, date: "Mar 2026" },
+    ],
+    operationalDocs: [
+      { title: "TTL Annual Report 2025", fileSize: "12.4 MB", pages: 88, date: "Mar 2026" },
+    ],
   },
   {
     slug: "aspire-mining",
@@ -455,8 +684,41 @@ export const MOCK_ENTITIES: MockEntity[] = [
     name: "Tsakhia Solar Park",
     sector: "Energy",
     type: "project",
-    description: "100MW utility-scale solar project in Dundgobi province. Part of Mongolia's 30% renewables target by 2030.",
+    description: "Tsakhia Solar Park is a 100MW utility-scale solar project in Dundgobi province, part of Mongolia's 30% renewables target by 2030. The project includes a dedicated 110kV substation and 22km transmission line to the Central Grid.",
     isRaising: true,
+    isFeatured: true,
+    dataSource: "Company Submitted",
+    website: "https://tsakhiasolar.mn",
+    location: "Dundgobi Province, Mongolia",
+    stage: "Construction",
+    keyMetrics: {
+      "Installed Capacity": "100 MW",
+      "Annual Generation": "180 GWh",
+      "Total CAPEX": "$92M",
+      "Commissioning": "Q3 2026",
+      "Offtaker": "Central Grid (Mongolia)",
+      "PPA Term": "25 years",
+    },
+    sponsor: { name: "Newcom Group", slug: "newcom-group", stake: 70 },
+    sponsorRepresentative: { name: "B. Munkhzul", title: "Project Director", initials: "BM" },
+    parentGroup: { name: "Newcom Group", slug: "newcom-group" },
+    sustainability: {
+      outcomes: ["Renewable energy generation", "Climate change mitigation"],
+      sdgs: [7, 13],
+      esgPolicy: true,
+      disclosure: true,
+      transitionStrategy: true,
+      impactTracked: true,
+      impactVerified: true,
+      certifications: [{ name: "IFC Performance Standards" }],
+    },
+    ceo: { name: "B. Munkhzul", title: "Project Director", initials: "BM" },
+    pitchDecks: [
+      { title: "Tsakhia Solar — Project Brief", fileSize: "4.2 MB", pages: 16, date: "Feb 2026" },
+    ],
+    investmentTeasers: [
+      { title: "Tsakhia Solar Investment Teaser", fileSize: "1.1 MB", pages: 6, date: "Mar 2026" },
+    ],
   },
   {
     slug: "khanbogd-copper",
@@ -490,7 +752,40 @@ export const MOCK_ENTITIES: MockEntity[] = [
     name: "KPMG Mongolia",
     sector: "Professional Services",
     type: "service_provider",
-    description: "Audit, tax, and advisory services. Covers mining, banking, and public sector engagements in Mongolia.",
+    description: "KPMG Mongolia provides audit, tax, and advisory services to Mongolia's leading banks, mining companies, and public sector institutions. Part of the global KPMG network with cross-border capability across tax structuring, M&A advisory, and IFRS compliance.",
+    dataSource: "CMM Verified",
+    website: "https://kpmg.com/mn",
+    yearEstablished: 2003,
+    languages: ["English", "Mongolian", "Russian"],
+    internationalAffiliations: ["KPMG Global Network", "KPMG Asia Pacific"],
+    practiceAreas: [
+      "Audit & Assurance",
+      "Tax Advisory",
+      "M&A Advisory",
+      "IFRS Conversion",
+      "Risk & Compliance",
+      "Mining Sector Advisory",
+      "Banking Sector Audit",
+    ],
+    notableEngagements: [
+      "Lead auditor for Khan Bank (2020-present)",
+      "Tax advisor on Oyu Tolgoi UDP restructuring",
+      "IFRS conversion for MSE-listed companies (cohort of 12 issuers)",
+    ],
+    notableClients: ["Khan Bank", "Oyu Tolgoi LLC", "Erdenet Mining Corporation"],
+    contactEmail: "info@kpmg.mn",
+    contactPhone: "+976 11 345 678",
+    contactAddress: "Blue Sky Tower, 17 Peace Ave, Ulaanbaatar 14240, Mongolia",
+    ceo: { name: "Erdenechimeg B.", title: "Managing Partner", initials: "EB" },
+    executives: [
+      { name: "Otgonbayar T.", title: "Senior Partner — Audit", initials: "OT" },
+      { name: "Battsetseg D.", title: "Senior Partner — Tax", initials: "BD" },
+      { name: "Ganbold N.", title: "Senior Partner — Advisory", initials: "GN" },
+    ],
+    reports: [
+      { title: "Mongolia Tax Card 2026", fileSize: "1.8 MB", pages: 12, date: "Jan 2026" },
+      { title: "Banking Sector Annual Review 2025", fileSize: "4.2 MB", pages: 28, date: "Feb 2026" },
+    ],
   },
   {
     slug: "gobi-cashmere",
