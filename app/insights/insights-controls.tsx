@@ -9,23 +9,26 @@ import { cn } from "@/app/lib/cn";
 const CONTENT_FILTERS = [
   { label: "All", value: "all" },
   { label: "Articles", value: "article" },
+  { label: "Market Briefs", value: "update" },
   { label: "Research", value: "research" },
   { label: "Deal Insights", value: "deal" },
-  { label: "Monthly Updates", value: "update" },
   { label: "Teasers", value: "teaser" },
   { label: "Press", value: "press" },
 ];
 
 const TOPICS = [
   "Mining & Resources",
-  "Capital Markets",
-  "Banking & Finance",
   "Energy",
-  "Economy",
-  "Politics & Government",
-  "ESG & Sustainability",
+  "Banking & Finance",
+  "Capital Markets",
+  "Economy & Macro",
+  "Policy & Regulation",
+  "ESG & Climate",
   "Technology",
-  "Real Estate",
+  "Real Estate & Infrastructure",
+  "State-Owned Enterprises",
+  "Ratings & Governance",
+  "Trade & Geopolitics",
 ];
 
 

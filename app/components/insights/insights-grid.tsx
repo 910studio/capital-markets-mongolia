@@ -24,9 +24,9 @@ interface InsightsGridProps {
 
 const TYPE_ORDER: { variant: string; label: string }[] = [
   { variant: "article", label: "Articles" },
+  { variant: "update", label: "Market Briefs" },
   { variant: "deal", label: "Deal Insights" },
   { variant: "research", label: "Research Reports" },
-  { variant: "update", label: "Monthly Updates" },
   { variant: "teaser", label: "Investment Teasers" },
   { variant: "press", label: "Press Releases" },
 ];

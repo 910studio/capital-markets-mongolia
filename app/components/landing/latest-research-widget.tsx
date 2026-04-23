@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/app/lib/cn";
 
-type ResearchBadgeVariant = "guide" | "article" | "update";
+type ResearchBadgeVariant = "research" | "article" | "update";
 
 interface ResearchItem {
   badge: string;
@@ -12,15 +12,15 @@ interface ResearchItem {
 }
 
 const BADGE_STYLES: Record<ResearchBadgeVariant, string> = {
-  guide: "bg-brand-m text-brand",
+  research: "bg-brand-m text-brand",
   article: "bg-pos-m text-pos",
   update: "bg-signal-m text-signal",
 };
 
 const RESEARCH_ITEMS: ResearchItem[] = [
   {
-    badge: "Guide",
-    variant: "guide",
+    badge: "Research",
+    variant: "research",
     title: "Mongolia's Mining Sector: Q1 2026 Performance Review",
     date: "Apr 1",
     href: "/insights/mongolia-mining-sector-2026-outlook",
@@ -33,7 +33,7 @@ const RESEARCH_ITEMS: ResearchItem[] = [
     href: "/insights/khan-resources-uranium",
   },
   {
-    badge: "Update",
+    badge: "Market Brief",
     variant: "update",
     title: "MIF 2026 Preview: What Global Investors Need to Know",
     date: "Mar 25",
