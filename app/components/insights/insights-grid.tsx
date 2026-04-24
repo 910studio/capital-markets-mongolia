@@ -17,10 +17,14 @@ export interface Article {
   topics?: string[];
 }
 
+export type GridLayout = "default" | "no-hero" | "semafor";
+
 interface InsightsGridProps {
   articles: Article[];
   onBadgeClick?: (variant: string) => void;
   activeFilter?: string;
+  layout?: GridLayout;
+  showTags?: boolean;
 }
 
 const TYPE_ORDER: { variant: string; label: string }[] = [
@@ -36,35 +40,27 @@ const SECTION_PREVIEW = 7;
 
 /* ── InsightsGrid ── */
 
-export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsGridProps) {
+export function InsightsGrid({
+  articles,
+  onBadgeClick,
+  activeFilter,
+  layout = "default",
+  showTags = false,
+}: InsightsGridProps) {
   if (articles.length === 0) return null;
 
-  // When a specific filter is active — 1-3-4 grid
+  // When a specific filter is active — clean browse grid, no oversized hero.
+  // Rows: 3 image cards, then 4 image cards, then 4-col text-only for the rest.
   if (activeFilter && activeFilter !== "all") {
-    const fHeadline = articles[0];
-    const fImages = articles.slice(1, 4);
-    const fRest = articles.slice(4);
+    const fImages3 = articles.slice(0, 3);
+    const fImages4 = articles.slice(3, 7);
+    const fRest = articles.slice(7);
 
     return (
       <div className="flex flex-col gap-5">
-        {fHeadline && (
-          <ContentCard
-            key={fHeadline.slug}
-            title={fHeadline.title}
-            excerpt={fHeadline.excerpt}
-            badge={fHeadline.badge}
-            author={fHeadline.author}
-            date={fHeadline.date}
-            readTime={fHeadline.readTime}
-            featured
-            href={`/insights/${fHeadline.slug}`}
-            image={fHeadline.image}
-            onBadgeClick={onBadgeClick}
-          />
-        )}
-        {fImages.length > 0 && (
+        {fImages3.length > 0 && (
           <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2">
-            {fImages.map((article) => (
+            {fImages3.map((article) => (
               <ContentCard
                 key={article.slug}
                 title={article.title}
@@ -73,6 +69,29 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
                 author={article.author}
                 date={article.date}
                 readTime={article.readTime}
+                topics={article.topics}
+                showTopics={showTags}
+                href={`/insights/${article.slug}`}
+                image={article.image}
+                showImage={!!article.image}
+                onBadgeClick={onBadgeClick}
+              />
+            ))}
+          </div>
+        )}
+        {fImages4.length > 0 && (
+          <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
+            {fImages4.map((article) => (
+              <ContentCard
+                key={article.slug}
+                title={article.title}
+                excerpt={article.excerpt}
+                badge={article.badge}
+                author={article.author}
+                date={article.date}
+                readTime={article.readTime}
+                topics={article.topics}
+                showTopics={showTags}
                 href={`/insights/${article.slug}`}
                 image={article.image}
                 showImage={!!article.image}
@@ -91,6 +110,8 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
                 author={article.author}
                 date={article.date}
                 readTime={article.readTime}
+                topics={article.topics}
+                showTopics={showTags}
                 href={`/insights/${article.slug}`}
                 onBadgeClick={onBadgeClick}
               />
@@ -101,13 +122,134 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
     );
   }
 
-  // Default view: 1-3-4 hero grid + type sections below
-  /* Hero row: 3 cards, middle is the latest (index 0) and featured-large */
-  const featured = articles[0];
-  const leftFlank = articles[1];
-  const rightFlank = articles[2];
-  const withImages = articles.slice(3, 6);
-  const restForGrid = articles.slice(6, 10);
+  /* ── Build the hero block based on layout ── */
+
+  // Semafor hero: 70/30 — one big image headliner + vertical text column
+  const renderSemaforHero = () => {
+    const headliner = articles[0];
+    const sideList = articles.slice(1, 5); // 4 text-only in the 30% column
+    if (!headliner) return null;
+    return (
+      <div className="grid grid-cols-[7fr_3fr] gap-4 items-stretch max-lg:grid-cols-1">
+        <ContentCard
+          key={headliner.slug}
+          title={headliner.title}
+          excerpt={headliner.excerpt}
+          badge={headliner.badge}
+          author={headliner.author}
+          date={headliner.date}
+          readTime={headliner.readTime}
+          topics={headliner.topics}
+          showTopics={showTags}
+          featured
+          fillHeight
+          href={`/insights/${headliner.slug}`}
+          image={headliner.image}
+          onBadgeClick={onBadgeClick}
+        />
+        <div className="flex flex-col gap-3 min-w-0 h-full">
+          {sideList.map((article) => (
+            <ContentCard
+              key={article.slug}
+              title={article.title}
+              badge={article.badge}
+              author={article.author}
+              date={article.date}
+              readTime={article.readTime}
+              topics={article.topics}
+              showTopics={showTags}
+              href={`/insights/${article.slug}`}
+              onBadgeClick={onBadgeClick}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Default hero: 1-3-1 flanked row
+  const renderDefaultHero = () => {
+    const featured = articles[0];
+    const leftFlank = articles[1];
+    const rightFlank = articles[2];
+    if (!featured) return null;
+    return (
+      <div className="grid grid-cols-[1fr_2fr_1fr] gap-4 items-stretch max-md:grid-cols-1 max-lg:grid-cols-1">
+        {leftFlank && (
+          <ContentCard
+            key={leftFlank.slug}
+            title={leftFlank.title}
+            excerpt={leftFlank.excerpt}
+            badge={leftFlank.badge}
+            author={leftFlank.author}
+            date={leftFlank.date}
+            readTime={leftFlank.readTime}
+            topics={leftFlank.topics}
+            showTopics={showTags}
+            flankFeatured
+            href={`/insights/${leftFlank.slug}`}
+            image={leftFlank.image}
+            onBadgeClick={onBadgeClick}
+          />
+        )}
+        <ContentCard
+          key={featured.slug}
+          title={featured.title}
+          excerpt={featured.excerpt}
+          badge={featured.badge}
+          author={featured.author}
+          date={featured.date}
+          readTime={featured.readTime}
+          topics={featured.topics}
+          showTopics={showTags}
+          featured
+          href={`/insights/${featured.slug}`}
+          image={featured.image}
+          onBadgeClick={onBadgeClick}
+        />
+        {rightFlank && (
+          <ContentCard
+            key={rightFlank.slug}
+            title={rightFlank.title}
+            excerpt={rightFlank.excerpt}
+            badge={rightFlank.badge}
+            author={rightFlank.author}
+            date={rightFlank.date}
+            readTime={rightFlank.readTime}
+            topics={rightFlank.topics}
+            showTopics={showTags}
+            flankFeatured
+            href={`/insights/${rightFlank.slug}`}
+            image={rightFlank.image}
+            onBadgeClick={onBadgeClick}
+          />
+        )}
+      </div>
+    );
+  };
+
+  /* ── Compute slices per layout ── */
+  // default: hero uses [0..3], withImages [3..6], restForGrid [6..10]
+  // no-hero: no hero row, withImages [0..3], restForGrid [3..7]
+  // semafor: hero uses [0..5] (1 + 4 text col), withImages [5..8], textOnlyRow [8..12]
+
+  let heroNode: React.ReactNode = null;
+  let withImages: Article[] = [];
+  let restForGrid: Article[] = [];
+  let textOnlyRow: Article[] = [];
+
+  if (layout === "no-hero") {
+    withImages = articles.slice(0, 3);
+    restForGrid = articles.slice(3, 7);
+  } else if (layout === "semafor") {
+    heroNode = renderSemaforHero();
+    withImages = articles.slice(5, 8);
+    textOnlyRow = articles.slice(8, 12);
+  } else {
+    heroNode = renderDefaultHero();
+    withImages = articles.slice(3, 6);
+    restForGrid = articles.slice(6, 10);
+  }
 
   // Group ALL articles by type for sections below
   const grouped = new Map<string, Article[]>();
@@ -119,56 +261,8 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Hero row — small / big / small, middle is the latest */}
-      {featured && (
-        <div className="grid grid-cols-[1fr_2fr_1fr] gap-4 items-stretch max-md:grid-cols-1 max-lg:grid-cols-1">
-          {leftFlank && (
-            <ContentCard
-              key={leftFlank.slug}
-              title={leftFlank.title}
-              excerpt={leftFlank.excerpt}
-              badge={leftFlank.badge}
-              author={leftFlank.author}
-              date={leftFlank.date}
-              readTime={leftFlank.readTime}
-              topics={leftFlank.topics}
-              flankFeatured
-              href={`/insights/${leftFlank.slug}`}
-              image={leftFlank.image}
-              onBadgeClick={onBadgeClick}
-            />
-          )}
-          <ContentCard
-            key={featured.slug}
-            title={featured.title}
-            excerpt={featured.excerpt}
-            badge={featured.badge}
-            author={featured.author}
-            date={featured.date}
-            readTime={featured.readTime}
-            featured
-            href={`/insights/${featured.slug}`}
-            image={featured.image}
-            onBadgeClick={onBadgeClick}
-          />
-          {rightFlank && (
-            <ContentCard
-              key={rightFlank.slug}
-              title={rightFlank.title}
-              excerpt={rightFlank.excerpt}
-              badge={rightFlank.badge}
-              author={rightFlank.author}
-              date={rightFlank.date}
-              readTime={rightFlank.readTime}
-              topics={rightFlank.topics}
-              flankFeatured
-              href={`/insights/${rightFlank.slug}`}
-              image={rightFlank.image}
-              onBadgeClick={onBadgeClick}
-            />
-          )}
-        </div>
-      )}
+      {/* Hero row */}
+      {heroNode}
 
       {/* 3 — Image cards */}
       {withImages.length > 0 && (
@@ -182,6 +276,8 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
               author={article.author}
               date={article.date}
               readTime={article.readTime}
+              topics={article.topics}
+              showTopics={showTags}
               href={`/insights/${article.slug}`}
               image={article.image}
               showImage
@@ -191,7 +287,7 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
         </div>
       )}
 
-      {/* 4 — Image cards (smaller) */}
+      {/* 4 — Image cards (smaller) — default & no-hero */}
       {restForGrid.length > 0 && (
         <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
           {restForGrid.map((article) => (
@@ -203,9 +299,31 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
               author={article.author}
               date={article.date}
               readTime={article.readTime}
+              topics={article.topics}
+              showTopics={showTags}
               href={`/insights/${article.slug}`}
               image={article.image}
               showImage={!!article.image}
+              onBadgeClick={onBadgeClick}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 4 — Text-only row — semafor bottom row */}
+      {textOnlyRow.length > 0 && (
+        <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
+          {textOnlyRow.map((article) => (
+            <ContentCard
+              key={article.slug}
+              title={article.title}
+              badge={article.badge}
+              author={article.author}
+              date={article.date}
+              readTime={article.readTime}
+              topics={article.topics}
+              showTopics={showTags}
+              href={`/insights/${article.slug}`}
               onBadgeClick={onBadgeClick}
             />
           ))}
@@ -252,6 +370,8 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
                     author={article.author}
                     date={article.date}
                     readTime={article.readTime}
+                    topics={article.topics}
+                    showTopics={showTags}
                     href={`/insights/${article.slug}`}
                     image={article.image}
                     showImage={!!article.image}
@@ -270,6 +390,8 @@ export function InsightsGrid({ articles, onBadgeClick, activeFilter }: InsightsG
                       author={article.author}
                       date={article.date}
                       readTime={article.readTime}
+                      topics={article.topics}
+                      showTopics={showTags}
                       href={`/insights/${article.slug}`}
                       onBadgeClick={onBadgeClick}
                     />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { InsightsGrid } from "@/app/components/insights/insights-grid";
+import { InsightsGrid, type GridLayout } from "@/app/components/insights/insights-grid";
 import type { Article } from "@/app/components/insights/insights-grid";
 import { PaywallCounter } from "@/app/components/ui/paywall-counter";
 import { cn } from "@/app/lib/cn";
@@ -31,6 +31,13 @@ const TOPICS = [
   "Trade & Geopolitics",
 ];
 
+const LAYOUT_VARIANTS: { id: string; label: string; layout: GridLayout; showTags: boolean }[] = [
+  { id: "v1", label: "V1 · No hero · Tags", layout: "no-hero", showTags: true },
+  { id: "v2", label: "V2 · No hero · No tags", layout: "no-hero", showTags: false },
+  { id: "v3", label: "V3 · Semafor · Tags", layout: "semafor", showTags: true },
+  { id: "v4", label: "V4 · Semafor · No tags", layout: "semafor", showTags: false },
+];
+
 
 interface InsightsControlsProps {
   articles: Article[];
@@ -40,6 +47,10 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
   const [filter, setFilter] = useState("all");
   const [topic, setTopic] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [variantId, setVariantId] = useState<string>("v1");
+  const [switcherOpen, setSwitcherOpen] = useState(true);
+
+  const variant = LAYOUT_VARIANTS.find((v) => v.id === variantId) ?? LAYOUT_VARIANTS[0];
 
   const filtered = useMemo(() => {
     let result = articles;
@@ -216,7 +227,13 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
 
       {/* Content grid */}
       {filtered.length > 0 ? (
-        <InsightsGrid articles={filtered} onBadgeClick={handleBadgeClick} activeFilter={filter} />
+        <InsightsGrid
+          articles={filtered}
+          onBadgeClick={handleBadgeClick}
+          activeFilter={filter}
+          layout={variant.layout}
+          showTags={variant.showTags}
+        />
       ) : (
         <div className="py-20 text-center">
           <div className="w-12 h-12 rounded-[var(--card-r)] bg-surface grid place-items-center mx-auto mb-4">
@@ -235,6 +252,51 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
           </button>
         </div>
       )}
+
+      {/* ── Floating layout switcher ── */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[70] flex flex-col items-center gap-2">
+        {switcherOpen ? (
+          <div className="bg-[var(--white)] border border-border rounded-[var(--card-r)] shadow-xl p-2 min-w-[220px]">
+            <div className="flex items-center justify-between px-2 py-1.5 mb-1">
+              <span className="font-display font-bold text-[11px] uppercase tracking-[0.08em] text-fg-3">
+                Layout preview
+              </span>
+              <button
+                onClick={() => setSwitcherOpen(false)}
+                aria-label="Close switcher"
+                className="w-5 h-5 rounded grid place-items-center cursor-pointer border-none bg-transparent text-fg-3 hover:text-fg"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              {LAYOUT_VARIANTS.map((v) => (
+                <button
+                  key={v.id}
+                  onClick={() => setVariantId(v.id)}
+                  className={cn(
+                    "text-left px-3 py-2 rounded-[var(--btn-r)] text-xs font-medium cursor-pointer transition-all duration-[200ms] border-none",
+                    v.id === variantId
+                      ? "bg-brand-m text-brand font-semibold"
+                      : "bg-transparent text-fg-2 hover:bg-surface hover:text-fg"
+                  )}
+                >
+                  {v.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setSwitcherOpen(true)}
+            className="bg-[var(--white)] border border-border rounded-full shadow-xl px-4 py-2 text-xs font-display font-bold text-fg cursor-pointer hover:border-brand-l transition-colors"
+          >
+            Layout · {variant.id.toUpperCase()}
+          </button>
+        )}
+      </div>
     </>
   );
 }
