@@ -13,3 +13,8 @@ export { DealsTableWidget } from "./deals-table-widget";
 export { DownloadsWidget } from "./downloads-widget";
 export { RequestConnectionWidget } from "./request-connection-widget";
 export { ProfileBadgeWidget } from "./profile-badge-widget";
+export { SubsidiariesWidget } from "./subsidiaries-widget";
+export { BoardMembersWidget } from "./board-members-widget";
+export { ParentGroupCard } from "./parent-group-card";
+export { RegistrationCtaWidget } from "./registration-cta-widget";
+export { ExecutiveOrgChart } from "./executive-org-chart";
