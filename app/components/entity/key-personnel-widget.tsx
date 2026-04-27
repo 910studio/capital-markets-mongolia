@@ -11,6 +11,7 @@ interface Person {
 
 interface KeyPersonnelWidgetProps {
   people: Person[];
+  title?: string;
   className?: string;
 }
 
@@ -18,11 +19,12 @@ interface KeyPersonnelWidgetProps {
 
 export function KeyPersonnelWidget({
   people,
+  title = "Key Personnel",
   className,
 }: KeyPersonnelWidgetProps) {
   return (
     <Widget className={className}>
-      <WidgetHeader title="Key Personnel" />
+      <WidgetHeader title={title} />
       <WidgetBody>
         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
           {people.map((person) => (

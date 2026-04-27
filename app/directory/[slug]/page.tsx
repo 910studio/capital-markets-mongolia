@@ -15,7 +15,13 @@ import {
   DownloadsWidget,
   RequestConnectionWidget,
   ProfileBadgeWidget,
+  SubsidiariesWidget,
+  BoardMembersWidget,
+  ParentGroupCard,
+  RegistrationCtaWidget,
+  ExecutiveOrgChart,
 } from "@/app/components/entity";
+import { EntityNewsWidget } from "@/app/components/feed/entity-news-widget";
 import { BlockerLabel } from "@/app/components/ui/blocker-label";
 import {
   MOCK_ENTITIES,
@@ -286,12 +292,14 @@ export default async function EntityProfilePage({ params }: PageProps) {
       <div className="grid grid-cols-[1fr_340px] gap-12 pb-20 items-start max-lg:grid-cols-1 max-lg:gap-6">
         {/* ── Main column ── */}
         <div className="flex flex-col gap-5 min-w-0">
-          {/* Sector taxonomy blocker */}
-          <BlockerLabel owner="Namkhai / Zoloo" variant="block">
-            Sector taxonomy is not yet finalized. The current sector tag
-            (&quot;{entity.sector}&quot;) uses the placeholder vocabulary. Final category list
-            pending from CMM research team before v1 launch.
-          </BlockerLabel>
+          {/* Sector taxonomy blocker — kept for non-public types while spec firms up */}
+          {!isPublic && (
+            <BlockerLabel owner="Namkhai / Zoloo" variant="block">
+              Sector taxonomy is not yet finalized. The current sector tag
+              (&quot;{entity.sector}&quot;) uses the placeholder vocabulary. Final category list
+              pending from CMM research team before v1 launch.
+            </BlockerLabel>
+          )}
 
           {isPublic && (
             <MarketDataWidget
@@ -395,21 +403,23 @@ export default async function EntityProfilePage({ params }: PageProps) {
             </>
           )}
 
-          {/* Financial Performance — BLOCKED */}
+          {/* Financial Performance */}
           {showFinancials && (
             <div className="flex flex-col gap-3">
-              <BlockerLabel owner="Zoloo & Namkhai" variant="block">
-                Financial Performance structure (Summary Ratios + Multi-Year Tables) is
-                PENDING sign-off. Current tables use placeholder metrics from the spec
-                draft and will be reshaped once the team confirms the final field list.
-              </BlockerLabel>
+              {!isPublic && (
+                <BlockerLabel owner="Zoloo & Namkhai" variant="block">
+                  Financial Performance structure (Summary Ratios + Multi-Year Tables) is
+                  PENDING sign-off for private entities. Current tables use placeholder metrics
+                  and will be reshaped once the team confirms the final field list.
+                </BlockerLabel>
+              )}
 
               {/* Summary Ratios */}
               {entity.summaryRatios && (
                 <div className="widget">
                   <div className="widget-header">
                     <span>Summary Ratios</span>
-                    <span className="font-mono text-[10px] text-fg-3">DRAFT</span>
+                    {!isPublic && <span className="font-mono text-[10px] text-fg-3">DRAFT</span>}
                   </div>
                   <div className="widget-body grid grid-cols-3 gap-3 max-sm:grid-cols-2">
                     {[
@@ -438,7 +448,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
                 <FinancialTableWidget
                   years={financialTable.years}
                   data={financialTable.data}
-                  source="DRAFT — Structure pending Zoloo & Namkhai sign-off."
+                  source={isPublic ? `Source: ${entity.exchange ?? "MSE"} disclosures` : "DRAFT — Structure pending Zoloo & Namkhai sign-off."}
                 />
               )}
             </div>
@@ -447,11 +457,35 @@ export default async function EntityProfilePage({ params }: PageProps) {
           {/* Sustainability */}
           {showSustainability && <SustainabilityWidget data={entity.sustainability!} />}
 
+          {/* Ownership & Structure (public company premium) */}
+          {isPublic && (entity.parentGroup || (entity.subsidiaries && entity.subsidiaries.length > 0)) && (
+            <div className="flex flex-col gap-4">
+              {entity.parentGroup && <ParentGroupCard parent={entity.parentGroup} />}
+              {entity.subsidiaries && entity.subsidiaries.length > 0 && (
+                <SubsidiariesWidget subsidiaries={entity.subsidiaries} />
+              )}
+            </div>
+          )}
+
+          {/* Executive Team */}
+          {isPublic ? (
+            (entity.ceo || (entity.executives && entity.executives.length > 0)) && (
+              <ExecutiveOrgChart
+                ceo={entity.ceo}
+                executives={entity.executives ?? []}
+              />
+            )
+          ) : (
+            personnel.length > 0 && <KeyPersonnelWidget people={personnel} />
+          )}
+
+          {/* Board of Directors (public company premium) */}
+          {isPublic && entity.boardMembers && entity.boardMembers.length > 0 && (
+            <BoardMembersWidget members={entity.boardMembers} />
+          )}
+
           {/* Deal Insights */}
           {showDeals && <DealsTableWidget summary={entity.dealsSummary} deals={entity.deals!} />}
-
-          {/* Key People */}
-          {personnel.length > 0 && <KeyPersonnelWidget people={personnel} />}
 
           {/* Service Provider contact */}
           {isServiceProvider && (entity.contactEmail || entity.contactPhone || entity.contactAddress) && (
@@ -486,10 +520,11 @@ export default async function EntityProfilePage({ params }: PageProps) {
         </div>
 
         {/* ── Sticky sidebar ── */}
-        <aside className="sticky top-[80px] max-h-[calc(100vh-100px)] overflow-y-auto flex flex-col gap-5 scrollbar-none max-lg:static max-lg:max-h-none max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1">
+        <aside className="lg:sticky lg:top-[80px] flex flex-col gap-5 max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1">
           {showConnection && (
             <RequestConnectionWidget entityName={entity.name} loggedIn={false} />
           )}
+          {isPublic && <RegistrationCtaWidget entityName={entity.name} />}
           <QuickStatsWidget stats={quickStats} />
           {ownership.length > 0 && <OwnershipWidget owners={ownership} />}
           <DownloadsWidget
@@ -500,8 +535,12 @@ export default async function EntityProfilePage({ params }: PageProps) {
             operationalDocs={entity.operationalDocs}
             requiresAuth
           />
+          {isPublic ? (
+            <EntityNewsWidget entitySlug={entity.slug} title="Recent News" />
+          ) : (
+            <NewsWidget items={news} />
+          )}
           {relatedArticles.length > 0 && <ResearchWidget items={relatedArticles} />}
-          <NewsWidget items={news} />
         </aside>
       </div>
     </div>
