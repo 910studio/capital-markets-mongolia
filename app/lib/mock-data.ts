@@ -911,3 +911,561 @@ export const SERIES = [
   "DealBook",
   "Investor Guide to Mongolia",
 ] as const;
+
+/* ── Events ────────────────────────────── */
+
+export type EventStatus = "upcoming" | "past" | "registration-open" | "sold-out";
+export type EventFormat = "in-person" | "virtual" | "hybrid";
+
+export interface MockEventAgendaItem {
+  time: string;
+  title: string;
+  speakerSlugs?: string[];
+  description?: string;
+  type?: "keynote" | "panel" | "presentation" | "break" | "networking";
+}
+
+export interface MockEventSponsor {
+  name: string;
+  tier: "platinum" | "gold" | "silver" | "partner";
+  logo?: string;
+}
+
+export interface MockEvent {
+  slug: string;
+  title: string;
+  shortName?: string;
+  tagline: string;
+  description: string;
+  status: EventStatus;
+  format: EventFormat;
+  startDate: string;
+  endDate?: string;
+  location: string;
+  venue?: string;
+  city?: string;
+  expectedAttendees?: number;
+  presentingCompanies?: number;
+  registrationCount?: number;
+  registrationDeadline?: string;
+  ticketPrice?: string;
+  coverImage?: string;
+  speakerSlugs: string[];
+  sponsors?: MockEventSponsor[];
+  agenda?: MockEventAgendaItem[];
+  recapUrl?: string;
+  replayUrl?: string;
+  topics?: string[];
+}
+
+export const MOCK_EVENTS: MockEvent[] = [
+  {
+    slug: "mif-2026",
+    title: "Mongolia Investment Forum 2026",
+    shortName: "MIF 2026",
+    tagline: "The annual gathering of Mongolia's capital markets",
+    description:
+      "MIF 2026 is the year's flagship gathering for institutional investors, sovereign funds, and Mongolia's leading corporates. Two days of keynotes, deal-flow presentations, and curated 1:1 meetings centered on the country's mining, banking, and energy growth stories.",
+    status: "registration-open",
+    format: "in-person",
+    startDate: "2026-05-15",
+    endDate: "2026-05-16",
+    location: "Shangri-La Hotel, Ulaanbaatar",
+    venue: "Shangri-La Ballroom",
+    city: "Ulaanbaatar",
+    expectedAttendees: 200,
+    presentingCompanies: 40,
+    registrationCount: 142,
+    registrationDeadline: "2026-05-10",
+    ticketPrice: "MNT 1,200,000",
+    coverImage: "/events/mif-2026.webp",
+    speakerSlugs: ["uchral-n", "byambasaikhan-b", "khan-bank-ceo", "rio-tinto-cfo", "namkhaidorj-b-speaker"],
+    sponsors: [
+      { name: "Khan Bank", tier: "platinum" },
+      { name: "Trade and Development Bank", tier: "platinum" },
+      { name: "Rio Tinto", tier: "gold" },
+      { name: "KPMG Mongolia", tier: "gold" },
+      { name: "Baker McKenzie", tier: "silver" },
+      { name: "Golomt Bank", tier: "silver" },
+    ],
+    agenda: [
+      { time: "08:30", title: "Registration & Coffee", type: "break" },
+      { time: "09:00", title: "Opening Keynote: Mongolia's 2026 Outlook", speakerSlugs: ["uchral-n"], type: "keynote" },
+      { time: "10:00", title: "Banking Sector Panel: Capital Formation in 2026", speakerSlugs: ["khan-bank-ceo", "namkhaidorj-b-speaker"], type: "panel" },
+      { time: "11:15", title: "Coffee Break", type: "break" },
+      { time: "11:30", title: "Mining: Oyu Tolgoi Phase 2 & Beyond", speakerSlugs: ["rio-tinto-cfo"], type: "presentation" },
+      { time: "12:30", title: "Lunch & Networking", type: "networking" },
+      { time: "14:00", title: "Capital Markets Reform: Where We Are", speakerSlugs: ["byambasaikhan-b"], type: "panel" },
+      { time: "15:30", title: "Investor 1:1 Sessions", type: "networking" },
+      { time: "18:00", title: "Welcome Reception", type: "networking" },
+    ],
+    topics: ["Capital Markets", "Mining & Resources", "Banking & Finance"],
+  },
+  {
+    slug: "mongolia-mining-summit-2026",
+    title: "Mongolia Mining & Energy Summit",
+    shortName: "MMES 2026",
+    tagline: "Critical minerals, copper, and the energy transition",
+    description:
+      "A focused one-day summit on Mongolia's role in the global critical minerals supply chain. Operator presentations, off-take negotiations, and policy briefings from the Ministry of Mining.",
+    status: "registration-open",
+    format: "hybrid",
+    startDate: "2026-06-12",
+    location: "Blue Sky Tower, Ulaanbaatar",
+    venue: "Blue Sky Conference Hall",
+    city: "Ulaanbaatar",
+    expectedAttendees: 120,
+    presentingCompanies: 18,
+    registrationCount: 64,
+    ticketPrice: "MNT 800,000",
+    coverImage: "/events/mining-summit-2026.webp",
+    speakerSlugs: ["damdinnyam-g", "rio-tinto-cfo", "ariunzaya-o-speaker"],
+    sponsors: [
+      { name: "Rio Tinto", tier: "platinum" },
+      { name: "Erdenes Mongol", tier: "gold" },
+    ],
+    topics: ["Mining & Resources", "Energy", "Policy & Regulation"],
+  },
+  {
+    slug: "cmm-investor-day-spring-2026",
+    title: "CMM Investor Day — Spring 2026",
+    tagline: "Quarterly briefing for CMM members",
+    description:
+      "A members-only briefing covering the Q1 2026 macro picture, banking sector earnings recap, and CMM's deal pipeline outlook.",
+    status: "registration-open",
+    format: "virtual",
+    startDate: "2026-05-28",
+    location: "Online (Zoom)",
+    expectedAttendees: 80,
+    registrationCount: 41,
+    ticketPrice: "Members only",
+    coverImage: "/events/investor-day-spring.webp",
+    speakerSlugs: ["namkhaidorj-b-speaker", "ariunzaya-o-speaker"],
+    topics: ["Capital Markets", "Banking & Finance"],
+  },
+  {
+    slug: "cmm-investor-day-winter-2025",
+    title: "CMM Investor Day — Winter 2025",
+    tagline: "2026 outlook & 2025 deal recap",
+    description:
+      "Members briefing covering 2025 deal recap, 2026 themes, and the inaugural Mongolia DealBook 2025 launch.",
+    status: "past",
+    format: "hybrid",
+    startDate: "2025-12-04",
+    location: "Shangri-La Hotel, Ulaanbaatar",
+    city: "Ulaanbaatar",
+    expectedAttendees: 90,
+    registrationCount: 88,
+    coverImage: "/events/investor-day-winter.webp",
+    speakerSlugs: ["namkhaidorj-b-speaker", "byambasaikhan-b"],
+    recapUrl: "/insights/mongolia-dealbook-2025",
+    replayUrl: "#",
+    topics: ["Capital Markets"],
+  },
+  {
+    slug: "mif-2025",
+    title: "Mongolia Investment Forum 2025",
+    shortName: "MIF 2025",
+    tagline: "Last year's flagship — 180 attendees",
+    description:
+      "MIF 2025 brought together 180+ institutional investors and 35 presenting companies. Highlights included the launch of Mongolia DealBook and the Bank of Mongolia governor's keynote.",
+    status: "past",
+    format: "in-person",
+    startDate: "2025-05-22",
+    endDate: "2025-05-23",
+    location: "Shangri-La Hotel, Ulaanbaatar",
+    city: "Ulaanbaatar",
+    expectedAttendees: 180,
+    presentingCompanies: 35,
+    registrationCount: 184,
+    coverImage: "/events/mif-2025.webp",
+    speakerSlugs: ["khan-bank-ceo", "byambasaikhan-b"],
+    recapUrl: "#",
+    replayUrl: "#",
+    topics: ["Capital Markets", "Banking & Finance"],
+  },
+  {
+    slug: "esg-mongolia-2025",
+    title: "ESG Mongolia 2025",
+    tagline: "Sustainable finance & climate disclosure",
+    description:
+      "Half-day workshop on Mongolia's SDG Finance Taxonomy adoption, IFC Performance Standards, and bank-led green finance initiatives.",
+    status: "past",
+    format: "in-person",
+    startDate: "2025-10-15",
+    location: "Corporate Hotel, Ulaanbaatar",
+    city: "Ulaanbaatar",
+    expectedAttendees: 70,
+    registrationCount: 72,
+    coverImage: "/events/esg-mongolia-2025.webp",
+    speakerSlugs: ["ariunzaya-o-speaker"],
+    recapUrl: "#",
+    topics: ["ESG & Climate", "Banking & Finance"],
+  },
+];
+
+/* ── Speakers ──────────────────────────── */
+
+export interface MockSpeaker {
+  slug: string;
+  name: string;
+  initials: string;
+  title: string;
+  org: string;
+  orgSlug?: string;
+  bio: string;
+  expertise?: string[];
+  photo?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  websiteUrl?: string;
+}
+
+export const MOCK_SPEAKERS: MockSpeaker[] = [
+  {
+    slug: "uchral-n",
+    name: "Uchral N.",
+    initials: "UN",
+    title: "Prime Minister",
+    org: "Government of Mongolia",
+    bio: "Prime Minister of Mongolia since April 2026. Previously Minister of Digital Development and Communications, where he championed capital markets reform and delivered the Orano uranium agreement.",
+    expertise: ["Policy & Regulation", "Capital Markets", "Foreign Investment"],
+  },
+  {
+    slug: "byambasaikhan-b",
+    name: "Byambasaikhan B.",
+    initials: "BB",
+    title: "Board Chair",
+    org: "Tavan Tolgoi JSC",
+    orgSlug: "tavan-tolgoi",
+    bio: "Veteran capital markets executive. Board Chair at Tavan Tolgoi JSC and former CEO of Erdenes Mongol. Frequent contributor to CMM research on state-owned enterprises and IPO readiness.",
+    expertise: ["Capital Markets", "State-Owned Enterprises", "Mining & Resources"],
+  },
+  {
+    slug: "khan-bank-ceo",
+    name: "John Bell",
+    initials: "JB",
+    title: "Chief Executive Officer",
+    org: "Khan Bank",
+    orgSlug: "khan-bank",
+    bio: "CEO of Khan Bank since 2023. Previously held senior roles at HSBC and Standard Chartered across Asia. Leading Khan Bank's digital banking transformation.",
+    expertise: ["Banking & Finance", "Digital Transformation"],
+  },
+  {
+    slug: "rio-tinto-cfo",
+    name: "Sarah Mitchell",
+    initials: "SM",
+    title: "CFO, Copper Division",
+    org: "Rio Tinto",
+    bio: "Leads finance for Rio Tinto's global copper portfolio, including Oyu Tolgoi. Joined Rio Tinto in 2015 from BHP.",
+    expertise: ["Mining & Resources", "Capital Allocation"],
+  },
+  {
+    slug: "damdinnyam-g",
+    name: "Damdinnyam G.",
+    initials: "DG",
+    title: "Minister of Mining",
+    org: "Government of Mongolia",
+    bio: "Minister of Mining in the Uchral cabinet. Previously CEO of Erdenes Tavan Tolgoi. Architect of the 2026 royalty reform draft.",
+    expertise: ["Mining & Resources", "Policy & Regulation"],
+  },
+  {
+    slug: "namkhaidorj-b-speaker",
+    name: "Namkhaidorj B.",
+    initials: "NB",
+    title: "Senior Analyst",
+    org: "CMM",
+    bio: "CMM's senior analyst covering fixed income, deal structuring, and capital markets transactions. Co-author of the Mongolia DealBook series.",
+    expertise: ["Capital Markets", "Fixed Income"],
+  },
+  {
+    slug: "ariunzaya-o-speaker",
+    name: "Ariunzaya O.",
+    initials: "AO",
+    title: "Geopolitics & Minerals Analyst",
+    org: "CMM",
+    bio: "Covers critical minerals policy, international relations, and Mongolia's positioning in global supply chains.",
+    expertise: ["Mining & Resources", "Geopolitics", "ESG & Climate"],
+  },
+];
+
+/* ── News (Market Feed) ────────────────── */
+
+export type NewsCategory = "markets" | "companies" | "sectors" | "policy" | "deals" | "macro";
+
+export const NEWS_CATEGORY_LABELS: Record<NewsCategory, string> = {
+  markets: "Markets",
+  companies: "Companies",
+  sectors: "Sectors",
+  policy: "Policy",
+  deals: "Deals",
+  macro: "Macro",
+};
+
+export const NEWS_CATEGORY_COLORS: Record<NewsCategory, string> = {
+  markets: "var(--cat-markets)",
+  companies: "var(--cat-companies)",
+  sectors: "var(--cat-sectors)",
+  policy: "var(--brand-l)",
+  deals: "var(--cat-insights)",
+  macro: "var(--cat-ai)",
+};
+
+export interface MockNewsItem {
+  id: string;
+  headline: string;
+  summary?: string;
+  source: string;
+  sourceUrl?: string;
+  publishedAt: string;
+  category: NewsCategory;
+  topics?: string[];
+  entitySlugs: string[];
+  /** AI confidence score 0-1 from entity-matching pipeline */
+  confidence: number;
+  /** True when analyst has reviewed the AI tagging */
+  reviewed?: boolean;
+  isBreaking?: boolean;
+  imageUrl?: string;
+}
+
+export const MOCK_NEWS: MockNewsItem[] = [
+  {
+    id: "n-001",
+    headline: "MSE Top-20 Closes at 6-Month High on Banking Rally",
+    summary: "The benchmark gained 1.8% on the day, led by Khan Bank (+2.5%) and Golomt Bank (+1.2%). Volume hit MNT 12.4B, well above the 30-day average.",
+    source: "Bloomberg",
+    publishedAt: "2026-04-27T08:42:00Z",
+    category: "markets",
+    topics: ["Capital Markets", "Banking & Finance"],
+    entitySlugs: ["khan-bank", "golomt-bank", "mse"],
+    confidence: 0.94,
+    reviewed: true,
+    isBreaking: true,
+  },
+  {
+    id: "n-002",
+    headline: "Khan Bank Announces MNT 50B Bond Issuance for Infrastructure Lending",
+    summary: "Five-year senior secured note priced at 11.5%. Proceeds earmarked for power transmission and urban water projects.",
+    source: "Reuters",
+    publishedAt: "2026-04-27T07:15:00Z",
+    category: "deals",
+    topics: ["Banking & Finance", "Capital Markets"],
+    entitySlugs: ["khan-bank"],
+    confidence: 0.97,
+    reviewed: true,
+  },
+  {
+    id: "n-003",
+    headline: "Oyu Tolgoi Underground Phase 2 Reaches Production Milestone",
+    summary: "Rio Tinto announced first ore from Panel 2 ahead of schedule. Sustaining capex guidance held at $1.2B for 2026.",
+    source: "Mining.com",
+    publishedAt: "2026-04-27T05:30:00Z",
+    category: "companies",
+    topics: ["Mining & Resources"],
+    entitySlugs: ["oyu-tolgoi"],
+    confidence: 0.98,
+    reviewed: true,
+  },
+  {
+    id: "n-004",
+    headline: "Cabinet Approves Updated Mining Royalty Framework",
+    summary: "Draft amendments cap progressive surcharges at 18% for copper exports. Industry response cautiously positive; Erdenes Mongol awaiting written guidance.",
+    source: "Montsame",
+    publishedAt: "2026-04-26T22:00:00Z",
+    category: "policy",
+    topics: ["Mining & Resources", "Policy & Regulation"],
+    entitySlugs: ["oyu-tolgoi", "erdenet-mining"],
+    confidence: 0.91,
+    reviewed: true,
+  },
+  {
+    id: "n-005",
+    headline: "TDB Said to Mandate Banks for $500M Eurobond Roadshow",
+    summary: "Citi, JPMorgan, and Mizuho reportedly mandated for early-June marketing. Use-of-proceeds includes refinancing and Central Asian expansion capex.",
+    source: "Reuters",
+    publishedAt: "2026-04-26T18:45:00Z",
+    category: "deals",
+    topics: ["Banking & Finance", "Capital Markets"],
+    entitySlugs: ["tdb"],
+    confidence: 0.85,
+    reviewed: true,
+  },
+  {
+    id: "n-006",
+    headline: "Mongolia's March CPI Comes In at 11.8%, Below Consensus",
+    summary: "Headline inflation eased 30bps from February. Food prices remain the dominant driver. Bank of Mongolia next decision May 12.",
+    source: "FT",
+    publishedAt: "2026-04-26T14:20:00Z",
+    category: "macro",
+    topics: ["Economy & Macro"],
+    entitySlugs: [],
+    confidence: 0.99,
+    reviewed: true,
+  },
+  {
+    id: "n-007",
+    headline: "Ard App Crosses 2M Active Users, Doubles QoQ Transaction Volume",
+    summary: "Ard Financial Group's super-app reported 2.1M MAUs as of March. P2P transfer and merchant payments led growth.",
+    source: "Bloomberg",
+    publishedAt: "2026-04-26T11:00:00Z",
+    category: "companies",
+    topics: ["Technology", "Banking & Finance"],
+    entitySlugs: ["ard-financial-group"],
+    confidence: 0.92,
+    reviewed: true,
+  },
+  {
+    id: "n-008",
+    headline: "Erdenes Tavan Tolgoi IPO Roadmap Pushed to H2 2026",
+    summary: "MSE listing now targeted for September. Working group cites pending royalty framework as the main schedule risk.",
+    source: "CMM Research",
+    publishedAt: "2026-04-26T09:30:00Z",
+    category: "companies",
+    topics: ["Capital Markets", "Mining & Resources", "State-Owned Enterprises"],
+    entitySlugs: ["tavan-tolgoi", "erdenet-mining"],
+    confidence: 0.78,
+  },
+  {
+    id: "n-009",
+    headline: "Coking Coal Spot Hits 14-Month Low on China Steel Demand",
+    summary: "Newcastle benchmark fell to $186/t. Mongolian exporters face additional pressure from rail capacity constraints at Gashuunsukhait.",
+    source: "Mining.com",
+    publishedAt: "2026-04-25T16:10:00Z",
+    category: "sectors",
+    topics: ["Mining & Resources", "Trade & Geopolitics"],
+    entitySlugs: ["tavan-tolgoi"],
+    confidence: 0.87,
+    reviewed: true,
+  },
+  {
+    id: "n-010",
+    headline: "Tsakhia Solar Park Achieves Financial Close",
+    summary: "100MW project reached financial close with $92M senior facility led by ADB. Commissioning targeted Q3 2026.",
+    source: "Reuters",
+    publishedAt: "2026-04-25T13:45:00Z",
+    category: "deals",
+    topics: ["Energy", "ESG & Climate"],
+    entitySlugs: ["tsakhia-solar", "newcom-group"],
+    confidence: 0.95,
+    reviewed: true,
+  },
+  {
+    id: "n-011",
+    headline: "FMO Commits Additional $50M to Mongolian Green Finance Pipeline",
+    summary: "Top-up follows the original $150M facility announced in January. Khan Bank and TDB are the lead intermediaries.",
+    source: "Bloomberg",
+    publishedAt: "2026-04-25T10:00:00Z",
+    category: "deals",
+    topics: ["ESG & Climate", "Banking & Finance"],
+    entitySlugs: ["khan-bank", "tdb"],
+    confidence: 0.93,
+    reviewed: true,
+  },
+  {
+    id: "n-012",
+    headline: "Gobi Cashmere Q1 Revenue Up 14% on Premium Channel Growth",
+    summary: "Direct-to-consumer revenue grew 32% YoY. EBITDA margin expanded 180bps to 18.4%.",
+    source: "Bloomberg",
+    publishedAt: "2026-04-24T15:30:00Z",
+    category: "companies",
+    topics: ["Agriculture"],
+    entitySlugs: ["gobi-cashmere"],
+    confidence: 0.96,
+    reviewed: true,
+  },
+  {
+    id: "n-013",
+    headline: "MSE to Pilot T+2 Settlement in June",
+    summary: "Mongolian Stock Exchange announced phase 1 of its settlement modernization program. Initial scope covers MSE Top-20 constituents.",
+    source: "Montsame",
+    publishedAt: "2026-04-24T11:15:00Z",
+    category: "policy",
+    topics: ["Capital Markets"],
+    entitySlugs: ["mse"],
+    confidence: 0.89,
+    reviewed: true,
+  },
+  {
+    id: "n-014",
+    headline: "Aspire Mining Closes A$15M Placement, Resumes Ovoot Drilling",
+    summary: "Funds support an extended drill campaign at the Ovoot Coking Coal Project. Lead manager: Canaccord Genuity.",
+    source: "Mining.com",
+    publishedAt: "2026-04-24T08:20:00Z",
+    category: "deals",
+    topics: ["Mining & Resources", "Capital Markets"],
+    entitySlugs: ["aspire-mining"],
+    confidence: 0.94,
+    reviewed: true,
+  },
+  {
+    id: "n-015",
+    headline: "Bank of Mongolia Holds Policy Rate at 12%",
+    summary: "Statement cited persistent food-price inflation and tugrik volatility. Next meeting May 12.",
+    source: "FT",
+    publishedAt: "2026-04-23T17:00:00Z",
+    category: "policy",
+    topics: ["Economy & Macro", "Banking & Finance"],
+    entitySlugs: [],
+    confidence: 0.99,
+    reviewed: true,
+  },
+  {
+    id: "n-016",
+    headline: "Mongolian Properties Reports First-Quarter Pre-Sales of MNT 84B",
+    summary: "Pre-sales tracked above plan. Three new projects targeted for Q3 launch in UB.",
+    source: "CMM Research",
+    publishedAt: "2026-04-23T12:00:00Z",
+    category: "companies",
+    topics: ["Real Estate & Infrastructure"],
+    entitySlugs: [],
+    confidence: 0.62,
+  },
+  {
+    id: "n-017",
+    headline: "Newcom & Korean Consortium Sign MoU for Wind Project",
+    summary: "150MW wind farm in Sainshand. PPA framework under negotiation with Central Grid.",
+    source: "Reuters",
+    publishedAt: "2026-04-22T20:30:00Z",
+    category: "sectors",
+    topics: ["Energy", "ESG & Climate"],
+    entitySlugs: ["newcom-group"],
+    confidence: 0.83,
+    reviewed: true,
+  },
+  {
+    id: "n-018",
+    headline: "Mandal Insurance Net Income Up 22% on Non-Life Premium Growth",
+    summary: "Combined ratio improved to 92.3%. Investment income held flat YoY.",
+    source: "Bloomberg",
+    publishedAt: "2026-04-22T14:00:00Z",
+    category: "companies",
+    topics: ["Banking & Finance"],
+    entitySlugs: ["mandal-insurance"],
+    confidence: 0.95,
+    reviewed: true,
+  },
+  {
+    id: "n-019",
+    headline: "Parliament Approves 2026 Supplementary Budget",
+    summary: "MNT 1.2T supplementary budget passed final reading. Allocations weighted toward energy infrastructure and pension top-ups.",
+    source: "Montsame",
+    publishedAt: "2026-04-22T09:45:00Z",
+    category: "policy",
+    topics: ["Policy & Regulation", "Economy & Macro"],
+    entitySlugs: [],
+    confidence: 0.88,
+    reviewed: true,
+  },
+  {
+    id: "n-020",
+    headline: "M Bank Reports Strong Trade Finance Demand From Mid-Cap Importers",
+    summary: "Trade finance book grew 18% YoY in Q1. NIM held at 3.9%.",
+    source: "CMM Research",
+    publishedAt: "2026-04-21T16:30:00Z",
+    category: "companies",
+    topics: ["Banking & Finance"],
+    entitySlugs: [],
+    confidence: 0.71,
+  },
+];
