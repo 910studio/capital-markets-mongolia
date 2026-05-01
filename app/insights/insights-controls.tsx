@@ -3,14 +3,14 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { InsightsGrid } from "@/app/components/insights/insights-grid";
 import type { Article, GridLayout } from "@/app/components/insights/insights-grid";
+import { PaywallCounter } from "@/app/components/ui/paywall-counter";
+import { cn } from "@/app/lib/cn";
 
 const LAYOUT_OPTIONS: { value: GridLayout; label: string }[] = [
   { value: "default", label: "Default" },
-  { value: "no-hero", label: "No Hero" },
-  { value: "semafor", label: "Semafor" },
+  { value: "featured", label: "Featured" },
+  { value: "editorial", label: "Editorial" },
 ];
-import { PaywallCounter } from "@/app/components/ui/paywall-counter";
-import { cn } from "@/app/lib/cn";
 
 const CONTENT_FILTERS = [
   { label: "All", value: "all" },
@@ -45,7 +45,7 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
   const [filter, setFilter] = useState("all");
   const [topic, setTopic] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [layout, setLayout] = useState<GridLayout>("no-hero");
+  const [layout, setLayout] = useState<GridLayout>("default");
 
   const filtered = useMemo(() => {
     let result = articles;
@@ -125,16 +125,12 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
                 key={t}
                 onClick={() => { setTopic(topic === t ? null : t); }}
                 className={cn(
-                  "flex items-center gap-2 text-left px-3 py-2 rounded-[var(--btn-r)] text-sm font-medium cursor-pointer transition-all duration-[200ms] border-none",
+                  "text-left px-3 py-2 rounded-[var(--btn-r)] text-sm font-medium cursor-pointer transition-all duration-[200ms] border-none",
                   topic === t
                     ? "bg-brand-m text-brand font-semibold"
                     : "bg-transparent text-fg-2 hover:text-brand"
                 )}
               >
-                <span className={cn(
-                  "w-1.5 h-1.5 rounded-full shrink-0 transition-colors",
-                  topic === t ? "bg-brand" : "bg-fg-3"
-                )} />
                 {t}
               </button>
             ))}

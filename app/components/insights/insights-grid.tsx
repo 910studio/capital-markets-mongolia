@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ContentCard } from "./content-card";
 
 /* ── Types ─────────────────────────────── */
@@ -17,7 +18,7 @@ export interface Article {
   topics?: string[];
 }
 
-export type GridLayout = "default" | "no-hero" | "semafor";
+export type GridLayout = "default" | "featured" | "editorial";
 
 interface InsightsGridProps {
   articles: Article[];
@@ -38,6 +39,57 @@ const TYPE_ORDER: { variant: string; label: string }[] = [
 
 const SECTION_PREVIEW = 7;
 
+/* ── EditorialListItem (used by editorial hero right column) ── */
+
+function EditorialListItem({
+  article,
+  onBadgeClick,
+}: {
+  article: Article;
+  onBadgeClick?: (variant: string) => void;
+}) {
+  return (
+    <Link
+      href={`/insights/${article.slug}`}
+      className="group flex items-start gap-3 py-3 border-b border-border-s last:border-b-0 last:pb-0 first:pt-0 no-underline"
+    >
+      {article.image && (
+        <div className="relative w-40 aspect-[4/3] rounded-[var(--card-r)] overflow-hidden shrink-0 border border-border-s bg-surface max-md:w-32">
+          {article.image}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onBadgeClick?.(article.badge.variant);
+          }}
+          className="bg-transparent border-none p-0 cursor-pointer"
+        >
+          <span className={`badge badge-solid-${article.badge.variant} !text-[10px]`}>
+            {article.badge.label}
+          </span>
+        </button>
+        <h3 className="font-display font-bold text-sm text-fg leading-snug mt-1.5 line-clamp-2 group-hover:text-brand transition-colors">
+          {article.title}
+        </h3>
+        <div className="text-[11px] text-fg-3 mt-1.5 flex items-center gap-1.5">
+          <span>{article.author}</span>
+          <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
+          <span>{article.date}</span>
+          {article.readTime && (
+            <>
+              <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
+              <span>{article.readTime}</span>
+            </>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 /* ── InsightsGrid ── */
 
 export function InsightsGrid({
@@ -50,7 +102,6 @@ export function InsightsGrid({
   if (articles.length === 0) return null;
 
   // When a specific filter is active — clean browse grid, no oversized hero.
-  // Rows: 3 image cards, then 4 image cards, then 4-col text-only for the rest.
   if (activeFilter && activeFilter !== "all") {
     const fImages3 = articles.slice(0, 3);
     const fImages4 = articles.slice(3, 7);
@@ -122,15 +173,62 @@ export function InsightsGrid({
     );
   }
 
-  /* ── Build the hero block based on layout ── */
+  /* ── Hero renders ─────────────────────── */
 
-  // Semafor hero: 70/30 — one big image headliner + vertical text column
-  const renderSemaforHero = () => {
+  // Featured hero: one wide horizontal card. Image left 60%, text right 40%.
+  const renderFeaturedHero = () => {
+    const a = articles[0];
+    if (!a) return null;
+    return (
+      <Link
+        href={`/insights/${a.slug}`}
+        className="group grid grid-cols-[3fr_2fr] gap-0 rounded-[var(--card-r)] overflow-hidden border border-border-s bg-[var(--white)] no-underline max-lg:grid-cols-1"
+      >
+        {a.image && (
+          <div className="relative aspect-[16/10] max-lg:aspect-[16/9] overflow-hidden bg-surface">
+            {a.image}
+          </div>
+        )}
+        <div className="flex flex-col justify-center gap-3 p-6 max-lg:p-5">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onBadgeClick?.(a.badge.variant);
+            }}
+            className="bg-transparent border-none p-0 cursor-pointer self-start"
+          >
+            <span className={`badge badge-solid-${a.badge.variant}`}>{a.badge.label}</span>
+          </button>
+          <h2 className="font-display font-extrabold text-3xl tracking-tight leading-[1.15] text-fg group-hover:text-brand transition-colors max-lg:text-2xl">
+            {a.title}
+          </h2>
+          <p className="text-sm text-fg-2 leading-relaxed line-clamp-3">
+            {a.excerpt}
+          </p>
+          <div className="text-xs text-fg-3 flex items-center gap-1.5 mt-1">
+            <span className="font-medium text-fg-2">{a.author}</span>
+            <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
+            <span>{a.date}</span>
+            {a.readTime && (
+              <>
+                <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
+                <span>{a.readTime}</span>
+              </>
+            )}
+          </div>
+        </div>
+      </Link>
+    );
+  };
+
+  // Editorial hero: 60/40 split — featured card left, 4 list items right (with thumbnails)
+  const renderEditorialHero = () => {
     const headliner = articles[0];
-    const sideList = articles.slice(1, 5); // 4 text-only in the 30% column
+    const sideList = articles.slice(1, 4);
     if (!headliner) return null;
     return (
-      <div className="grid grid-cols-[7fr_3fr] gap-4 items-stretch max-lg:grid-cols-1">
+      <div className="grid grid-cols-[3fr_2fr] gap-6 items-stretch lg:min-h-[540px] max-lg:grid-cols-1">
         <ContentCard
           key={headliner.slug}
           title={headliner.title}
@@ -147,18 +245,11 @@ export function InsightsGrid({
           image={headliner.image}
           onBadgeClick={onBadgeClick}
         />
-        <div className="flex flex-col gap-3 min-w-0 h-full">
+        <div className="flex flex-col min-w-0 h-full pl-6 border-l border-border-s justify-between max-lg:border-l-0 max-lg:pl-0 max-lg:border-t max-lg:pt-4">
           {sideList.map((article) => (
-            <ContentCard
+            <EditorialListItem
               key={article.slug}
-              title={article.title}
-              badge={article.badge}
-              author={article.author}
-              date={article.date}
-              readTime={article.readTime}
-              topics={article.topics}
-              showTopics={showTags}
-              href={`/insights/${article.slug}`}
+              article={article}
               onBadgeClick={onBadgeClick}
             />
           ))}
@@ -167,88 +258,27 @@ export function InsightsGrid({
     );
   };
 
-  // Default hero: 1-3-1 flanked row
-  const renderDefaultHero = () => {
-    const featured = articles[0];
-    const leftFlank = articles[1];
-    const rightFlank = articles[2];
-    if (!featured) return null;
-    return (
-      <div className="grid grid-cols-[1fr_2fr_1fr] gap-4 items-stretch max-md:grid-cols-1 max-lg:grid-cols-1">
-        {leftFlank && (
-          <ContentCard
-            key={leftFlank.slug}
-            title={leftFlank.title}
-            excerpt={leftFlank.excerpt}
-            badge={leftFlank.badge}
-            author={leftFlank.author}
-            date={leftFlank.date}
-            readTime={leftFlank.readTime}
-            topics={leftFlank.topics}
-            showTopics={showTags}
-            flankFeatured
-            href={`/insights/${leftFlank.slug}`}
-            image={leftFlank.image}
-            onBadgeClick={onBadgeClick}
-          />
-        )}
-        <ContentCard
-          key={featured.slug}
-          title={featured.title}
-          excerpt={featured.excerpt}
-          badge={featured.badge}
-          author={featured.author}
-          date={featured.date}
-          readTime={featured.readTime}
-          topics={featured.topics}
-          showTopics={showTags}
-          featured
-          href={`/insights/${featured.slug}`}
-          image={featured.image}
-          onBadgeClick={onBadgeClick}
-        />
-        {rightFlank && (
-          <ContentCard
-            key={rightFlank.slug}
-            title={rightFlank.title}
-            excerpt={rightFlank.excerpt}
-            badge={rightFlank.badge}
-            author={rightFlank.author}
-            date={rightFlank.date}
-            readTime={rightFlank.readTime}
-            topics={rightFlank.topics}
-            showTopics={showTags}
-            flankFeatured
-            href={`/insights/${rightFlank.slug}`}
-            image={rightFlank.image}
-            onBadgeClick={onBadgeClick}
-          />
-        )}
-      </div>
-    );
-  };
-
   /* ── Compute slices per layout ── */
-  // default: hero uses [0..3], withImages [3..6], restForGrid [6..10]
-  // no-hero: no hero row, withImages [0..3], restForGrid [3..7]
-  // semafor: hero uses [0..5] (1 + 4 text col), withImages [5..8], textOnlyRow [8..12]
+  // default: no hero, withImages [0..3], restForGrid [3..7]
+  // featured: hero uses [0], withImages [1..4], restForGrid [4..8]
+  // editorial: hero uses [0..5] (1 + 4 list), withImages [5..8], restForGrid [8..12]
 
   let heroNode: React.ReactNode = null;
   let withImages: Article[] = [];
   let restForGrid: Article[] = [];
-  let textOnlyRow: Article[] = [];
 
-  if (layout === "no-hero") {
+  if (layout === "featured") {
+    heroNode = renderFeaturedHero();
+    withImages = articles.slice(1, 4);
+    restForGrid = articles.slice(4, 8);
+  } else if (layout === "editorial") {
+    heroNode = renderEditorialHero();
+    withImages = articles.slice(4, 7);
+    restForGrid = articles.slice(7, 11);
+  } else {
+    // default — clean browse grid, no hero
     withImages = articles.slice(0, 3);
     restForGrid = articles.slice(3, 7);
-  } else if (layout === "semafor") {
-    heroNode = renderSemaforHero();
-    withImages = articles.slice(5, 8);
-    textOnlyRow = articles.slice(8, 12);
-  } else {
-    heroNode = renderDefaultHero();
-    withImages = articles.slice(3, 6);
-    restForGrid = articles.slice(6, 10);
   }
 
   // Group ALL articles by type for sections below
@@ -287,7 +317,7 @@ export function InsightsGrid({
         </div>
       )}
 
-      {/* 4 — Image cards (smaller) — default & no-hero */}
+      {/* 4 — Smaller cards (with images when available) */}
       {restForGrid.length > 0 && (
         <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
           {restForGrid.map((article) => (
@@ -304,26 +334,6 @@ export function InsightsGrid({
               href={`/insights/${article.slug}`}
               image={article.image}
               showImage={!!article.image}
-              onBadgeClick={onBadgeClick}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* 4 — Text-only row — semafor bottom row */}
-      {textOnlyRow.length > 0 && (
-        <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
-          {textOnlyRow.map((article) => (
-            <ContentCard
-              key={article.slug}
-              title={article.title}
-              badge={article.badge}
-              author={article.author}
-              date={article.date}
-              readTime={article.readTime}
-              topics={article.topics}
-              showTopics={showTags}
-              href={`/insights/${article.slug}`}
               onBadgeClick={onBadgeClick}
             />
           ))}
