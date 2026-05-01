@@ -47,7 +47,7 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
         className="card block no-underline !p-0 overflow-hidden h-full flex flex-col group"
       >
         <div
-          className="relative aspect-[16/8] w-full shrink-0 bg-gradient-to-br from-brand to-brand-l"
+          className="relative aspect-[16/9] w-full shrink-0 bg-gradient-to-br from-brand to-brand-l"
           style={{ borderBottom: "1px solid var(--border-s)" }}
         >
           <div className="absolute inset-0 flex items-end p-6">
