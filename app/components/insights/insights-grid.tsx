@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ContentCard } from "./content-card";
-import { Badge } from "@/app/components/ui";
 
 /* ── Types ─────────────────────────────── */
 
@@ -68,9 +67,9 @@ function EditorialListItem({
           }}
           className="bg-transparent border-none p-0 cursor-pointer"
         >
-          <Badge variant={article.badge.variant} className="!text-[10px]">
+          <span className={`badge badge-solid-${article.badge.variant} !text-[10px]`}>
             {article.badge.label}
-          </Badge>
+          </span>
         </button>
         <h3 className="font-display font-bold text-sm text-fg leading-snug mt-1.5 line-clamp-2 group-hover:text-brand transition-colors">
           {article.title}
@@ -199,7 +198,7 @@ export function InsightsGrid({
             }}
             className="bg-transparent border-none p-0 cursor-pointer self-start"
           >
-            <Badge variant={a.badge.variant}>{a.badge.label}</Badge>
+            <span className={`badge badge-solid-${a.badge.variant}`}>{a.badge.label}</span>
           </button>
           <h2 className="font-display font-extrabold text-3xl tracking-tight leading-[1.15] text-fg group-hover:text-brand transition-colors max-lg:text-2xl">
             {a.title}
