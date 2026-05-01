@@ -2,19 +2,6 @@ import Link from "next/link";
 import { cn } from "@/app/lib/cn";
 import type { MockEntity } from "@/app/lib/mock-data";
 
-/* ── Sector badge mapping (muted, standard) ── */
-
-const SECTOR_BADGE: Record<string, string> = {
-  "Mining & Resources": "badge-sectors",
-  "Banking & Finance": "badge-companies",
-  "Capital Markets": "badge-markets",
-  "Energy": "badge-insights",
-  "Technology": "badge-ai",
-  "Real Estate & Infrastructure": "badge-companies",
-  "Agriculture": "badge-sectors",
-  "Professional Services": "badge-markets",
-};
-
 /* ── EntityCard ───────────────────────────── */
 
 export function EntityCard({ entity }: { entity: MockEntity }) {
@@ -50,27 +37,30 @@ export function EntityCard({ entity }: { entity: MockEntity }) {
             {entity.name}
           </h3>
 
-          {hasTicker && entity.price != null && (
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="font-mono text-xs text-fg-3">
-                {entity.ticker}
-              </span>
-              <span className="font-mono text-xs font-medium text-fg">
-                {entity.price.toLocaleString()}
-              </span>
-              {entity.changePercent != null && (
-                <span
-                  className={cn(
-                    "font-mono text-xs font-medium",
-                    entity.changePercent >= 0 ? "text-pos" : "text-neg"
-                  )}
-                >
-                  {entity.changePercent >= 0 ? "+" : ""}
-                  {entity.changePercent}%
+          {/* Stats row — always reserves space so cards with/without stats match height */}
+          <div className="flex items-center gap-1.5 mt-0.5 h-[18px]">
+            {hasTicker && entity.price != null && (
+              <>
+                <span className="font-mono text-xs text-fg-3">
+                  {entity.ticker}
                 </span>
-              )}
-            </div>
-          )}
+                <span className="font-mono text-xs font-medium text-fg">
+                  {entity.price.toLocaleString()}
+                </span>
+                {entity.changePercent != null && (
+                  <span
+                    className={cn(
+                      "font-mono text-xs font-medium",
+                      entity.changePercent >= 0 ? "text-pos" : "text-neg"
+                    )}
+                  >
+                    {entity.changePercent >= 0 ? "+" : ""}
+                    {entity.changePercent}%
+                  </span>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -79,18 +69,16 @@ export function EntityCard({ entity }: { entity: MockEntity }) {
         {entity.description}
       </p>
 
-      {/* Badges — sector + raising only (type comes from section context) */}
-      <div className="flex gap-1 mt-2.5 flex-wrap">
-        <span
-          className={cn(
-            "badge",
-            SECTOR_BADGE[entity.sector] ?? "badge-markets"
-          )}
-        >
+      {/* Tags — muted sector pill + highlighted raising pill (type comes from section context) */}
+      <div className="flex gap-1.5 mt-2.5 flex-wrap">
+        <span className="font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2">
           {entity.sector}
         </span>
         {entity.isRaising && (
-          <span className="badge badge-signal">Raising</span>
+          <span className="inline-flex items-center gap-1.5 font-body font-semibold text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-brand text-[var(--brand-t)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-t)] animate-pulse" />
+            Raising
+          </span>
         )}
       </div>
     </Link>

@@ -188,6 +188,12 @@ interface EntityHeaderProps {
   website?: string;
   foreignBlocker?: React.ReactNode;
   className?: string;
+  /* v1 = CTAs in header, tags + socials in meta row (default).
+     v2 = CTAs hoisted to sidebar by parent; tags + socials demoted to footer row under description.
+     v3 = Editorial layout: kicker row, big bold name with price callout right, larger brief, footer meta. No logo block. */
+  variant?: "v1" | "v2" | "v3";
+  /* Slim sticky-scroll mode (used by V1 only). Renders a single-row bar with logo, name, ticker/price, CTAs. */
+  compact?: boolean;
 
   /* Crunchbase-style meta row data */
   marketCap?: string;
@@ -235,7 +241,64 @@ export function EntityHeader({
   languagesCount,
   practiceAreas,
   socialLinks,
+  variant = "v1",
+  compact = false,
 }: EntityHeaderProps) {
+  const isV2 = variant === "v2";
+  const isV3 = variant === "v3";
+
+  /* ── Compact (sticky-scroll) mode ─────────────── */
+  if (compact) {
+    return (
+      <div
+        className={cn(
+          "flex items-center gap-3 min-w-0",
+          className,
+        )}
+      >
+        <div
+          className="w-9 h-9 rounded-[var(--btn-r)] flex items-center justify-center font-display font-extrabold text-sm text-brand-l shrink-0"
+          style={{
+            background:
+              "linear-gradient(135deg, var(--brand-m), var(--surface-el))",
+          }}
+        >
+          {initials}
+        </div>
+        <span className="font-display font-extrabold text-sm tracking-tight text-fg leading-none truncate">
+          {name}
+        </span>
+        {exchange && ticker && (
+          <span className="font-mono font-medium text-xs text-fg-3 tracking-[0.02em] shrink-0 max-md:hidden">
+            {exchange}: {ticker}
+          </span>
+        )}
+        {price && (
+          <span className="font-mono font-semibold text-sm text-fg shrink-0 max-md:hidden">
+            {price}
+          </span>
+        )}
+        {priceChange && (
+          <span
+            className={cn(
+              "font-mono font-semibold text-xs shrink-0 max-md:hidden",
+              priceDirection === "up" ? "text-pos" : "text-neg",
+            )}
+          >
+            {priceChange} {priceDirection === "up" ? "↑" : "↓"}
+          </span>
+        )}
+        <div className="flex gap-2 ml-auto shrink-0">
+          <button className="btn btn-secondary text-xs py-1.5 px-3 max-sm:hidden">
+            Add to Watchlist
+          </button>
+          <button className="btn btn-signal text-xs py-1.5 px-3">
+            Request Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
   /* Practice areas truncation: first 2 + "+N more" */
   let practiceAreasLabel: string | undefined;
   if (practiceAreas && practiceAreas.length > 0) {
@@ -250,7 +313,7 @@ export function EntityHeader({
      Separator dots are interleaved so missing fields don't leave orphan dots. */
   const metaNodes: React.ReactNode[] = [];
 
-  if (dataSource) metaNodes.push(<ProfileBadgeWidget key="cmm" dataSource={dataSource} />);
+  if (dataSource && !isV2) metaNodes.push(<ProfileBadgeWidget key="cmm" dataSource={dataSource} />);
 
   if (exchange && ticker) {
     metaNodes.push(
@@ -285,23 +348,26 @@ export function EntityHeader({
     );
   }
 
-  metaNodes.push(
+  const typePill = (
     <span
       key="type"
       className="font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2"
     >
       {type}
-    </span>,
+    </span>
   );
 
-  metaNodes.push(
+  const sectorPill = (
     <span
       key="sector"
       className="font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2"
     >
       {sector}
-    </span>,
+    </span>
   );
+
+  metaNodes.push(typePill);
+  metaNodes.push(sectorPill);
 
   if (yearEstablished) {
     metaNodes.push(
@@ -355,12 +421,14 @@ export function EntityHeader({
     );
   }
 
-  if (website) {
-    metaNodes.push(
-      <MetaItem key="web" icon={<Icons.Globe />} href={website}>
-        {website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-      </MetaItem>,
-    );
+  const websiteNode = website ? (
+    <MetaItem key="web" icon={<Icons.Globe />} href={website}>
+      {website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+    </MetaItem>
+  ) : null;
+
+  if (websiteNode) {
+    metaNodes.push(websiteNode);
   }
 
   /* Socials cluster as a single trailing group with no internal separators */
@@ -395,6 +463,103 @@ export function EntityHeader({
     interleaved.push(node);
   });
 
+  /* ── V3: Editorial layout ───────────────────────── */
+  if (isV3) {
+    /* Footer meta: location/founded/raising/practice/website/socials. Exclude pricing + tags. */
+    const v3FooterNodes = metaNodes.filter((n) => {
+      const key = (n as { key?: string | null })?.key;
+      return (
+        key !== "type" &&
+        key !== "sector" &&
+        key !== "cmm" &&
+        key !== "ticker" &&
+        key !== "price" &&
+        key !== "change"
+      );
+    });
+    const v3FooterInterleaved: React.ReactNode[] = [];
+    v3FooterNodes.forEach((node, i) => {
+      if (i > 0) v3FooterInterleaved.push(<MetaSep key={`v3-sep-${i}`} />);
+      v3FooterInterleaved.push(node);
+    });
+
+    return (
+      <div className={cn("pb-10 border-b-2 border-border mb-10", className)}>
+        {/* Kicker bar — colored marker + type · sector caps + CMM badge anchored right */}
+        <div className="flex items-center gap-3 pb-4 mb-7 border-b border-border-s flex-wrap">
+          <div className="w-1 h-4 bg-brand rounded-[1px]" />
+          <span className="font-mono text-xs uppercase tracking-[0.16em] font-semibold text-fg">
+            {type}
+          </span>
+          <span className="text-fg-3 font-mono">·</span>
+          <span className="font-mono text-xs uppercase tracking-[0.16em] text-fg-2">
+            {sector}
+          </span>
+          {dataSource && (
+            <div className="ml-auto">
+              <ProfileBadgeWidget dataSource={dataSource} />
+            </div>
+          )}
+        </div>
+
+        {/* Hero: 2-column — big name + dek on left, anchored stat card on right */}
+        <div className="grid grid-cols-[1fr_300px] gap-12 items-start max-lg:grid-cols-[1fr_260px] max-md:grid-cols-1 max-md:gap-6">
+          {/* Left column: name + dek */}
+          <div className="flex flex-col gap-5">
+            <h1 className="font-display font-extrabold text-[64px] tracking-[-0.02em] leading-[0.95] text-fg max-lg:text-5xl max-md:text-4xl">
+              {name}
+            </h1>
+            {description && (
+              <p className="font-display font-medium text-xl leading-[1.4] text-fg-2 max-w-[60ch] max-md:text-lg">
+                {description}
+              </p>
+            )}
+          </div>
+
+          {/* Right column: bordered stat card — only shown if there's pricing data */}
+          {(price || (exchange && ticker)) && (
+            <div className="border border-border bg-surface rounded-[var(--card-r)] p-5 flex flex-col gap-4 max-md:max-w-[320px]">
+              {exchange && ticker && (
+                <div className="font-mono text-[11px] uppercase tracking-[0.1em] font-semibold text-fg-3 pb-3 border-b border-border-s">
+                  {exchange}: {ticker}
+                </div>
+              )}
+              {price && (
+                <div className="flex flex-col gap-1">
+                  <span className="font-display text-[10px] uppercase tracking-[0.1em] font-semibold text-fg-3">
+                    Price
+                  </span>
+                  <span className="font-mono font-bold text-[32px] text-fg leading-none tabular-nums">
+                    {price}
+                  </span>
+                  {priceChange && (
+                    <span
+                      className={cn(
+                        "font-mono font-semibold text-sm tabular-nums",
+                        priceDirection === "up" ? "text-pos" : "text-neg",
+                      )}
+                    >
+                      {priceChange} {priceDirection === "up" ? "↑" : "↓"}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Byline meta row */}
+        {v3FooterInterleaved.length > 0 && (
+          <div className="flex items-center gap-x-3 gap-y-1.5 flex-wrap pt-7 mt-7 border-t border-border-s">
+            {v3FooterInterleaved}
+          </div>
+        )}
+
+        {foreignBlocker && <div className="pt-4">{foreignBlocker}</div>}
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -404,7 +569,12 @@ export function EntityHeader({
     >
       {/* Logo / Initials */}
       <div
-        className="w-28 h-28 min-w-28 rounded-[var(--card-r)] flex items-center justify-center font-display font-extrabold text-3xl text-brand-l shrink-0"
+        className={cn(
+          "rounded-[var(--card-r)] flex items-center justify-center font-display font-extrabold text-brand-l shrink-0",
+          isV2
+            ? "w-40 self-stretch min-h-40 text-5xl max-md:w-28 max-md:h-28 max-md:min-h-0 max-md:self-auto max-md:text-3xl"
+            : "w-28 h-28 min-w-28 text-3xl",
+        )}
         style={{
           background:
             "linear-gradient(135deg, var(--brand-m), var(--surface-el))",
@@ -420,24 +590,34 @@ export function EntityHeader({
           <h1 className="font-display font-extrabold text-3xl tracking-tight text-fg leading-heading">
             {name}
           </h1>
-          <div className="flex gap-2 ml-auto max-md:ml-0 max-md:w-full">
-            <button className="btn btn-secondary text-sm">Add to Watchlist</button>
-            <button className="btn btn-signal text-sm">Request Connection</button>
-          </div>
+          {isV2 && dataSource && <ProfileBadgeWidget dataSource={dataSource} />}
+          {!isV2 && (
+            <div className="flex gap-2 ml-auto max-md:ml-0 max-md:w-full">
+              <button className="btn btn-secondary text-sm">Add to Watchlist</button>
+              <button className="btn btn-signal text-sm">Request Connection</button>
+            </div>
+          )}
         </div>
 
-        {/* Row 2: combined meta row (ticker/price + Crunchbase-style icon-pairs) */}
-        {interleaved.length > 0 && (
+        {/* Meta row above description (V1) */}
+        {!isV2 && interleaved.length > 0 && (
           <div className="flex items-center gap-x-3 gap-y-1.5 flex-wrap">
             {interleaved}
           </div>
         )}
 
-        {/* Row 4: Description */}
+        {/* Description */}
         {description && (
-          <p className="text-sm text-fg-2 leading-relaxed">
+          <p className={cn("text-fg-2 leading-relaxed", isV2 ? "text-base" : "text-sm")}>
             {description}
           </p>
+        )}
+
+        {/* Meta row below description (V2) — full stats + tags + website + socials */}
+        {isV2 && interleaved.length > 0 && (
+          <div className="flex items-center gap-x-3 gap-y-1.5 flex-wrap pt-1">
+            {interleaved}
+          </div>
         )}
 
         {foreignBlocker && <div className="pt-1">{foreignBlocker}</div>}

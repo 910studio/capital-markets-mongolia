@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
-  EntityHeader,
   MarketDataWidget,
   FinancialTableWidget,
   KeyPersonnelWidget,
@@ -24,6 +23,7 @@ import {
   ENTITY_TYPE_LABELS,
   type MockEntity,
 } from "@/app/lib/mock-data";
+import { ProfileVariants } from "./profile-variants";
 
 /* ═══════════════════════════════════════════════════════════
    Entity Profile — /directory/[slug]
@@ -265,19 +265,10 @@ export default async function EntityProfilePage({ params }: PageProps) {
     },
   ].filter(Boolean) as { id: string; label: string }[];
 
-  return (
-    <div className="max-w-[var(--content-max)] mx-auto px-6 w-full py-0">
-      {/* Entity Header */}
-      <div className="pt-6">
-        <EntityHeader {...headerProps} />
-      </div>
-
-      {/* Two-column layout */}
-      <div className="grid grid-cols-[1fr_340px] gap-12 pb-20 items-start max-lg:grid-cols-1 max-lg:gap-6">
-        {/* ── Main column ── */}
-        <div className="flex flex-col gap-5 min-w-0">
-          {/* Sector taxonomy blocker — kept for non-public types while spec firms up */}
-          {!isPublic && (
+  const mainContent = (
+    <>
+      {/* Sector taxonomy blocker — kept for non-public types while spec firms up */}
+      {!isPublic && (
             <BlockerLabel owner="Namkhai / Zoloo" variant="block">
               Sector taxonomy is not yet finalized. The current sector tag
               (&quot;{entity.sector}&quot;) uses the placeholder vocabulary. Final category list
@@ -533,24 +524,31 @@ export default async function EntityProfilePage({ params }: PageProps) {
               </div>
             </section>
           )}
-        </div>
+    </>
+  );
 
-        {/* ── Sticky sidebar ── */}
-        <aside className="lg:sticky lg:top-[80px] flex flex-col gap-5 max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1">
-          {tocItems.length > 0 && <ArticleSidebar toc={tocItems} />}
-          {showConnection && (
-            <RequestConnectionWidget entityName={entity.name} loggedIn={false} />
-          )}
-          <DownloadsWidget
-            reports={entity.reports}
-            pitchDecks={entity.pitchDecks}
-            sustainabilityDocs={entity.sustainabilityDocs}
-            investmentTeasers={entity.investmentTeasers}
-            operationalDocs={entity.operationalDocs}
-            requiresAuth
-          />
-        </aside>
-      </div>
-    </div>
+  const sidebarContent = (
+    <>
+      {tocItems.length > 0 && <ArticleSidebar toc={tocItems} />}
+      {showConnection && (
+        <RequestConnectionWidget entityName={entity.name} loggedIn={false} />
+      )}
+      <DownloadsWidget
+        reports={entity.reports}
+        pitchDecks={entity.pitchDecks}
+        sustainabilityDocs={entity.sustainabilityDocs}
+        investmentTeasers={entity.investmentTeasers}
+        operationalDocs={entity.operationalDocs}
+        requiresAuth
+      />
+    </>
+  );
+
+  return (
+    <ProfileVariants
+      headerProps={headerProps}
+      mainContent={mainContent}
+      sidebarContent={sidebarContent}
+    />
   );
 }
