@@ -2,7 +2,13 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { InsightsGrid } from "@/app/components/insights/insights-grid";
-import type { Article } from "@/app/components/insights/insights-grid";
+import type { Article, GridLayout } from "@/app/components/insights/insights-grid";
+
+const LAYOUT_OPTIONS: { value: GridLayout; label: string }[] = [
+  { value: "default", label: "Default" },
+  { value: "no-hero", label: "No Hero" },
+  { value: "semafor", label: "Semafor" },
+];
 import { PaywallCounter } from "@/app/components/ui/paywall-counter";
 import { cn } from "@/app/lib/cn";
 
@@ -39,6 +45,7 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
   const [filter, setFilter] = useState("all");
   const [topic, setTopic] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [layout, setLayout] = useState<GridLayout>("no-hero");
 
   const filtered = useMemo(() => {
     let result = articles;
@@ -208,6 +215,22 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
         </div>
 
         <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 p-0.5 rounded-[var(--btn-r)] border border-border bg-[var(--white)]">
+            {LAYOUT_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setLayout(opt.value)}
+                className={cn(
+                  "px-2.5 py-1 rounded-[var(--btn-r)] text-xs font-display font-semibold cursor-pointer transition-all duration-[200ms] border-none",
+                  layout === opt.value
+                    ? "bg-brand text-white"
+                    : "bg-transparent text-fg-2 hover:text-brand"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
           <span className="text-xs text-fg-3 font-mono">{total} results</span>
           <PaywallCounter used={2} total={3} />
         </div>
@@ -219,7 +242,7 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
           articles={filtered}
           onBadgeClick={handleBadgeClick}
           activeFilter={filter}
-          layout="no-hero"
+          layout={layout}
           showTags
         />
       ) : (

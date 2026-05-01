@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   EntityHeader,
@@ -7,21 +6,17 @@ import {
   FinancialTableWidget,
   KeyPersonnelWidget,
   OwnershipWidget,
-  ResearchWidget,
-  NewsWidget,
-  QuickStatsWidget,
   SustainabilityWidget,
   DealsTableWidget,
   DownloadsWidget,
   RequestConnectionWidget,
-  ProfileBadgeWidget,
   SubsidiariesWidget,
   BoardMembersWidget,
   ParentGroupCard,
-  RegistrationCtaWidget,
   ExecutiveOrgChart,
+  EntityCoverageWidget,
 } from "@/app/components/entity";
-import { EntityNewsWidget } from "@/app/components/feed/entity-news-widget";
+import { ArticleSidebar } from "@/app/components/content/article-sidebar";
 import { BlockerLabel } from "@/app/components/ui/blocker-label";
 import {
   MOCK_ENTITIES,
@@ -149,6 +144,25 @@ export default async function EntityProfilePage({ params }: PageProps) {
     typeVariant: getTypeVariant(entity.type),
     sector: entity.sector,
     description: entity.description,
+    dataSource: entity.dataSource,
+    website: entity.website,
+    marketCap: entity.marketCap,
+    listingLocation: entity.listingLocation,
+    parentGroupName: entity.parentGroup?.name,
+    sponsorName: entity.sponsor?.name,
+    isRaising: entity.isRaising,
+    stage: entity.stage,
+    location: entity.location,
+    yearEstablished: entity.yearEstablished,
+    languagesCount: entity.languages?.length,
+    practiceAreas: entity.practiceAreas,
+    socialLinks: entity.socialLinks,
+    foreignBlocker:
+      entity.listingLocation === "FOREIGN" ? (
+        <BlockerLabel owner="Zane">
+          Foreign market data is manually entered — long-term solution pending
+        </BlockerLabel>
+      ) : undefined,
   };
 
   /* ── Related research ── */
@@ -176,35 +190,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
           : "Article",
       date: new Date(a.publishedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     }));
-
-  /* ── Quick stats (header sidebar) ── */
-  const quickStats = isServiceProvider
-    ? [
-        { label: "Type", value: typeLabel, isMono: false },
-        { label: "Sector", value: entity.sector, isMono: false },
-        ...(entity.yearEstablished ? [{ label: "Established", value: String(entity.yearEstablished), isMono: true }] : []),
-        ...(entity.languages && entity.languages.length > 0
-          ? [{ label: "Languages", value: entity.languages.join(", "), isMono: false }]
-          : []),
-      ]
-    : isProject
-    ? [
-        { label: "Stage", value: entity.stage ?? "—", isMono: false },
-        { label: "Sector", value: entity.sector, isMono: false },
-        ...(entity.location ? [{ label: "Location", value: entity.location, isMono: false }] : []),
-      ]
-    : isPublic
-    ? [
-        { label: "Market Cap", value: entity.marketCap ?? "—" },
-        { label: "Ticker", value: entity.ticker ?? "—", isMono: true },
-        { label: "Sector", value: entity.sector, isMono: false },
-        ...(entity.price ? [{ label: "Price", value: `₮${entity.price.toLocaleString()}`, isMono: true }] : []),
-      ]
-    : [
-        { label: "Type", value: typeLabel, isMono: false },
-        { label: "Sector", value: entity.sector, isMono: false },
-        ...(entity.isRaising ? [{ label: "Status", value: "Actively Raising", isMono: false }] : []),
-      ];
 
   /* ── Ownership ── */
   const ownership =
@@ -241,51 +226,50 @@ export default async function EntityProfilePage({ params }: PageProps) {
     title: p!.title,
   }));
 
+  /* ── Table of Contents ── */
+  const tocItems: { id: string; label: string }[] = [
+    isPublic && { id: "market-data", label: "Market Data" },
+    isProject && entity.keyMetrics && { id: "key-metrics", label: "Key Metrics" },
+    isServiceProvider && entity.practiceAreas && entity.practiceAreas.length > 0 && {
+      id: "practice-areas",
+      label: "Practice Areas",
+    },
+    isServiceProvider && entity.notableEngagements && entity.notableEngagements.length > 0 && {
+      id: "engagements",
+      label: "Notable Engagements",
+    },
+    isServiceProvider && entity.notableClients && entity.notableClients.length > 0 && {
+      id: "clients",
+      label: "Notable Clients",
+    },
+    showFinancials && { id: "financials", label: "Financial Performance" },
+    showSustainability && { id: "sustainability", label: "Sustainability" },
+    (ownership.length > 0 ||
+      (isPublic && (entity.parentGroup || (entity.subsidiaries && entity.subsidiaries.length > 0)))) && {
+      id: "ownership-structure",
+      label: "Ownership & Structure",
+    },
+    (isPublic ? (entity.ceo || (entity.executives && entity.executives.length > 0)) : personnel.length > 0) && {
+      id: "leadership",
+      label: isPublic ? "Executive Team" : "Key Personnel",
+    },
+    isPublic && entity.boardMembers && entity.boardMembers.length > 0 && {
+      id: "board",
+      label: "Board of Directors",
+    },
+    showDeals && { id: "deals", label: "Deal Insights" },
+    (relatedArticles.length > 0 || isPublic) && { id: "coverage", label: "News & Research" },
+    isServiceProvider && (entity.contactEmail || entity.contactPhone || entity.contactAddress) && {
+      id: "contact",
+      label: "Contact",
+    },
+  ].filter(Boolean) as { id: string; label: string }[];
+
   return (
     <div className="max-w-[var(--content-max)] mx-auto px-6 w-full py-0">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm pt-6 pb-5">
-        <Link href="/directory" className="text-fg-3 no-underline font-medium hover:text-brand transition-colors">
-          Directory
-        </Link>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-fg-3 shrink-0 opacity-40">
-          <path d="m9 18 6-6-6-6" />
-        </svg>
-        <Link href={`/directory?type=${entity.type}`} className="text-fg-3 no-underline font-medium hover:text-brand transition-colors">
-          {typeLabel}
-        </Link>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-fg-3 shrink-0 opacity-40">
-          <path d="m9 18 6-6-6-6" />
-        </svg>
-        <span className="text-fg font-semibold">{entity.name}</span>
-      </nav>
-
       {/* Entity Header */}
-      <EntityHeader {...headerProps} />
-
-      {/* Profile badge + website row */}
-      <div className="flex items-center gap-3 flex-wrap -mt-4 mb-6 text-xs">
-        {entity.dataSource && <ProfileBadgeWidget dataSource={entity.dataSource} />}
-        {entity.website && (
-          <a
-            href={entity.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-brand-l hover:text-brand font-medium no-underline"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            {entity.website.replace(/^https?:\/\//, "")}
-          </a>
-        )}
-        {entity.listingLocation === "FOREIGN" && (
-          <BlockerLabel owner="Zane">
-            Foreign market data is manually entered — long-term solution pending
-          </BlockerLabel>
-        )}
+      <div className="pt-6">
+        <EntityHeader {...headerProps} />
       </div>
 
       {/* Two-column layout */}
@@ -302,6 +286,7 @@ export default async function EntityProfilePage({ params }: PageProps) {
           )}
 
           {isPublic && (
+            <section id="market-data" className="scroll-mt-[80px]">
             <MarketDataWidget
               price={headerProps.price ?? "—"}
               priceChange={headerProps.priceChange ?? "—"}
@@ -323,11 +308,12 @@ export default async function EntityProfilePage({ params }: PageProps) {
               lastUpdated={entity.lastUpdated ?? new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               source={entity.exchange ?? "—"}
             />
+            </section>
           )}
 
           {/* Project key metrics */}
           {isProject && entity.keyMetrics && (
-            <div className="widget">
+            <section id="key-metrics" className="widget scroll-mt-[80px]">
               <div className="widget-header">
                 <span>Key Metrics</span>
               </div>
@@ -341,14 +327,14 @@ export default async function EntityProfilePage({ params }: PageProps) {
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
           {/* Service Provider: Practice Areas + Engagements */}
           {isServiceProvider && (
             <>
               {entity.practiceAreas && entity.practiceAreas.length > 0 && (
-                <div className="widget">
+                <section id="practice-areas" className="widget scroll-mt-[80px]">
                   <div className="widget-header">
                     <span>Practice Areas</span>
                   </div>
@@ -362,11 +348,11 @@ export default async function EntityProfilePage({ params }: PageProps) {
                       </span>
                     ))}
                   </div>
-                </div>
+                </section>
               )}
 
               {entity.notableEngagements && entity.notableEngagements.length > 0 && (
-                <div className="widget">
+                <section id="engagements" className="widget scroll-mt-[80px]">
                   <div className="widget-header">
                     <span>Notable Engagements</span>
                   </div>
@@ -380,11 +366,11 @@ export default async function EntityProfilePage({ params }: PageProps) {
                       ))}
                     </ul>
                   </div>
-                </div>
+                </section>
               )}
 
               {entity.notableClients && entity.notableClients.length > 0 && (
-                <div className="widget">
+                <section id="clients" className="widget scroll-mt-[80px]">
                   <div className="widget-header">
                     <span>Notable Clients</span>
                   </div>
@@ -398,14 +384,14 @@ export default async function EntityProfilePage({ params }: PageProps) {
                       </span>
                     ))}
                   </div>
-                </div>
+                </section>
               )}
             </>
           )}
 
           {/* Financial Performance */}
           {showFinancials && (
-            <div className="flex flex-col gap-3">
+            <section id="financials" className="flex flex-col gap-3 scroll-mt-[80px]">
               {!isPublic && (
                 <BlockerLabel owner="Zoloo & Namkhai" variant="block">
                   Financial Performance structure (Summary Ratios + Multi-Year Tables) is
@@ -451,45 +437,75 @@ export default async function EntityProfilePage({ params }: PageProps) {
                   source={isPublic ? `Source: ${entity.exchange ?? "MSE"} disclosures` : "DRAFT — Structure pending Zoloo & Namkhai sign-off."}
                 />
               )}
-            </div>
+            </section>
           )}
 
           {/* Sustainability */}
-          {showSustainability && <SustainabilityWidget data={entity.sustainability!} />}
+          {showSustainability && (
+            <section id="sustainability" className="scroll-mt-[80px]">
+              <SustainabilityWidget data={entity.sustainability!} />
+            </section>
+          )}
 
-          {/* Ownership & Structure (public company premium) */}
-          {isPublic && (entity.parentGroup || (entity.subsidiaries && entity.subsidiaries.length > 0)) && (
-            <div className="flex flex-col gap-4">
-              {entity.parentGroup && <ParentGroupCard parent={entity.parentGroup} />}
-              {entity.subsidiaries && entity.subsidiaries.length > 0 && (
+          {/* Ownership & Structure */}
+          {(ownership.length > 0 ||
+            (isPublic && (entity.parentGroup || (entity.subsidiaries && entity.subsidiaries.length > 0)))) && (
+            <section id="ownership-structure" className="flex flex-col gap-4 scroll-mt-[80px]">
+              {ownership.length > 0 && <OwnershipWidget owners={ownership} />}
+              {isPublic && entity.parentGroup && <ParentGroupCard parent={entity.parentGroup} />}
+              {isPublic && entity.subsidiaries && entity.subsidiaries.length > 0 && (
                 <SubsidiariesWidget subsidiaries={entity.subsidiaries} />
               )}
-            </div>
+            </section>
           )}
 
           {/* Executive Team */}
           {isPublic ? (
             (entity.ceo || (entity.executives && entity.executives.length > 0)) && (
-              <ExecutiveOrgChart
-                ceo={entity.ceo}
-                executives={entity.executives ?? []}
-              />
+              <section id="leadership" className="scroll-mt-[80px]">
+                <ExecutiveOrgChart
+                  ceo={entity.ceo}
+                  executives={entity.executives ?? []}
+                />
+              </section>
             )
           ) : (
-            personnel.length > 0 && <KeyPersonnelWidget people={personnel} />
+            personnel.length > 0 && (
+              <section id="leadership" className="scroll-mt-[80px]">
+                <KeyPersonnelWidget people={personnel} />
+              </section>
+            )
           )}
 
           {/* Board of Directors (public company premium) */}
           {isPublic && entity.boardMembers && entity.boardMembers.length > 0 && (
-            <BoardMembersWidget members={entity.boardMembers} />
+            <section id="board" className="scroll-mt-[80px]">
+              <BoardMembersWidget members={entity.boardMembers} />
+            </section>
           )}
 
           {/* Deal Insights */}
-          {showDeals && <DealsTableWidget summary={entity.dealsSummary} deals={entity.deals!} />}
+          {showDeals && (
+            <section id="deals" className="scroll-mt-[80px]">
+              <DealsTableWidget summary={entity.dealsSummary} deals={entity.deals!} />
+            </section>
+          )}
+
+          {/* News & Research (combined coverage) */}
+          {(relatedArticles.length > 0 || isPublic) && (
+            <section id="coverage" className="scroll-mt-[80px]">
+              <EntityCoverageWidget
+                entitySlug={entity.slug}
+                research={relatedArticles}
+                useMockNews={isPublic}
+                fallbackNews={!isPublic ? news.map((n) => ({ id: n.id, title: n.title, source: n.source, date: n.date })) : []}
+              />
+            </section>
+          )}
 
           {/* Service Provider contact */}
           {isServiceProvider && (entity.contactEmail || entity.contactPhone || entity.contactAddress) && (
-            <div className="widget">
+            <section id="contact" className="widget scroll-mt-[80px]">
               <div className="widget-header">
                 <span>Contact</span>
               </div>
@@ -515,18 +531,16 @@ export default async function EntityProfilePage({ params }: PageProps) {
                   </div>
                 )}
               </div>
-            </div>
+            </section>
           )}
         </div>
 
         {/* ── Sticky sidebar ── */}
         <aside className="lg:sticky lg:top-[80px] flex flex-col gap-5 max-lg:grid max-lg:grid-cols-2 max-md:grid-cols-1">
+          {tocItems.length > 0 && <ArticleSidebar toc={tocItems} />}
           {showConnection && (
             <RequestConnectionWidget entityName={entity.name} loggedIn={false} />
           )}
-          {isPublic && <RegistrationCtaWidget entityName={entity.name} />}
-          <QuickStatsWidget stats={quickStats} />
-          {ownership.length > 0 && <OwnershipWidget owners={ownership} />}
           <DownloadsWidget
             reports={entity.reports}
             pitchDecks={entity.pitchDecks}
@@ -535,12 +549,6 @@ export default async function EntityProfilePage({ params }: PageProps) {
             operationalDocs={entity.operationalDocs}
             requiresAuth
           />
-          {isPublic ? (
-            <EntityNewsWidget entitySlug={entity.slug} title="Recent News" />
-          ) : (
-            <NewsWidget items={news} />
-          )}
-          {relatedArticles.length > 0 && <ResearchWidget items={relatedArticles} />}
         </aside>
       </div>
     </div>
