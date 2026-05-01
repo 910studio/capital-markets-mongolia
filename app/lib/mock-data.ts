@@ -146,6 +146,11 @@ export interface MockEntity {
   /* Header */
   logo?: string;
   website?: string;
+  socialLinks?: {
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+  };
 
   /* Financial — BLOCKED pending Zoloo/Namkhai structure */
   summaryRatios?: SummaryRatios;
@@ -459,6 +464,11 @@ export const MOCK_ENTITIES: MockEntity[] = [
     price: 48200,
     change: 1200,
     changePercent: 2.55,
+    website: "https://khanbank.com",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/khan-bank",
+      facebook: "https://facebook.com/khanbank",
+    },
   },
   {
     slug: "erdenet-mining",
@@ -481,6 +491,12 @@ export const MOCK_ENTITIES: MockEntity[] = [
     change: -450,
     changePercent: -1.37,
     isRaising: true,
+    website: "https://tdbm.mn",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/trade-and-development-bank",
+      twitter: "https://twitter.com/tdbmongolia",
+      facebook: "https://facebook.com/tdbmongolia",
+    },
   },
   {
     slug: "ard-financial-group",
@@ -493,6 +509,11 @@ export const MOCK_ENTITIES: MockEntity[] = [
     price: 1850,
     change: 45,
     changePercent: 2.49,
+    website: "https://ard.mn",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/ard-financial-group",
+      facebook: "https://facebook.com/ardholdings",
+    },
   },
   {
     slug: "mse",
@@ -501,6 +522,11 @@ export const MOCK_ENTITIES: MockEntity[] = [
     sector: "Capital Markets",
     type: "public_company",
     description: "Mongolia's primary securities exchange. ~200 listed companies, market cap ~MNT 10T.",
+    website: "https://mse.mn",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/mongolian-stock-exchange",
+      facebook: "https://facebook.com/mongolianstockexchange",
+    },
   },
   {
     slug: "oyu-tolgoi",
@@ -536,6 +562,11 @@ export const MOCK_ENTITIES: MockEntity[] = [
     isFeatured: true,
     dataSource: "CMM Verified",
     website: "https://golomtbank.com",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/golomt-bank",
+      twitter: "https://twitter.com/golomtbank",
+      facebook: "https://facebook.com/golomtbank",
+    },
 
     /* Financials — placeholder structure, real numbers TBD */
     summaryRatios: {
@@ -868,6 +899,11 @@ export const MOCK_ENTITIES: MockEntity[] = [
     price: 520,
     change: -8,
     changePercent: -1.52,
+    website: "https://mandal.mn",
+    socialLinks: {
+      linkedin: "https://linkedin.com/company/mandal-insurance",
+      facebook: "https://facebook.com/mandalinsurance",
+    },
   },
   {
     slug: "baker-mckenzie-mongolia",
