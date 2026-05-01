@@ -162,20 +162,11 @@ function StatusBadge({
   status: { label: string; tone: "signal" | "pos" | "neg" | "fg" };
   size?: "xs" | "sm";
 }) {
-  const toneClass =
-    status.tone === "signal"
-      ? "bg-[var(--signal-m)] text-[color:var(--signal-h)]"
-      : status.tone === "pos"
-      ? "bg-[var(--pos-m)] text-[color:var(--pos-t)]"
-      : status.tone === "neg"
-      ? "bg-[var(--neg-m)] text-[color:var(--neg-t)]"
-      : "bg-surface text-fg-2";
   return (
     <span
       className={cn(
-        "inline-flex items-center font-mono uppercase font-semibold tracking-badge rounded-[var(--btn-r)]",
-        toneClass,
-        size === "xs" ? "text-[9px] px-1.5 py-0.5" : "text-[10px] px-2 py-0.5"
+        "inline-flex items-center font-body font-medium rounded-[var(--btn-r)] bg-surface text-fg-2",
+        size === "xs" ? "text-[10px] px-1.5 py-0.5" : "text-[11px] px-2 py-0.5",
       )}
     >
       {status.label}

@@ -5,7 +5,6 @@ import {
   NEWS_CATEGORY_COLORS,
   NEWS_CATEGORY_LABELS,
 } from "@/app/lib/mock-data";
-import { cn } from "@/app/lib/cn";
 
 interface NewsItemCardProps {
   item: MockNewsItem;
@@ -132,7 +131,7 @@ export function NewsItemCard({
               <Link
                 key={e.slug}
                 href={`/directory/${e.slug}`}
-                className="font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-brand-m text-brand no-underline hover:bg-brand hover:text-white transition-colors"
+                className="font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2 no-underline hover:bg-brand-m hover:text-brand transition-colors"
               >
                 {e.ticker ?? e.name}
               </Link>
@@ -175,8 +174,7 @@ function CategoryDot({
 
 function BreakingBadge() {
   return (
-    <span className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-badge font-bold text-[color:var(--neg-t)] bg-[var(--neg-m)] px-1.5 py-0.5 rounded-[var(--btn-r)]">
-      <span className="w-1 h-1 rounded-full bg-[color:var(--neg)] animate-pulse" />
+    <span className="inline-flex items-center font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2">
       Breaking
     </span>
   );
@@ -185,10 +183,7 @@ function BreakingBadge() {
 function LowConfidenceBadge() {
   return (
     <span
-      className={cn(
-        "inline-flex items-center font-mono text-[10px] uppercase tracking-badge font-semibold",
-        "text-fg-3 border border-border bg-[var(--surface-down)] px-1.5 py-0.5 rounded-[var(--btn-r)]"
-      )}
+      className="inline-flex items-center font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2"
       title="Low-confidence AI tagging — pending analyst review"
     >
       Unverified
