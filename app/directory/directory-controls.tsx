@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { EntityCard } from "@/app/components/directory/entity-card";
 import { cn } from "@/app/lib/cn";
 import type { MockEntity } from "@/app/lib/mock-data";
@@ -43,6 +43,151 @@ function writeParams(state: {
   window.history.replaceState(null, "", str ? `?${str}` : window.location.pathname);
 }
 
+/* ── Sector dropdown ─────────────────────── */
+
+function SectorDropdown({
+  value,
+  onChange,
+  options,
+}: {
+  value: string | null;
+  onChange: (value: string | null) => void;
+  options: readonly string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number; minWidth: number } | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+
+  /* Recompute panel position any time it opens or the viewport changes */
+  useEffect(() => {
+    if (!open) {
+      setPos(null);
+      return;
+    }
+    const update = () => {
+      const el = triggerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setPos({ top: r.bottom + 6, left: r.left, minWidth: Math.max(r.width, 220) });
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open]);
+
+  /* Click-outside + Escape */
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (
+        triggerRef.current && !triggerRef.current.contains(t) &&
+        panelRef.current && !panelRef.current.contains(t)
+      ) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const label = value ?? "All Sectors";
+  const active = !!value;
+
+  return (
+    <>
+      <button
+        type="button"
+        ref={triggerRef}
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "flex items-center gap-2 px-3 py-1.5 rounded-[var(--btn-r)] border text-sm font-display font-semibold cursor-pointer transition-all duration-[200ms] whitespace-nowrap",
+          active
+            ? "border-transparent bg-brand-m text-brand"
+            : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l",
+        )}
+      >
+        <span>{label}</span>
+        <svg
+          className={cn(
+            "transition-transform duration-200",
+            open && "rotate-180",
+          )}
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {open && pos && (
+        <div
+          ref={panelRef}
+          style={{ position: "fixed", top: pos.top, left: pos.left, minWidth: pos.minWidth }}
+          className="z-[100] py-1 rounded-[var(--card-r)] border border-border bg-[var(--white)] shadow-lg max-h-[320px] overflow-y-auto scrollbar-none"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              onChange(null);
+              setOpen(false);
+            }}
+            className={cn(
+              "flex items-center w-full text-left px-3 py-2 text-sm font-medium cursor-pointer transition-colors border-none",
+              !active
+                ? "bg-brand-m text-brand font-semibold"
+                : "bg-transparent text-fg-2 hover:bg-surface hover:text-fg",
+            )}
+          >
+            All Sectors
+          </button>
+          <div className="h-px bg-border-s my-1" />
+          {options.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => {
+                onChange(s);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex items-center gap-2 w-full text-left px-3 py-2 text-sm font-medium cursor-pointer transition-colors border-none",
+                value === s
+                  ? "bg-brand-m text-brand font-semibold"
+                  : "bg-transparent text-fg-2 hover:bg-surface hover:text-fg",
+              )}
+            >
+              <span
+                className={cn(
+                  "w-1.5 h-1.5 rounded-full shrink-0 transition-colors",
+                  value === s ? "bg-brand" : "bg-fg-3",
+                )}
+              />
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 /* ── Search icon ─────────────────────────── */
 
 function SearchIcon() {
@@ -71,6 +216,13 @@ interface DirectoryControlsProps {
   entities: MockEntity[];
 }
 
+type LayoutVariant = "v1" | "v2";
+
+const LAYOUT_OPTIONS: { value: LayoutVariant; label: string }[] = [
+  { value: "v1", label: "V1 — Drawer" },
+  { value: "v2", label: "V2 — Inline Filters" },
+];
+
 export function DirectoryControls({ entities }: DirectoryControlsProps) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
@@ -78,6 +230,7 @@ export function DirectoryControls({ entities }: DirectoryControlsProps) {
   const [raising, setRaising] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [layout, setLayout] = useState<LayoutVariant>("v1");
 
   /* Hydrate from URL on mount */
   useEffect(() => {
@@ -159,8 +312,8 @@ export function DirectoryControls({ entities }: DirectoryControlsProps) {
 
   return (
     <>
-      {/* Slide-in drawer + backdrop */}
-      {drawerOpen && (
+      {/* Slide-in drawer + backdrop (V1 only) */}
+      {layout === "v1" && drawerOpen && (
         <div
           className="fixed inset-0 z-[60] bg-black/30"
           onClick={() => setDrawerOpen(false)}
@@ -171,7 +324,7 @@ export function DirectoryControls({ entities }: DirectoryControlsProps) {
           "fixed top-0 left-0 z-[61] h-full w-[340px] max-w-[85vw] bg-[var(--white)] border-r border-border shadow-xl",
           "flex flex-col",
           "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          drawerOpen ? "translate-x-0" : "-translate-x-full"
+          layout === "v1" && drawerOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-border-s shrink-0">
@@ -279,67 +432,149 @@ export function DirectoryControls({ entities }: DirectoryControlsProps) {
         </p>
       </div>
 
-      {/* Top bar */}
-      <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
-        <div className="flex items-center gap-3 flex-wrap">
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-[var(--btn-r)] border text-sm font-display font-semibold cursor-pointer transition-all duration-[200ms]",
-              hasFilters
-                ? "border-brand bg-brand-m text-brand"
-                : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
-            )}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
-              <line x1="4" y1="6" x2="20" y2="6" />
-              <line x1="4" y1="12" x2="14" y2="12" />
-              <line x1="4" y1="18" x2="10" y2="18" />
-            </svg>
-            Filters
-            {activeCount > 0 && (
-              <span className="w-5 h-5 rounded-full bg-brand text-white text-[10px] font-bold grid place-items-center">
-                {activeCount}
+      {/* ── V1: drawer-trigger top bar ─────────────────── */}
+      {layout === "v1" && (
+        <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className={cn(
+                "flex items-center gap-2 px-3 py-1.5 rounded-[var(--btn-r)] border text-sm font-display font-semibold cursor-pointer transition-all duration-[200ms]",
+                hasFilters
+                  ? "border-brand bg-brand-m text-brand"
+                  : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
+              )}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="14" y2="12" />
+                <line x1="4" y1="18" x2="10" y2="18" />
+              </svg>
+              Filters
+              {activeCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-brand text-white text-[10px] font-bold grid place-items-center">
+                  {activeCount}
+                </span>
+              )}
+            </button>
+
+            {type !== "all" && (
+              <span className="flex items-center gap-1.5 text-xs font-medium text-brand bg-brand-m px-2.5 py-1 rounded-[var(--btn-r)]">
+                {ENTITY_TYPE_LABELS[type as keyof typeof ENTITY_TYPE_LABELS]}
+                <button onClick={() => setType("all")} className="text-brand hover:text-brand-h cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
               </span>
             )}
+            {sector && (
+              <span className="flex items-center gap-1.5 text-xs font-medium text-brand bg-brand-m px-2.5 py-1 rounded-[var(--btn-r)]">
+                {sector}
+                <button onClick={() => setSector(null)} className="text-brand hover:text-brand-h cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
+              </span>
+            )}
+            {raising && (
+              <span className="flex items-center gap-1.5 text-xs font-medium text-signal-h bg-signal-m px-2.5 py-1 rounded-[var(--btn-r)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-signal" />
+                Actively Raising
+                <button onClick={() => setRaising(false)} className="text-signal-h hover:text-signal cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="relative w-[280px] max-md:w-full">
+              <SearchIcon />
+              <input
+                type="text"
+                placeholder="Search by name, ticker..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input !pl-9"
+              />
+            </div>
+            <span className="text-xs text-fg-3 font-mono whitespace-nowrap">{total} results</span>
+          </div>
+        </div>
+      )}
+
+      {/* ── V2: inline filter bar — single row ── */}
+      {layout === "v2" && (
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto scrollbar-none -mx-1 px-1">
+          {/* Type tabs */}
+          {ENTITY_TYPE_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => { setType(f.value); window.scrollTo({ top: 0 }); }}
+              className={cn(
+                "px-3 py-1.5 rounded-[var(--btn-r)] text-sm font-display font-semibold whitespace-nowrap transition-all border border-transparent cursor-pointer shrink-0",
+                type === f.value
+                  ? "bg-brand-m text-brand"
+                  : "text-fg-2 hover:text-fg hover:bg-surface",
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+
+          {/* Divider */}
+          <div className="w-px h-5 bg-border-s mx-1 shrink-0" />
+
+          {/* Sector dropdown (custom, styled) */}
+          <div className="shrink-0">
+            <SectorDropdown value={sector} onChange={setSector} options={SECTOR_LIST} />
+          </div>
+
+          {/* Raising toggle */}
+          <button
+            onClick={() => setRaising(!raising)}
+            role="switch"
+            aria-checked={raising}
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-[var(--btn-r)] border text-sm font-display font-semibold cursor-pointer transition-all duration-[200ms] whitespace-nowrap shrink-0",
+              raising
+                ? "border-transparent bg-brand-m text-brand"
+                : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l",
+            )}
+          >
+            <span
+              className={cn(
+                "relative inline-block w-8 h-[18px] rounded-full transition-colors duration-200 shrink-0",
+                raising ? "bg-brand" : "bg-border",
+              )}
+            >
+              <span
+                className={cn(
+                  "absolute top-[2px] left-[2px] w-[14px] h-[14px] rounded-full bg-[var(--white)] shadow-sm transition-transform duration-200",
+                  raising ? "translate-x-[14px]" : "translate-x-0",
+                )}
+              />
+            </span>
+            Actively Raising
           </button>
 
-          {type !== "all" && (
-            <span className="flex items-center gap-1.5 text-xs font-medium text-brand bg-brand-m px-2.5 py-1 rounded-[var(--btn-r)]">
-              {ENTITY_TYPE_LABELS[type as keyof typeof ENTITY_TYPE_LABELS]}
-              <button onClick={() => setType("all")} className="text-brand hover:text-brand-h cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
-            </span>
+          {hasFilters && (
+            <button
+              onClick={clearAll}
+              className="text-xs font-display font-semibold text-fg-3 hover:text-brand cursor-pointer bg-transparent border-none px-2 whitespace-nowrap shrink-0"
+            >
+              Clear all
+            </button>
           )}
-          {sector && (
-            <span className="flex items-center gap-1.5 text-xs font-medium text-brand bg-brand-m px-2.5 py-1 rounded-[var(--btn-r)]">
-              {sector}
-              <button onClick={() => setSector(null)} className="text-brand hover:text-brand-h cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
-            </span>
-          )}
-          {raising && (
-            <span className="flex items-center gap-1.5 text-xs font-medium text-signal-h bg-signal-m px-2.5 py-1 rounded-[var(--btn-r)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-signal" />
-              Actively Raising
-              <button onClick={() => setRaising(false)} className="text-signal-h hover:text-signal cursor-pointer bg-transparent border-none p-0 text-xs font-bold">×</button>
-            </span>
-          )}
-        </div>
 
-        <div className="flex items-center gap-3">
-          {/* Search */}
-          <div className="relative w-[280px] max-md:w-full">
+          {/* Spacer pushes search + count to the right */}
+          <div className="flex-1" />
+
+          <div className="relative w-[240px] shrink-0 max-md:w-[180px]">
             <SearchIcon />
             <input
               type="text"
               placeholder="Search by name, ticker..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="input pl-9"
+              className="input !pl-9"
             />
           </div>
-          <span className="text-xs text-fg-3 font-mono whitespace-nowrap">{total} results</span>
+          <span className="text-xs text-fg-3 font-mono whitespace-nowrap shrink-0">{total} results</span>
         </div>
-      </div>
+      )}
 
       {/* Content */}
       {filtered.length === 0 ? (
@@ -403,6 +638,24 @@ export function DirectoryControls({ entities }: DirectoryControlsProps) {
           })}
         </div>
       )}
+
+      {/* Floating variant switcher (bottom-center) */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 p-1 rounded-[var(--btn-r)] border border-border bg-[var(--white)] shadow-lg">
+        {LAYOUT_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => setLayout(opt.value)}
+            className={cn(
+              "px-3 py-1.5 rounded-[var(--btn-r)] text-xs font-display font-semibold cursor-pointer transition-all duration-[200ms] border-none",
+              layout === opt.value
+                ? "bg-brand text-white"
+                : "bg-transparent text-fg-2 hover:text-brand",
+            )}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
     </>
   );
 }
