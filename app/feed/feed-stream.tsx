@@ -81,10 +81,10 @@ export function FeedStream({ items }: FeedStreamProps) {
                 key={c.value}
                 onClick={() => setCategory(c.value)}
                 className={cn(
-                  "px-3 py-1.5 rounded-[var(--btn-r)] text-sm font-display font-semibold whitespace-nowrap transition-all border cursor-pointer",
+                  "px-3 py-1.5 rounded-[var(--btn-r)] text-sm font-display font-semibold whitespace-nowrap transition-all border border-transparent cursor-pointer",
                   category === c.value
-                    ? "border-brand bg-brand-m text-brand"
-                    : "border-transparent text-fg-2 hover:text-fg hover:bg-surface"
+                    ? "bg-brand-m text-brand"
+                    : "text-fg-2 hover:text-fg hover:bg-surface"
                 )}
               >
                 {c.label}
@@ -128,7 +128,7 @@ export function FeedStream({ items }: FeedStreamProps) {
                     className="sticky z-20 -mx-2 px-2 py-2 backdrop-blur-md bg-[var(--header-blur)] border-b border-border-s flex items-center gap-3 mb-3"
                     style={{ top: "var(--header-h)" }}
                   >
-                    <h2 className="font-display font-extrabold text-sm uppercase tracking-[0.08em] text-fg-2">
+                    <h2 className="font-display font-extrabold text-sm tracking-tight text-fg-2">
                       {label}
                     </h2>
                     <div className="flex-1 h-px bg-border-s" />
