@@ -7,6 +7,15 @@ interface ProfileBadgeWidgetProps {
 }
 
 const BADGE_STYLES: Record<DataSource, { label: string; classes: string; icon: React.ReactNode }> = {
+  "CMM Curated": {
+    label: "CMM Curated",
+    classes: "bg-pos-m text-pos",
+    icon: (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z" />
+      </svg>
+    ),
+  },
   "CMM Verified": {
     label: "CMM Verified",
     classes: "bg-pos-m text-pos",
@@ -14,6 +23,17 @@ const BADGE_STYLES: Record<DataSource, { label: string; classes: string; icon: R
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
         <path d="m9 11 3 3L22 4" />
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      </svg>
+    ),
+  },
+  "AI-Sourced": {
+    label: "AI-Sourced · Unverified",
+    classes: "bg-signal-m text-signal-h",
+    icon: (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
       </svg>
     ),
   },

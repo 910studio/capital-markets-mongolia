@@ -14,6 +14,7 @@ import {
   ParentGroupCard,
   ExecutiveOrgChart,
   EntityCoverageWidget,
+  AISourcedProfile,
 } from "@/app/components/entity";
 import { ArticleSidebar } from "@/app/components/content/article-sidebar";
 import { BlockerLabel } from "@/app/components/ui/blocker-label";
@@ -110,6 +111,11 @@ export default async function EntityProfilePage({ params }: PageProps) {
   const { slug } = await params;
   const entity = MOCK_ENTITIES.find((e) => e.slug === slug);
   if (!entity) notFound();
+
+  /* AI-Sourced profiles render the thin fall-back layout */
+  if (entity.dataSource === "AI-Sourced") {
+    return <AISourcedProfile entity={entity} />;
+  }
 
   const initials = entity.name
     .split(/[\s-]+/)

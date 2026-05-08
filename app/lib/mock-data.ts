@@ -45,7 +45,25 @@ export const SECTOR_LIST = [
 
 /* ── Rich entity spec (from Entity Fields Master, Apr 23) ── */
 
-export type DataSource = "AI-Generated" | "CMM Verified" | "Company Submitted";
+export type DataSource = "AI-Sourced" | "AI-Generated" | "CMM Verified" | "CMM Curated" | "Company Submitted";
+
+export type AIConfidence = "high" | "medium" | "low";
+
+export interface AISourceCitation {
+  field: string;
+  source: string;
+  url?: string;
+  confidence: AIConfidence;
+}
+
+export interface AISourceMeta {
+  /** ISO date the AI pipeline last refreshed this profile */
+  lastCrawled: string;
+  /** Field-level provenance for analyst spot-check */
+  citations: AISourceCitation[];
+  /** Optional model + run ID for traceability */
+  pipelineRun?: string;
+}
 export type ListingLocation = "LOCAL" | "FOREIGN";
 export type ProjectStage = "Exploration" | "Feasibility" | "Construction" | "Operating" | "Expansion";
 
@@ -198,6 +216,9 @@ export interface MockEntity {
   sustainabilityDocs?: Download[];
   investmentTeasers?: Download[];
   operationalDocs?: Download[];
+
+  /* AI-Sourced metadata (only present when dataSource === "AI-Sourced") */
+  aiMeta?: AISourceMeta;
 }
 
 export const MOCK_ARTICLES: MockArticle[] = [
@@ -982,6 +1003,88 @@ export const MOCK_ENTITIES: MockEntity[] = [
     price: 1240,
     change: 15,
     changePercent: 1.22,
+  },
+
+  /* ── AI-Sourced profiles (fall-back tier, sparse data, claim CTAs) ── */
+  {
+    slug: "khar-tolgoi-mining",
+    name: "Khar Tolgoi Mining JSC",
+    ticker: "KHTM",
+    sector: "Mining & Resources",
+    type: "public_company",
+    description:
+      "Khar Tolgoi Mining JSC is an MSE-listed company referenced in mineral processing filings, with reported activity in fluorspar and base metals. Public disclosures suggest small-cap operations in the Selenge aimag. This profile is auto-generated from open sources and has not been verified by CMM analysts. Financial data, ownership, and corporate filings have not been reviewed.",
+    listingLocation: "LOCAL",
+    exchange: "MSE",
+    website: "https://khartolgoi.mn",
+    location: "Selenge, Mongolia",
+    yearEstablished: 2007,
+    dataSource: "AI-Sourced",
+    aiMeta: {
+      lastCrawled: "2026-05-05",
+      pipelineRun: "ai-pipeline-2026-05-05-r92",
+      citations: [
+        { field: "name", source: "MSE listed companies registry", confidence: "high" },
+        { field: "ticker", source: "MSE listed companies registry", confidence: "high" },
+        { field: "exchange", source: "MSE listed companies registry", confidence: "high" },
+        { field: "sector", source: "MSE sector classification", confidence: "high" },
+        { field: "yearEstablished", source: "State Registration Office record", confidence: "medium" },
+        { field: "location", source: "MRPAM license geo-data", confidence: "medium" },
+        { field: "website", source: "Domain WHOIS + MSE filings", confidence: "medium" },
+        { field: "description", source: "Synthesized from MSE filings + 3 news mentions", confidence: "low" },
+      ],
+    },
+  },
+  {
+    slug: "bayan-airag-exploration",
+    name: "Bayan-Airag Exploration LLC",
+    sector: "Mining & Resources",
+    type: "private_company",
+    description:
+      "Bayan-Airag Exploration LLC is a Mongolia-registered mineral exploration company reportedly holding licenses in the Govi-Altai region. Public records suggest a focus on copper-gold porphyry targets. This profile is auto-generated from open sources and has not been verified by CMM analysts.",
+    website: "https://bayan-airag.mn",
+    location: "Govi-Altai, Mongolia",
+    yearEstablished: 2018,
+    dataSource: "AI-Sourced",
+    aiMeta: {
+      lastCrawled: "2026-05-04",
+      pipelineRun: "ai-pipeline-2026-05-04-r91",
+      citations: [
+        { field: "name", source: "Mongolia State Registry", confidence: "high" },
+        { field: "sector", source: "Inferred from mineral license filings (MRPAM)", confidence: "high" },
+        { field: "yearEstablished", source: "State Registration Office record", confidence: "high" },
+        { field: "location", source: "MRPAM license geo-data", confidence: "medium" },
+        { field: "website", source: "Web crawl, domain WHOIS", confidence: "medium" },
+        { field: "description", source: "Generated from filings + sector context", confidence: "low" },
+      ],
+    },
+  },
+  {
+    slug: "digipay-mongolia",
+    name: "DigiPay Mongolia LLC",
+    sector: "Technology",
+    type: "private_company",
+    description:
+      "DigiPay Mongolia LLC appears to operate a mobile payments and merchant settlement platform serving small businesses in Ulaanbaatar. Press mentions reference partnerships with two domestic banks. Headcount and financials are not publicly disclosed. This profile is auto-generated from open sources.",
+    website: "https://digipay.mn",
+    location: "Ulaanbaatar, Mongolia",
+    yearEstablished: 2021,
+    dataSource: "AI-Sourced",
+    socialLinks: {
+      facebook: "https://facebook.com/digipaymn",
+    },
+    aiMeta: {
+      lastCrawled: "2026-05-06",
+      pipelineRun: "ai-pipeline-2026-05-06-r93",
+      citations: [
+        { field: "name", source: "Mongolia State Registry", confidence: "high" },
+        { field: "sector", source: "Inferred from press coverage + website meta", confidence: "high" },
+        { field: "website", source: "Domain WHOIS + Google search", confidence: "high" },
+        { field: "yearEstablished", source: "State Registration Office record", confidence: "medium" },
+        { field: "location", source: "Website footer + LinkedIn", confidence: "medium" },
+        { field: "description", source: "Synthesized from 4 news mentions", confidence: "low" },
+      ],
+    },
   },
 ];
 
