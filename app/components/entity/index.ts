@@ -17,3 +17,4 @@ export { BoardMembersWidget } from "./board-members-widget";
 export { ParentGroupCard } from "./parent-group-card";
 export { ExecutiveOrgChart } from "./executive-org-chart";
 export { EntityCoverageWidget } from "./entity-coverage-widget";
+export { AISourcedProfile } from "./ai-sourced-profile";
