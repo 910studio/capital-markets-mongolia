@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { FeedbackProvider } from "@910studio/feedback-widget";
 import { Header } from "./components/layout/header";
 import { Footer } from "./components/layout/footer";
 import { OfflineScreen } from "./components/layout/offline-screen";
@@ -41,16 +40,14 @@ export default function RootLayout({
       className={`${plusJakarta.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-screen">
-        <FeedbackProvider config={{ projectId: "cmm-fe", accentColor: "#7B4FD6" }}>
-          <OfflineScreen />
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="pt-[var(--header-h)] flex-1 w-full">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </FeedbackProvider>
+        <OfflineScreen />
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="pt-[var(--header-h)] flex-1 w-full">
+            {children}
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
