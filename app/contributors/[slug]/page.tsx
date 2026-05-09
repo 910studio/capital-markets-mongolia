@@ -1,20 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MOCK_CONTRIBUTORS, MOCK_ARTICLES } from "@/app/lib/mock-data";
+import { MOCK_CONTRIBUTORS, MOCK_ARTICLES, type MockContributor } from "@/app/lib/mock-data";
 import { notFound } from "next/navigation";
+import { apiGet, path, ApiError } from "@/app/lib/api";
+import { adaptContributor, adaptInsightToArticle } from "@/app/lib/api-adapters";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const contributor = MOCK_CONTRIBUTORS.find((c) => c.slug === slug);
+interface ContributorArticle {
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  publishedAt: string;
+  contentType: string;
+  topics: string[];
+}
 
-  return {
-    title: contributor ? `${contributor.name} — MarketIQ` : "Contributor — MarketIQ",
-    description: contributor?.bio ?? "MarketIQ contributor profile.",
-  };
+interface LoadedContributor {
+  contributor: MockContributor;
+  articles: ContributorArticle[];
 }
 
 const AUTHOR_SLUG_MAP: Record<string, string> = {
@@ -27,16 +34,82 @@ const AUTHOR_SLUG_MAP: Record<string, string> = {
   "CMM Research": "cmm-research",
 };
 
+async function loadContributor(slug: string): Promise<LoadedContributor | null> {
+  // Try BFF first
+  try {
+    const dto = await apiGet(path("/api/contributors/{slug}", { slug }), {
+      next: { revalidate: 60, tags: [`contributor:${slug}`] },
+    });
+    const contributor = adaptContributor(dto);
+    // Fetch all insights, filter by author slug client-side (BFF list is small)
+    let articles: ContributorArticle[] = [];
+    try {
+      const insightsRes = await apiGet("/api/insights", {
+        query: { limit: 50 },
+        next: { revalidate: 60, tags: ["insights"] },
+      });
+      articles = insightsRes.items
+        .filter((it) => it.author?.slug === slug)
+        .map((it) => {
+          const a = adaptInsightToArticle(it);
+          return {
+            slug: a.slug,
+            title: a.title,
+            excerpt: a.excerpt,
+            date: a.date,
+            publishedAt: a.date,
+            contentType: it.contentType,
+            topics: a.topics ?? [],
+          };
+        });
+    } catch (err) {
+      console.error(`[contributor:${slug}] insights fetch failed:`, err);
+    }
+    return { contributor, articles };
+  } catch (err) {
+    if (!(err instanceof ApiError && err.status === 404)) {
+      console.error(`[contributor:${slug}] BFF failed, falling back to mock:`, err);
+    }
+  }
+  // Mock fallback
+  const mock = MOCK_CONTRIBUTORS.find((c) => c.slug === slug);
+  if (!mock) return null;
+  const articles: ContributorArticle[] = MOCK_ARTICLES
+    .filter((a) => AUTHOR_SLUG_MAP[a.author] === slug)
+    .map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      excerpt: a.excerpt,
+      date: new Date(a.publishedAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      publishedAt: new Date(a.publishedAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      contentType: a.contentType,
+      topics: a.topics,
+    }));
+  return { contributor: mock, articles };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const loaded = await loadContributor(slug);
+  return {
+    title: loaded ? `${loaded.contributor.name} — MarketIQ` : "Contributor — MarketIQ",
+    description: loaded?.contributor.bio ?? "MarketIQ contributor profile.",
+  };
+}
+
 export default async function ContributorPage({ params }: PageProps) {
   const { slug } = await params;
-  const contributor = MOCK_CONTRIBUTORS.find((c) => c.slug === slug);
-
-  if (!contributor) notFound();
-
-  const articles = MOCK_ARTICLES.filter((a) => {
-    const authorSlug = AUTHOR_SLUG_MAP[a.author];
-    return authorSlug === slug;
-  });
+  const loaded = await loadContributor(slug);
+  if (!loaded) notFound();
+  const { contributor, articles } = loaded;
 
   return (
     <div className="content-max">

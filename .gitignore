@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated API contract artifact (regenerate via api/pnpm openapi:emit)
+/openapi.json

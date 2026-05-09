@@ -24,7 +24,48 @@ import {
   ENTITY_TYPE_LABELS,
   type MockEntity,
 } from "@/app/lib/mock-data";
+import { apiGet, path, ApiError } from "@/app/lib/api";
+import { adaptEntityDetail } from "@/app/lib/api-adapters";
 import { ProfileVariants } from "./profile-variants";
+
+/**
+ * Hybrid loader: tries live API first, then mock by slug, merges API basics
+ * (name/description/sector/ticker/website) over mock rich fields (financials,
+ * sustainability, deals, etc.) so detail page renders both real + designed
+ * content during the integration ramp.
+ */
+async function loadEntity(slug: string): Promise<MockEntity | null> {
+  let apiEntity: MockEntity | null = null;
+  try {
+    const dto = await apiGet(path("/api/entities/{slug}", { slug }), {
+      next: { revalidate: 60, tags: [`entity:${slug}`] },
+    });
+    apiEntity = adaptEntityDetail(dto);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) {
+      // fall through to mock
+    } else {
+      console.error(`[entity:${slug}] API fetch failed, mock-only:`, err);
+    }
+  }
+  const mockEntity = MOCK_ENTITIES.find((e) => e.slug === slug);
+  if (apiEntity && mockEntity) {
+    // API basics override mock; mock retains rich fields the DTO doesn't expose.
+    return {
+      ...mockEntity,
+      name: apiEntity.name,
+      ticker: apiEntity.ticker ?? mockEntity.ticker,
+      sector: apiEntity.sector,
+      type: apiEntity.type,
+      description: apiEntity.description || mockEntity.description,
+      logo: apiEntity.logo ?? mockEntity.logo,
+      website: apiEntity.website ?? mockEntity.website,
+      yearEstablished: apiEntity.yearEstablished ?? mockEntity.yearEstablished,
+      dataSource: apiEntity.dataSource ?? mockEntity.dataSource,
+    };
+  }
+  return apiEntity ?? mockEntity ?? null;
+}
 
 /* ═══════════════════════════════════════════════════════════
    Entity Profile — /directory/[slug]
@@ -100,7 +141,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const ent = MOCK_ENTITIES.find((e) => e.slug === slug);
+  const ent = await loadEntity(slug);
   return {
     title: ent ? `${ent.name} — MarketIQ` : "Directory — MarketIQ",
     description: ent?.description ?? "Mongolia's capital markets company directory.",
@@ -109,7 +150,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EntityProfilePage({ params }: PageProps) {
   const { slug } = await params;
-  const entity = MOCK_ENTITIES.find((e) => e.slug === slug);
+  const entity = await loadEntity(slug);
   if (!entity) notFound();
 
   /* AI-Sourced profiles render the thin fall-back layout */
