@@ -94,16 +94,16 @@ export function ContentCard({
   /* ── Featured: big card with image on top, larger text below ── */
   if (featured) {
     return (
-      <Link href={href} className="card block no-underline !p-0 overflow-hidden h-full flex flex-col">
+      <Link href={href} className="insight-card card block no-underline !p-0 overflow-hidden h-full flex flex-col">
         {image && (
           <div
             className={
               fillHeight
-                ? "relative w-full flex-1 min-h-0"
-                : "relative aspect-[16/10] w-full shrink-0"
+                ? "relative w-full flex-1 min-h-0 overflow-hidden"
+                : "relative aspect-[16/10] w-full shrink-0 overflow-hidden"
             }
           >
-            {image}
+            <div className="insight-img absolute inset-0">{image}</div>
           </div>
         )}
         <div
@@ -140,10 +140,10 @@ export function ContentCard({
   /* ── Flank Featured: stretches to full height next to a featured card ── */
   if (flankFeatured) {
     return (
-      <Link href={href} className="card flex flex-col no-underline overflow-hidden min-w-0 h-full">
+      <Link href={href} className="insight-card card flex flex-col no-underline overflow-hidden min-w-0 h-full">
         {image && (
           <div className="rounded-[var(--card-img-r)] overflow-hidden border border-border-s relative aspect-[4/3] -mx-[var(--card-p)] -mt-[var(--card-p)] mb-4 shrink-0">
-            {image}
+            <div className="insight-img absolute inset-0">{image}</div>
           </div>
         )}
         <h3 className="font-display text-base font-bold leading-[1.3] tracking-[-0.01em] mb-2">
@@ -163,9 +163,9 @@ export function ContentCard({
   /* ── Image card: image on top ── */
   if (showImage && image) {
     return (
-      <Link href={href} className="card flex flex-col no-underline overflow-hidden min-w-0">
+      <Link href={href} className="insight-card card flex flex-col no-underline overflow-hidden min-w-0 h-full">
         <div className="rounded-[var(--card-img-r)] overflow-hidden border border-border-s relative aspect-[16/9] -mx-[var(--card-p)] -mt-[var(--card-p)] mb-3 shrink-0">
-          {image}
+          <div className="insight-img absolute inset-0">{image}</div>
         </div>
         <h3 className="font-display text-sm font-bold leading-[1.35] tracking-[-0.01em] line-clamp-2">{title}</h3>
         {excerpt && <p className="text-xs text-fg-3 leading-[1.5] line-clamp-2 mt-1">{excerpt}</p>}
@@ -179,7 +179,7 @@ export function ContentCard({
 
   /* ── Text-only compact card ── */
   return (
-    <Link href={href} className="card block no-underline overflow-hidden min-w-0">
+    <Link href={href} className="insight-card card block no-underline overflow-hidden min-w-0 h-full">
       <div className="flex flex-col gap-2">
         <h3 className="font-display text-[var(--card-title-s)] font-bold leading-[1.35] tracking-[-0.01em] line-clamp-2">{title}</h3>
         {renderTopics && <TopicPills topics={topics!} size="xs" />}

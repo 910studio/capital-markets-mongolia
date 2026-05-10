@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { cn } from "@/app/lib/cn";
 
 const NAV_LINKS = [
@@ -15,6 +16,7 @@ const NAV_LINKS = [
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isSignedIn, isLoaded } = useUser();
 
   useEffect(() => {
     setMobileOpen(false);
@@ -78,9 +80,16 @@ export function Header() {
             </svg>
           </button>
 
-          <Link href="/sign-in" className="btn btn-primary hidden sm:inline-flex">
-            Sign In
-          </Link>
+          {isLoaded && !isSignedIn && (
+            <Link href="/sign-in" className="btn btn-primary hidden sm:inline-flex">
+              Sign In
+            </Link>
+          )}
+          {isLoaded && isSignedIn && (
+            <div className="hidden sm:flex items-center">
+              <UserButton />
+            </div>
+          )}
         </div>
       </div>
 
@@ -108,12 +117,19 @@ export function Header() {
                 </Link>
               );
             })}
-            <Link
-              href="/sign-in"
-              className="btn btn-primary mt-2 sm:hidden text-center"
-            >
-              Sign In
-            </Link>
+            {isLoaded && !isSignedIn && (
+              <Link
+                href="/sign-in"
+                className="btn btn-primary mt-2 sm:hidden text-center"
+              >
+                Sign In
+              </Link>
+            )}
+            {isLoaded && isSignedIn && (
+              <div className="mt-3 sm:hidden flex justify-center">
+                <UserButton />
+              </div>
+            )}
           </div>
         </nav>
       )}

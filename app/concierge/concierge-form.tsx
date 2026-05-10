@@ -107,7 +107,7 @@ export function ConciergeForm() {
               className={cn(
                 "px-3 py-1.5 rounded-[var(--btn-r)] text-sm font-medium border cursor-pointer transition-all",
                 requestType === opt.value
-                  ? "border-brand bg-brand-m text-brand font-semibold"
+                  ? "border-transparent bg-brand-m text-brand font-semibold"
                   : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
               )}
             >
@@ -141,7 +141,7 @@ export function ConciergeForm() {
                 className={cn(
                   "px-2.5 py-1 rounded-[var(--btn-r)] text-xs font-medium border cursor-pointer transition-all",
                   active
-                    ? "border-brand bg-brand text-white"
+                    ? "border-transparent bg-brand text-white"
                     : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
                 )}
               >
@@ -179,7 +179,7 @@ export function ConciergeForm() {
               className={cn(
                 "flex-1 px-3 py-2 rounded-[var(--btn-r)] text-sm font-medium border cursor-pointer transition-all",
                 urgency === opt.value
-                  ? "border-brand bg-brand-m text-brand font-semibold"
+                  ? "border-transparent bg-brand-m text-brand font-semibold"
                   : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
               )}
             >

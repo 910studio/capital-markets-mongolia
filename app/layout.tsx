@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono, Newsreader } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Header } from "./components/layout/header";
 import { Footer } from "./components/layout/footer";
@@ -23,6 +24,13 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600"],
 });
 
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
   title: "MarketIQ — Capital Markets Mongolia",
   description:
@@ -35,20 +43,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${plusJakarta.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-screen">
-        <OfflineScreen />
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="pt-[var(--header-h)] flex-1 w-full">
-            {children}
-          </main>
-          <Footer />
-        </div>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html
+        lang="en"
+        className={`${plusJakarta.variable} ${dmSans.variable} ${jetbrainsMono.variable} ${newsreader.variable} h-full antialiased`}
+      >
+        <body className="min-h-screen">
+          <OfflineScreen />
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="pt-[var(--header-h)] flex-1 w-full">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

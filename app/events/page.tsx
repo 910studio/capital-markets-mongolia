@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MOCK_EVENTS } from "@/app/lib/mock-data";
 import { apiGet } from "@/app/lib/api";
 import { adaptEventListItem } from "@/app/lib/api-adapters";
 import { EventCard } from "@/app/components/events/event-card";
@@ -14,17 +13,15 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {
-  let events;
+  let events: ReturnType<typeof adaptEventListItem>[] = [];
   try {
     const res = await apiGet("/api/events", {
       query: { limit: 100 },
       next: { revalidate: 60, tags: ["events"] },
     });
     events = res.items.map(adaptEventListItem);
-    if (events.length === 0) events = MOCK_EVENTS;
   } catch (err) {
-    console.error("[events] API fetch failed, falling back to mocks:", err);
-    events = MOCK_EVENTS;
+    console.error("[events] API fetch failed:", err);
   }
 
   const upcoming = events

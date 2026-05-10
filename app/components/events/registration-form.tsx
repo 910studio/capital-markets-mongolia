@@ -92,7 +92,7 @@ export function RegistrationForm({
               className={cn(
                 "flex-1 px-3 py-2 rounded-[var(--btn-r)] text-sm font-medium border cursor-pointer transition-all",
                 attendance === opt.value
-                  ? "border-brand bg-brand-m text-brand font-semibold"
+                  ? "border-transparent bg-brand-m text-brand font-semibold"
                   : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
               )}
             >

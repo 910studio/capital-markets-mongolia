@@ -1,7 +1,19 @@
-import Link from "next/link";
-import { ContentCard } from "./content-card";
+"use client";
 
-/* ── Types ─────────────────────────────── */
+import Link from "next/link";
+import { useReveal } from "@/app/lib/use-reveal";
+
+/* ════════════════════════════════════════════════════════════════
+   InsightsGrid — Semafor-style ruled wire-service layout
+   ════════════════════════════════════════════════════════════════
+   Design DNA:
+   - Zero card chrome (no borders, no backgrounds, no shadows on tiles)
+   - Hairline rules separate everything (vertical between cols, horizontal between rows)
+   - Serif headlines (Newsreader), italic byline meta
+   - Section headers: thick top rule + small-caps eyebrow + thin bottom rule
+   - Hero is a magazine cover (huge serif headline, image inline-floating)
+   - Image only on lead per section, the rest is text-only headlines
+   ════════════════════════════════════════════════════════════════ */
 
 type BadgeVariant = "research" | "article" | "deal" | "update" | "teaser" | "press";
 
@@ -39,249 +51,399 @@ const TYPE_ORDER: { variant: string; label: string }[] = [
 
 const SECTION_PREVIEW = 7;
 
-/* ── EditorialListItem (used by editorial hero right column) ── */
+/* ── Reveal scope wrapper ───────────────────────── */
 
-function EditorialListItem({
-  article,
-  onBadgeClick,
+function Reveal({
+  children,
+  className,
+  as: Tag = "div",
 }: {
-  article: Article;
-  onBadgeClick?: (variant: string) => void;
+  children: React.ReactNode;
+  className?: string;
+  as?: "div" | "section";
 }) {
+  const ref = useReveal<HTMLDivElement>();
   return (
-    <Link
-      href={`/insights/${article.slug}`}
-      className="group flex items-start gap-3 py-3 border-b border-border-s last:border-b-0 last:pb-0 first:pt-0 no-underline"
-    >
-      {article.image && (
-        <div className="relative w-40 aspect-[4/3] rounded-[var(--card-r)] overflow-hidden shrink-0 border border-border-s bg-surface max-md:w-32">
-          {article.image}
-        </div>
-      )}
-      <div className="min-w-0 flex-1">
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onBadgeClick?.(article.badge.variant);
-          }}
-          className="bg-transparent border-none p-0 cursor-pointer"
-        >
-          <span className={`badge badge-solid-${article.badge.variant} !text-[10px]`}>
-            {article.badge.label}
-          </span>
-        </button>
-        <h3 className="font-display font-bold text-sm text-fg leading-snug mt-1.5 line-clamp-2 group-hover:text-brand transition-colors">
-          {article.title}
-        </h3>
-        <div className="text-[11px] text-fg-3 mt-1.5 flex items-center gap-1.5">
-          <span>{article.author}</span>
-          <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
-          <span>{article.date}</span>
-          {article.readTime && (
-            <>
-              <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
-              <span>{article.readTime}</span>
-            </>
-          )}
-        </div>
-      </div>
-    </Link>
+    <Tag ref={ref as React.Ref<HTMLDivElement>} data-reveal-scope className={className}>
+      {children}
+    </Tag>
   );
 }
 
-/* ── InsightsGrid ── */
+/* ── Byline (italic serif) ───────────────────────── */
+
+function Byline({
+  author,
+  date,
+  readTime,
+  className = "",
+}: {
+  author: string;
+  date: string;
+  readTime?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`text-[12px] text-fg-3 italic font-[var(--font-s)] flex items-center gap-1.5 ${className}`}
+      style={{ fontFamily: "var(--font-s)" }}
+    >
+      <span className="not-italic font-display font-semibold text-[10px] tracking-[0.08em] uppercase text-fg-2">
+        {author}
+      </span>
+      <span className="meta-dot inline-block w-[2px] h-[2px] rounded-full bg-fg-3" />
+      <span>{date}</span>
+      {readTime && (
+        <>
+          <span className="meta-dot inline-block w-[2px] h-[2px] rounded-full bg-fg-3" />
+          <span>{readTime}</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ── Tag (small caps, hover-to-brand) ──────────── */
+
+function Tag({ label, variant, onClick }: { label: string; variant: BadgeVariant; onClick?: () => void }) {
+  return (
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick?.();
+      }}
+      className={`tag-${variant} self-start font-display font-bold text-[10px] tracking-[0.14em] uppercase cursor-pointer bg-transparent border-none p-0 transition-colors`}
+    >
+      {label}
+    </button>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   PRIMITIVE: Hero — magazine-cover lead story
+   ════════════════════════════════════════════════ */
+
+function Hero({
+  article,
+  rail,
+  onBadgeClick,
+}: {
+  article: Article;
+  rail: Article[];
+  onBadgeClick?: (variant: string) => void;
+}) {
+  return (
+    <Reveal className="grid grid-cols-[1fr_320px] gap-12 max-lg:grid-cols-1 max-lg:gap-8 pb-12 border-b-2 border-fg">
+      {/* Lead — huge serif, image floats right of body */}
+      <Link href={`/insights/${article.slug}`} className="group no-underline min-w-0 block">
+        <Tag label={article.badge.label} variant={article.badge.variant} onClick={() => onBadgeClick?.(article.badge.variant)} />
+        <h1
+          data-reveal="title"
+          className="mt-4 font-bold tracking-[-0.02em] leading-[1.02] text-fg group-hover:text-brand transition-colors"
+          style={{
+            fontFamily: "var(--font-s)",
+            fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)",
+          }}
+        >
+          <span>{article.title}</span>
+        </h1>
+
+        {article.image && (
+          <div className="float-right ml-7 mt-5 mb-2 w-[44%] max-md:float-none max-md:ml-0 max-md:w-full max-md:mt-5">
+            <div className="relative aspect-[4/3] overflow-hidden bg-surface">
+              <div className="insight-img absolute inset-0" data-reveal="image">
+                {article.image}
+              </div>
+            </div>
+            <p className="mt-2 text-[11px] text-fg-3 italic" style={{ fontFamily: "var(--font-s)" }}>
+              Photo · {article.author}
+            </p>
+          </div>
+        )}
+
+        <p
+          className="mt-6 text-fg-2 leading-[1.55]"
+          style={{ fontFamily: "var(--font-s)", fontSize: "1.125rem" }}
+        >
+          {article.excerpt}
+        </p>
+
+        <div className="clear-both pt-6 mt-6 border-t border-border-s">
+          <Byline author={article.author} date={article.date} readTime={article.readTime} />
+        </div>
+      </Link>
+
+      {/* Right rail — vertical hairline left, stacked top stories */}
+      <aside className="lg:border-l lg:border-fg lg:pl-8 max-lg:border-t max-lg:border-fg max-lg:pt-6">
+        <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg pb-3 border-b border-fg mb-1">
+          The Rundown
+        </p>
+        <ol className="flex flex-col">
+          {rail.map((a, i) => (
+            <RailItem key={a.slug} article={a} index={i} number={i + 1} onBadgeClick={onBadgeClick} />
+          ))}
+        </ol>
+      </aside>
+    </Reveal>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   PRIMITIVE: RailItem — numbered headline list
+   ════════════════════════════════════════════════ */
+
+function RailItem({
+  article,
+  index,
+  number,
+  onBadgeClick,
+}: {
+  article: Article;
+  index: number;
+  number?: number;
+  onBadgeClick?: (variant: string) => void;
+}) {
+  return (
+    <li
+      data-reveal="stagger"
+      style={{ ["--stagger-i" as string]: index } as React.CSSProperties}
+      className="border-b border-border-s last:border-b-0 py-4 first:pt-3"
+    >
+      <Link href={`/insights/${article.slug}`} className="group no-underline flex gap-3 min-w-0">
+        {number !== undefined && (
+          <span
+            className="shrink-0 w-5 text-[11px] font-mono font-bold text-fg-3 tabular-nums pt-[3px]"
+          >
+            {String(number).padStart(2, "0")}
+          </span>
+        )}
+        <div className="min-w-0 flex flex-col gap-1.5">
+          <Tag label={article.badge.label} variant={article.badge.variant} onClick={() => onBadgeClick?.(article.badge.variant)} />
+          <h3
+            className="font-bold text-[15px] leading-[1.2] text-fg group-hover:text-brand transition-colors line-clamp-3"
+            style={{ fontFamily: "var(--font-s)", letterSpacing: "-0.01em" }}
+          >
+            {article.title}
+          </h3>
+          <Byline author={article.author} date={article.date} />
+        </div>
+      </Link>
+    </li>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   PRIMITIVE: TextCard — image + serif headline, no chrome
+   ════════════════════════════════════════════════ */
+
+function TextCard({
+  article,
+  index,
+  showImage = true,
+  onBadgeClick,
+}: {
+  article: Article;
+  index: number;
+  showImage?: boolean;
+  onBadgeClick?: (variant: string) => void;
+}) {
+  return (
+    <div
+      data-reveal="stagger"
+      style={{ ["--stagger-i" as string]: index } as React.CSSProperties}
+      className="min-w-0"
+    >
+      <Link href={`/insights/${article.slug}`} className="group no-underline flex flex-col gap-3 min-w-0 h-full">
+        {showImage && article.image && (
+          <div className="relative aspect-[4/3] overflow-hidden bg-surface mb-1">
+            <div className="insight-img absolute inset-0">{article.image}</div>
+          </div>
+        )}
+        <Tag label={article.badge.label} variant={article.badge.variant} onClick={() => onBadgeClick?.(article.badge.variant)} />
+        <h3
+          className="font-bold leading-[1.15] text-fg group-hover:text-brand transition-colors line-clamp-3"
+          style={{ fontFamily: "var(--font-s)", fontSize: showImage ? "1.375rem" : "1.125rem", letterSpacing: "-0.015em" }}
+        >
+          {article.title}
+        </h3>
+        {showImage && article.excerpt && (
+          <p
+            className="text-fg-2 leading-[1.5] line-clamp-2 text-[14px]"
+            style={{ fontFamily: "var(--font-s)" }}
+          >
+            {article.excerpt}
+          </p>
+        )}
+        <Byline author={article.author} date={article.date} readTime={article.readTime} className="mt-auto pt-2" />
+      </Link>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   PRIMITIVE: WireRow — text-only headlines, vertical hairlines between
+   ════════════════════════════════════════════════ */
+
+function WireRow({
+  articles,
+  onBadgeClick,
+  cols = 4,
+}: {
+  articles: Article[];
+  onBadgeClick?: (variant: string) => void;
+  cols?: 3 | 4 | 5;
+}) {
+  const gridCols = cols === 5 ? "grid-cols-5" : cols === 3 ? "grid-cols-3" : "grid-cols-4";
+  return (
+    <Reveal className={`grid ${gridCols} gap-0 max-md:grid-cols-1 max-lg:grid-cols-2`}>
+      {articles.map((a, i) => (
+        <article
+          key={a.slug}
+          data-reveal="stagger"
+          style={{ ["--stagger-i" as string]: i } as React.CSSProperties}
+          className="px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0 max-lg:first:pt-0"
+        >
+          <Link href={`/insights/${a.slug}`} className="group no-underline flex flex-col gap-2 min-w-0">
+            <Tag label={a.badge.label} variant={a.badge.variant} onClick={() => onBadgeClick?.(a.badge.variant)} />
+            <h3
+              className="font-bold leading-[1.2] text-fg group-hover:text-brand transition-colors line-clamp-4"
+              style={{ fontFamily: "var(--font-s)", fontSize: "1rem", letterSpacing: "-0.01em" }}
+            >
+              {a.title}
+            </h3>
+            <Byline author={a.author} date={a.date} className="mt-1" />
+          </Link>
+        </article>
+      ))}
+    </Reveal>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   PRIMITIVE: SectionHead — thick rule above, small caps, thin rule below
+   ════════════════════════════════════════════════ */
+
+function SectionHead({
+  label,
+  count,
+  hasMore,
+  onMore,
+}: {
+  label: string;
+  count: number;
+  hasMore?: boolean;
+  onMore?: () => void;
+}) {
+  return (
+    <div className="border-t-[2px] border-fg pt-3 mb-7 flex items-end justify-between sticky top-[var(--header-h)] z-10 bg-[var(--bg)]">
+      <h2 className="font-display font-extrabold text-[28px] tracking-tight text-fg leading-none">
+        {label}
+        <span className="ml-3 text-[12px] font-mono font-medium text-fg-3 tracking-[0.05em] tabular-nums align-baseline">
+          {String(count).padStart(2, "0")}
+        </span>
+      </h2>
+      {hasMore && (
+        <button
+          onClick={onMore}
+          className="text-[11px] uppercase tracking-[0.14em] font-display font-bold text-fg-3 hover:text-brand cursor-pointer bg-transparent border-none transition-colors"
+        >
+          View all →
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   SECTION BODY — Semafor 3+wire pattern
+   ════════════════════════════════════════════════ */
+
+function SectionBody({
+  items,
+  onBadgeClick,
+}: {
+  items: Article[];
+  onBadgeClick?: (variant: string) => void;
+}) {
+  if (items.length === 0) return null;
+
+  // Semafor pattern: 3 image-led cards on top, then 4 text-only headlines below
+  const top = items.slice(0, 3);
+  const tail = items.slice(3, 7);
+
+  return (
+    <div className="flex flex-col gap-8">
+      {top.length > 0 && (
+        <Reveal className="grid grid-cols-3 gap-0 max-md:grid-cols-1 max-lg:grid-cols-2">
+          {top.map((a, i) => (
+            <div
+              key={a.slug}
+              className="px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0 max-lg:first:pt-0"
+            >
+              <TextCard article={a} index={i} showImage onBadgeClick={onBadgeClick} />
+            </div>
+          ))}
+        </Reveal>
+      )}
+      {tail.length > 0 && (
+        <div className="border-t border-border-s pt-7">
+          <WireRow articles={tail} onBadgeClick={onBadgeClick} cols={tail.length >= 4 ? 4 : (tail.length as 3)} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   InsightsGrid — composition root
+   ════════════════════════════════════════════════ */
 
 export function InsightsGrid({
   articles,
   onBadgeClick,
   activeFilter,
-  layout = "default",
-  showTags = false,
 }: InsightsGridProps) {
   if (articles.length === 0) return null;
 
-  // When a specific filter is active — clean browse grid, no oversized hero.
+  // Filtered view — flat browse grid (no hero, no sections)
   if (activeFilter && activeFilter !== "all") {
-    const fImages3 = articles.slice(0, 3);
-    const fImages4 = articles.slice(3, 7);
-    const fRest = articles.slice(7);
-
+    const top = articles.slice(0, 3);
+    const next = articles.slice(3, 7);
+    const rest = articles.slice(7);
     return (
-      <div className="flex flex-col gap-5">
-        {fImages3.length > 0 && (
-          <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2">
-            {fImages3.map((article) => (
-              <ContentCard
-                key={article.slug}
-                title={article.title}
-                excerpt={article.excerpt}
-                badge={article.badge}
-                author={article.author}
-                date={article.date}
-                readTime={article.readTime}
-                topics={article.topics}
-                showTopics={showTags}
-                href={`/insights/${article.slug}`}
-                image={article.image}
-                showImage={!!article.image}
-                onBadgeClick={onBadgeClick}
-              />
+      <div className="flex flex-col gap-8">
+        {top.length > 0 && (
+          <Reveal className="grid grid-cols-3 gap-0 max-md:grid-cols-1 max-lg:grid-cols-2">
+            {top.map((a, i) => (
+              <div
+                key={a.slug}
+                className="px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0"
+              >
+                <TextCard article={a} index={i} onBadgeClick={onBadgeClick} />
+              </div>
             ))}
+          </Reveal>
+        )}
+        {next.length > 0 && (
+          <div className="border-t border-border-s pt-7">
+            <WireRow articles={next} onBadgeClick={onBadgeClick} />
           </div>
         )}
-        {fImages4.length > 0 && (
-          <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
-            {fImages4.map((article) => (
-              <ContentCard
-                key={article.slug}
-                title={article.title}
-                excerpt={article.excerpt}
-                badge={article.badge}
-                author={article.author}
-                date={article.date}
-                readTime={article.readTime}
-                topics={article.topics}
-                showTopics={showTags}
-                href={`/insights/${article.slug}`}
-                image={article.image}
-                showImage={!!article.image}
-                onBadgeClick={onBadgeClick}
-              />
-            ))}
-          </div>
-        )}
-        {fRest.length > 0 && (
-          <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
-            {fRest.map((article) => (
-              <ContentCard
-                key={article.slug}
-                title={article.title}
-                badge={article.badge}
-                author={article.author}
-                date={article.date}
-                readTime={article.readTime}
-                topics={article.topics}
-                showTopics={showTags}
-                href={`/insights/${article.slug}`}
-                onBadgeClick={onBadgeClick}
-              />
-            ))}
+        {rest.length > 0 && (
+          <div className="border-t border-border-s pt-7">
+            <WireRow articles={rest.slice(0, 4)} onBadgeClick={onBadgeClick} />
           </div>
         )}
       </div>
     );
   }
 
-  /* ── Hero renders ─────────────────────── */
+  // Default view — hero + sections
+  const lead = articles[0];
+  const rail = articles.slice(1, 6);
 
-  // Featured hero: one wide horizontal card. Image left 60%, text right 40%.
-  const renderFeaturedHero = () => {
-    const a = articles[0];
-    if (!a) return null;
-    return (
-      <Link
-        href={`/insights/${a.slug}`}
-        className="group grid grid-cols-[3fr_2fr] gap-0 rounded-[var(--card-r)] overflow-hidden border border-border-s bg-[var(--white)] no-underline max-lg:grid-cols-1"
-      >
-        {a.image && (
-          <div className="relative aspect-[16/10] max-lg:aspect-[16/9] overflow-hidden bg-surface">
-            {a.image}
-          </div>
-        )}
-        <div className="flex flex-col justify-center gap-3 p-6 max-lg:p-5">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onBadgeClick?.(a.badge.variant);
-            }}
-            className="bg-transparent border-none p-0 cursor-pointer self-start"
-          >
-            <span className={`badge badge-solid-${a.badge.variant}`}>{a.badge.label}</span>
-          </button>
-          <h2 className="font-display font-extrabold text-3xl tracking-tight leading-[1.15] text-fg group-hover:text-brand transition-colors max-lg:text-2xl">
-            {a.title}
-          </h2>
-          <p className="text-sm text-fg-2 leading-relaxed line-clamp-3">
-            {a.excerpt}
-          </p>
-          <div className="text-xs text-fg-3 flex items-center gap-1.5 mt-1">
-            <span className="font-medium text-fg-2">{a.author}</span>
-            <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
-            <span>{a.date}</span>
-            {a.readTime && (
-              <>
-                <span className="w-[3px] h-[3px] rounded-full bg-fg-3" />
-                <span>{a.readTime}</span>
-              </>
-            )}
-          </div>
-        </div>
-      </Link>
-    );
-  };
-
-  // Editorial hero: 60/40 split — featured card left, 4 list items right (with thumbnails)
-  const renderEditorialHero = () => {
-    const headliner = articles[0];
-    const sideList = articles.slice(1, 4);
-    if (!headliner) return null;
-    return (
-      <div className="grid grid-cols-[3fr_2fr] gap-6 items-stretch lg:min-h-[540px] max-lg:grid-cols-1">
-        <ContentCard
-          key={headliner.slug}
-          title={headliner.title}
-          excerpt={headliner.excerpt}
-          badge={headliner.badge}
-          author={headliner.author}
-          date={headliner.date}
-          readTime={headliner.readTime}
-          topics={headliner.topics}
-          showTopics={showTags}
-          featured
-          fillHeight
-          href={`/insights/${headliner.slug}`}
-          image={headliner.image}
-          onBadgeClick={onBadgeClick}
-        />
-        <div className="flex flex-col min-w-0 h-full pl-6 border-l border-border-s justify-between max-lg:border-l-0 max-lg:pl-0 max-lg:border-t max-lg:pt-4">
-          {sideList.map((article) => (
-            <EditorialListItem
-              key={article.slug}
-              article={article}
-              onBadgeClick={onBadgeClick}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  /* ── Compute slices per layout ── */
-  // default: no hero, withImages [0..3], restForGrid [3..7]
-  // featured: hero uses [0], withImages [1..4], restForGrid [4..8]
-  // editorial: hero uses [0..5] (1 + 4 list), withImages [5..8], restForGrid [8..12]
-
-  let heroNode: React.ReactNode = null;
-  let withImages: Article[] = [];
-  let restForGrid: Article[] = [];
-
-  if (layout === "featured") {
-    heroNode = renderFeaturedHero();
-    withImages = articles.slice(1, 4);
-    restForGrid = articles.slice(4, 8);
-  } else if (layout === "editorial") {
-    heroNode = renderEditorialHero();
-    withImages = articles.slice(4, 7);
-    restForGrid = articles.slice(7, 11);
-  } else {
-    // default — clean browse grid, no hero
-    withImages = articles.slice(0, 3);
-    restForGrid = articles.slice(3, 7);
-  }
-
-  // Group ALL articles by type for sections below
+  // Group articles by type
   const grouped = new Map<string, Article[]>();
   for (const article of articles) {
     const key = article.badge.variant;
@@ -290,126 +452,23 @@ export function InsightsGrid({
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Hero row */}
-      {heroNode}
+    <div className="flex flex-col gap-14">
+      {lead && <Hero article={lead} rail={rail} onBadgeClick={onBadgeClick} />}
 
-      {/* 3 — Image cards */}
-      {withImages.length > 0 && (
-        <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2">
-          {withImages.map((article) => (
-            <ContentCard
-              key={article.slug}
-              title={article.title}
-              excerpt={article.excerpt}
-              badge={article.badge}
-              author={article.author}
-              date={article.date}
-              readTime={article.readTime}
-              topics={article.topics}
-              showTopics={showTags}
-              href={`/insights/${article.slug}`}
-              image={article.image}
-              showImage
-              onBadgeClick={onBadgeClick}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* 4 — Smaller cards (with images when available) */}
-      {restForGrid.length > 0 && (
-        <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
-          {restForGrid.map((article) => (
-            <ContentCard
-              key={article.slug}
-              title={article.title}
-              excerpt={article.excerpt}
-              badge={article.badge}
-              author={article.author}
-              date={article.date}
-              readTime={article.readTime}
-              topics={article.topics}
-              showTopics={showTags}
-              href={`/insights/${article.slug}`}
-              image={article.image}
-              showImage={!!article.image}
-              onBadgeClick={onBadgeClick}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ── Type sections ── */}
       {TYPE_ORDER.map(({ variant, label }) => {
         const items = grouped.get(variant);
         if (!items || items.length === 0) return null;
-
         const preview = items.slice(0, SECTION_PREVIEW);
-        const hasMore = items.length > SECTION_PREVIEW;
-
         return (
-          <div key={variant} className="mt-4">
-            <div className="flex items-center justify-between py-2 border-b border-border-s mb-5 mt-6 sticky top-[var(--header-h)] z-10 bg-[var(--bg)]">
-              <button
-                onClick={() => onBadgeClick?.(variant)}
-                className="font-display font-extrabold text-xl tracking-tight text-fg cursor-pointer bg-transparent border-none p-0 hover:text-brand transition-colors"
-              >
-                {label}
-                <span className="text-fg-3 font-normal text-base ml-2">{items.length}</span>
-              </button>
-              {hasMore && (
-                <button
-                  onClick={() => onBadgeClick?.(variant)}
-                  className="text-sm font-semibold text-brand-l hover:text-brand cursor-pointer bg-transparent border-none transition-colors font-display"
-                >
-                  View all →
-                </button>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-4">
-              {/* First 3 — image cards */}
-              <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2">
-                {preview.slice(0, 3).map((article) => (
-                  <ContentCard
-                    key={article.slug}
-                    title={article.title}
-                    excerpt={article.excerpt}
-                    badge={article.badge}
-                    author={article.author}
-                    date={article.date}
-                    readTime={article.readTime}
-                    topics={article.topics}
-                    showTopics={showTags}
-                    href={`/insights/${article.slug}`}
-                    image={article.image}
-                    showImage={!!article.image}
-                    onBadgeClick={onBadgeClick}
-                  />
-                ))}
-              </div>
-              {/* Rest — 4-col text-only */}
-              {preview.length > 3 && (
-                <div className="grid grid-cols-4 gap-4 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
-                  {preview.slice(3).map((article) => (
-                    <ContentCard
-                      key={article.slug}
-                      title={article.title}
-                      badge={article.badge}
-                      author={article.author}
-                      date={article.date}
-                      readTime={article.readTime}
-                      topics={article.topics}
-                      showTopics={showTags}
-                      href={`/insights/${article.slug}`}
-                      onBadgeClick={onBadgeClick}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <section key={variant}>
+            <SectionHead
+              label={label}
+              count={items.length}
+              hasMore={items.length > SECTION_PREVIEW}
+              onMore={() => onBadgeClick?.(variant)}
+            />
+            <SectionBody items={preview} onBadgeClick={onBadgeClick} />
+          </section>
         );
       })}
     </div>

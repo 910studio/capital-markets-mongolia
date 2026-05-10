@@ -42,3 +42,9 @@ next-env.d.ts
 
 # Generated API contract artifact (regenerate via api/pnpm openapi:emit)
 /openapi.json
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# local screenshots / scratch
+/.tmp/

@@ -441,7 +441,7 @@ export function DirectoryControls({ entities }: DirectoryControlsProps) {
               className={cn(
                 "flex items-center gap-2 px-3 py-1.5 rounded-[var(--btn-r)] border text-sm font-display font-semibold cursor-pointer transition-all duration-[200ms]",
                 hasFilters
-                  ? "border-brand bg-brand-m text-brand"
+                  ? "border-transparent bg-brand-m text-brand"
                   : "border-border bg-[var(--white)] text-fg-2 hover:border-brand-l"
               )}
             >

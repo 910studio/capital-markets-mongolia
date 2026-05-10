@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-/* ── Map contentType to badge variant (mock fallback path only) ── */
+/* ── Map mock contentType → badge variant ── */
 
 const BADGE_MAP: Record<
   string,
@@ -56,7 +56,7 @@ const FALLBACK_ARTICLES: Article[] = MOCK_ARTICLES.map((a, i) => ({
 }));
 
 export default async function InsightsPage() {
-  let articles: Article[];
+  let articles: Article[] = [];
   try {
     const res = await apiGet("/api/insights", {
       query: { limit: 50, page: 1 },
@@ -77,7 +77,7 @@ export default async function InsightsPage() {
     }));
     if (articles.length === 0) articles = FALLBACK_ARTICLES;
   } catch (err) {
-    console.error("[insights] BFF fetch failed, falling back to mocks:", err);
+    console.error("[insights] BFF unavailable, using static seed:", err);
     articles = FALLBACK_ARTICLES;
   }
 
