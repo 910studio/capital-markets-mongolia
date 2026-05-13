@@ -81,9 +81,17 @@ export function Header() {
           </button>
 
           {isLoaded && !isSignedIn && (
-            <Link href="/sign-in" className="btn btn-primary hidden sm:inline-flex">
-              Sign In
-            </Link>
+            <div className="hidden sm:flex items-center gap-1">
+              <Link
+                href="/sign-in"
+                className="px-3 h-[34px] inline-flex items-center font-display font-semibold text-sm text-fg hover:text-brand transition-colors no-underline"
+              >
+                Sign In
+              </Link>
+              <Link href="/sign-up" className="btn btn-primary">
+                Get started
+              </Link>
+            </div>
           )}
           {isLoaded && isSignedIn && (
             <div className="hidden sm:flex items-center">
@@ -118,12 +126,14 @@ export function Header() {
               );
             })}
             {isLoaded && !isSignedIn && (
-              <Link
-                href="/sign-in"
-                className="btn btn-primary mt-2 sm:hidden text-center"
-              >
-                Sign In
-              </Link>
+              <div className="mt-2 sm:hidden flex flex-col gap-2">
+                <Link href="/sign-in" className="btn btn-secondary text-center">
+                  Sign In
+                </Link>
+                <Link href="/sign-up" className="btn btn-primary text-center">
+                  Get started
+                </Link>
+              </div>
             )}
             {isLoaded && isSignedIn && (
               <div className="mt-3 sm:hidden flex justify-center">

@@ -6,6 +6,7 @@ import {
   MOCK_ENTITIES,
   NEWS_CATEGORY_COLORS,
   NEWS_CATEGORY_LABELS,
+  type MockNewsItem,
 } from "@/app/lib/mock-data";
 import { NewsItemCard } from "@/app/components/feed/news-item-card";
 import { cn } from "@/app/lib/cn";
@@ -14,9 +15,99 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+interface NewsDetailDto {
+  id: string;
+  title: string;
+  url?: string;
+  source: string;
+  publishedAt: string;
+  signalScore?: number;
+  signalCategory?: string;
+  isIncludedInBrief?: boolean;
+  summary?: string;
+  whyItMatters?: string;
+  resolvedBody?: string;
+  entities?: { slug: string; name?: string }[];
+}
+
+const NEWS_CATEGORY_MAP: Record<string, MockNewsItem["category"]> = {
+  MARKET: "markets", CORPORATE: "companies", SECTOR: "sectors",
+  POLICY: "policy", DEAL: "deals", MACRO: "macro",
+  market: "markets", corporate: "companies", sector: "sectors",
+  policy: "policy", deal: "deals", macro: "macro",
+};
+
+async function fetchNews(id: string): Promise<MockNewsItem | undefined> {
+  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+  try {
+    const res = await fetch(`${base}/api/news/articles/${encodeURIComponent(id)}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return undefined;
+    const dto = (await res.json()) as NewsDetailDto;
+    const summary =
+      dto.summary?.trim() ||
+      dto.whyItMatters?.trim() ||
+      extractBodyExcerpt(dto.resolvedBody);
+    return {
+      id: dto.id,
+      headline: dto.title,
+      summary: summary || undefined,
+      source: dto.source,
+      sourceUrl: dto.url,
+      publishedAt: dto.publishedAt,
+      category: NEWS_CATEGORY_MAP[dto.signalCategory ?? ""] ?? "markets",
+      topics: [],
+      entitySlugs: (dto.entities ?? [])
+        .map((e) => e.slug)
+        .filter((s): s is string => typeof s === "string"),
+      confidence: typeof dto.signalScore === "number" ? dto.signalScore : 0.7,
+      reviewed: Boolean(dto.isIncludedInBrief),
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Pull the first decent paragraph out of the scraped markdown body.
+ * Skips title repeats, nav links, and image markdown — finds the first
+ * meaningful prose chunk (≥120 chars).
+ */
+function extractBodyExcerpt(body: string | undefined, maxChars = 360): string {
+  if (!body) return "";
+  // Drop URL-only lines, headings, list markdown, image refs.
+  const lines = body
+    .split(/\n+/)
+    .map((l) => l.trim())
+    .filter((l) => {
+      if (l.length < 60) return false;
+      if (/^#{1,6}\s/.test(l)) return false;
+      if (/^!\[/.test(l)) return false;
+      if (/^\[.*?\]\(https?:\/\//.test(l)) return false;
+      if (/^https?:\/\//.test(l)) return false;
+      return true;
+    });
+  const first = lines.find((l) => l.length >= 120);
+  if (!first) return "";
+  // Strip markdown link syntax: [text](url) → text, and asterisks/underscores.
+  const clean = first
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[*_]{1,3}([^*_]+)[*_]{1,3}/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (clean.length <= maxChars) return clean;
+  const cut = clean.slice(0, maxChars);
+  const lastStop = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("! "), cut.lastIndexOf("? "));
+  if (lastStop > maxChars * 0.6) return cut.slice(0, lastStop + 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + "…";
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const item = MOCK_NEWS.find((n) => n.id === id);
+  const live = await fetchNews(id);
+  const item = live ?? MOCK_NEWS.find((n) => n.id === id);
   if (!item) return { title: "News Not Found — MarketIQ" };
   return {
     title: `${item.headline} — MarketIQ`,
@@ -24,9 +115,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function NewsDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const item = MOCK_NEWS.find((n) => n.id === id);
+  const live = await fetchNews(id);
+  const item = live ?? MOCK_NEWS.find((n) => n.id === id);
   if (!item) notFound();
 
   const entities = item.entitySlugs

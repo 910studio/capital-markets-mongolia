@@ -143,7 +143,7 @@ function Hero({
           className="mt-4 font-bold tracking-[-0.02em] leading-[1.02] text-fg group-hover:text-brand transition-colors"
           style={{
             fontFamily: "var(--font-s)",
-            fontSize: "clamp(2.5rem, 5.5vw, 4.5rem)",
+            fontSize: "clamp(1.6rem, 3.52vw, 2.88rem)",
           }}
         >
           <span>{article.title}</span>

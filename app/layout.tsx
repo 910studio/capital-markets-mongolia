@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono, Newsreader } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { clerkAppearance } from "./lib/clerk-appearance";
 import "./globals.css";
 import { Header } from "./components/layout/header";
 import { Footer } from "./components/layout/footer";
@@ -43,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={clerkAppearance}>
       <html
         lang="en"
         className={`${plusJakarta.variable} ${dmSans.variable} ${jetbrainsMono.variable} ${newsreader.variable} h-full antialiased`}

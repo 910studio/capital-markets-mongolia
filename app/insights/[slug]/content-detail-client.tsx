@@ -15,7 +15,7 @@ import { EntityChip } from "@/app/components/content/entity-chip";
 import { ArticleSidebar } from "@/app/components/content/article-sidebar";
 import { PdfBar } from "@/app/components/content/pdf-bar";
 import { PaywallWall } from "@/app/components/content/paywall-wall";
-import { MOCK_ARTICLES, MOCK_CONTRIBUTORS, MOCK_ENTITIES } from "@/app/lib/mock-data";
+import { MOCK_ARTICLES, MOCK_CONTRIBUTORS, MOCK_ENTITIES, type MockArticle } from "@/app/lib/mock-data";
 
 /* ── Badge mapping ─────────────────────── */
 
@@ -69,12 +69,19 @@ function LinkedExcerpt({ text, entities }: { text: string; entities: { name: str
   );
 }
 
-export function ContentDetailClient({ slug }: { slug: string }) {
+export function ContentDetailClient({
+  slug,
+  article: articleProp,
+}: {
+  slug: string;
+  article?: MockArticle;
+}) {
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => { window.scrollTo({ top: 0 }); }, [slug]);
 
-  const article = MOCK_ARTICLES.find((a) => a.slug === slug);
+  // Prefer the BFF-fetched article (passed from server); fall back to mocks.
+  const article = articleProp ?? MOCK_ARTICLES.find((a) => a.slug === slug);
   if (!article) return <div className="content-max py-20 text-center text-fg-3">Article not found.</div>;
 
   const badge = BADGE_MAP[article.contentType] ?? { label: "Article", variant: "article" as const };
