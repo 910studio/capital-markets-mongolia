@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { cn } from "@/app/lib/cn";
+import {
+  registerForEventAction,
+  type RegisterActionState,
+} from "./register-action";
 
 interface RegistrationFormProps {
+  slug: string;
   eventTitle: string;
   ticketPrice?: string;
   registrationDeadline?: string;
@@ -14,25 +20,19 @@ const ATTENDANCE_TYPES = [
   { value: "virtual", label: "Virtual" },
 ];
 
+const INITIAL: RegisterActionState = { status: "idle" };
+
 export function RegistrationForm({
+  slug,
   eventTitle,
   ticketPrice,
   registrationDeadline,
 }: RegistrationFormProps) {
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const action = registerForEventAction.bind(null, slug);
+  const [state, formAction] = useActionState(action, INITIAL);
   const [attendance, setAttendance] = useState("in-person");
 
-  function handleSubmit(e: { preventDefault: () => void }) {
-    e.preventDefault();
-    setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-    }, 700);
-  }
-
-  if (submitted) {
+  if (state.status === "success") {
     return (
       <div className="card !p-6 flex flex-col gap-3">
         <div className="w-10 h-10 rounded-full bg-pos-m grid place-items-center">
@@ -53,7 +53,7 @@ export function RegistrationForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card !p-6 flex flex-col gap-4">
+    <form action={formAction} className="card !p-6 flex flex-col gap-4">
       <div>
         <div className="font-display font-extrabold text-base mb-1">
           Reserve your spot
@@ -109,18 +109,31 @@ export function RegistrationForm({
         placeholder="Dietary restrictions, accessibility, or topics you'd want to discuss 1:1."
       />
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="btn btn-primary w-full justify-center"
-      >
-        {submitting ? "Submitting…" : "Complete Registration"}
-      </button>
+      {state.status === "error" && state.message && (
+        <div className="text-sm text-neg bg-neg-m px-3 py-2 rounded-[var(--btn-r)] leading-[1.4]">
+          {state.message}
+        </div>
+      )}
+
+      <SubmitButton />
 
       <p className="text-[11px] text-fg-3 leading-[1.5]">
         By registering you agree to CMM&apos;s code of conduct and event policies.
       </p>
     </form>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="btn btn-primary w-full justify-center"
+    >
+      {pending ? "Submitting…" : "Complete Registration"}
+    </button>
   );
 }
 

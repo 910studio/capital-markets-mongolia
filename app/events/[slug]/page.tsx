@@ -205,6 +205,7 @@ export default async function EventDetailPage({ params }: PageProps) {
         >
           {!isPast && (
             <RegistrationForm
+              slug={event.slug}
               eventTitle={event.shortName ?? event.title}
               ticketPrice={event.ticketPrice}
               registrationDeadline={event.registrationDeadline}

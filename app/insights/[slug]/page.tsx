@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ContentDetailClient } from "./content-detail-client";
 import type { MockArticle } from "@/app/lib/mock-data";
 import { MOCK_ARTICLES } from "@/app/lib/mock-data";
+import { ApiError, apiGet, path } from "@/app/lib/api";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -10,33 +11,20 @@ interface PageProps {
 const CONTENT_TYPE_MAP: Record<string, MockArticle["contentType"]> = {
   article: "article",
   "market-brief": "market-brief",
+  "monthly-update": "market-brief",
   "investment-teaser": "investment-teaser",
   "deal-insight": "deal-insight",
   "research-report": "research-report",
   "press-release": "press-release",
+  "cmm-guide": "research-report",
 };
 
-interface InsightDetailDto {
-  slug: string;
-  title: string;
-  contentType: string;
-  excerpt?: string;
-  publishedAt?: string;
-  isPremium?: boolean;
-  coverImageUrl?: string;
-  topics?: string[];
-  author?: { name: string };
-  entities?: { slug: string }[];
-}
-
 async function fetchInsight(slug: string): Promise<MockArticle | undefined> {
-  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
   try {
-    const res = await fetch(`${base}/api/insights/${encodeURIComponent(slug)}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return undefined;
-    const dto = (await res.json()) as InsightDetailDto;
+    const dto = await apiGet(
+      path("/api/insights/{slug}", { slug }),
+      { next: { revalidate: 60, tags: [`insight:${slug}`] } },
+    );
     return {
       slug: dto.slug,
       title: dto.title,
@@ -50,7 +38,11 @@ async function fetchInsight(slug: string): Promise<MockArticle | undefined> {
       entityRefs: (dto.entities ?? []).map((e) => e.slug),
       coverImage: dto.coverImageUrl,
     };
-  } catch {
+  } catch (err) {
+    // 404 → fall through to mock fallback. Other errors → log & fall through.
+    if (!(err instanceof ApiError) || err.status !== 404) {
+      console.error("[insight detail] fetch failed:", err);
+    }
     return undefined;
   }
 }

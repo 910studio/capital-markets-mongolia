@@ -2,15 +2,13 @@
  * Tiny typed fetch wrapper around the CMM MarketIQ NestJS API.
  *
  * Uses generated OpenAPI types (`api-types.ts`) for compile-time safety
- * without a runtime client library. Swap to `openapi-fetch` or
- * `@hey-api/openapi-ts` SDK once `@cmm/api-client` package publishing
- * is set up.
+ * without a runtime client library.
  *
- * Usage (server component):
- *   const res = await api('/api/entities', { query: { limit: 24 } });
- *
- * Auth: pass a Bearer token in `token` for protected endpoints. Pull it
- * from Clerk's `auth().getToken()` in server components once Clerk is wired.
+ * Auth: in a server context (Server Component / Route Handler / Server
+ * Action) the Clerk session token is auto-attached as a Bearer header.
+ * Opt out with `{ anonymous: true }` when calling a public endpoint
+ * where you don't want to leak the token. In a client context no token
+ * is attached — client-side calls must go through a server action.
  */
 
 import type { paths } from "./api-types";
@@ -20,6 +18,20 @@ declare const process: { env: { NEXT_PUBLIC_API_URL?: string } };
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+
+const IS_SERVER = typeof window === "undefined";
+
+async function getClerkToken(): Promise<string | null> {
+  if (!IS_SERVER) return null;
+  try {
+    const { auth } = await import("@clerk/nextjs/server");
+    const session = await auth();
+    return (await session.getToken()) ?? null;
+  } catch {
+    // Outside a request scope (build, scripts) auth() throws — that's fine.
+    return null;
+  }
+}
 
 type Method = "GET" | "POST" | "PATCH" | "DELETE";
 
@@ -52,7 +64,10 @@ type PostResponse<P extends keyof paths> =
       : never;
 
 interface BaseOptions {
+  /** Override the auto-injected Clerk session token. */
   token?: string;
+  /** Skip auto-injecting the Clerk token (use for public endpoints). */
+  anonymous?: boolean;
   /** Next.js fetch cache options. Default: `no-store` for fresh data. */
   cache?: RequestCache;
   /** Next.js revalidation tag/seconds. */
@@ -101,7 +116,17 @@ async function request<T>(
     Accept: "application/json",
   };
   if (init.body !== undefined) headers["Content-Type"] = "application/json";
-  if (init.token) headers["Authorization"] = `Bearer ${init.token}`;
+
+  // Don't auto-inject a token on cacheable requests — Next.js would store
+  // the per-user response in the shared cache. Cacheable = anonymous by
+  // default. Caller can still pass `token` explicitly to override.
+  const isCacheable =
+    (init.cache !== undefined && init.cache !== "no-store") ||
+    init.next?.revalidate !== undefined;
+  const shouldAutoInject = !init.anonymous && !isCacheable;
+  const token =
+    init.token ?? (shouldAutoInject ? await getClerkToken() : null);
+  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   // Next.js augments RequestInit with `next` (revalidate/tags). Cast to any
   // so this file compiles in environments where Next's lib types haven't loaded.
@@ -138,6 +163,7 @@ export async function apiGet<P extends keyof paths>(
     {
       query: options.query as Record<string, unknown> | undefined,
       token: options.token,
+      anonymous: options.anonymous,
       cache: options.cache,
       next: options.next,
     },
@@ -154,6 +180,7 @@ export async function apiPost<P extends keyof paths>(
     {
       body: options.body,
       token: options.token,
+      anonymous: options.anonymous,
       cache: "no-store",
     },
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/app/lib/cn";
-import type { MockEntity } from "@/app/lib/mock-data";
+import { SECTOR_SLUG_TO_LABEL, type MockEntity } from "@/app/lib/mock-data";
 
 /* ── EntityCard ───────────────────────────── */
 
@@ -72,7 +72,7 @@ export function EntityCard({ entity }: { entity: MockEntity }) {
       {/* Tags — muted sector pill + highlighted raising pill (type comes from section context) */}
       <div className="flex gap-1.5 mt-2.5 flex-wrap">
         <span className="font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2">
-          {entity.sector}
+          {SECTOR_SLUG_TO_LABEL[entity.sector] ?? entity.sector}
         </span>
         {entity.isRaising && (
           <span className="inline-flex items-center gap-1.5 font-body font-semibold text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-brand text-[var(--brand-t)]">

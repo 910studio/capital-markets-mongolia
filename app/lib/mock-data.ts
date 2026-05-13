@@ -43,6 +43,36 @@ export const SECTOR_LIST = [
   "Professional Services",
 ] as const;
 
+/** Slug ↔ label pairs. Slugs match `public.sectors` rows on the backend. */
+export const SECTOR_OPTIONS = [
+  { slug: "mining", label: "Mining" },
+  { slug: "financial-services", label: "Financial Services" },
+  { slug: "energy", label: "Energy" },
+  { slug: "tech-media", label: "Technology & Media" },
+  { slug: "real-estate", label: "Real Estate" },
+  { slug: "infrastructure", label: "Infrastructure" },
+  { slug: "consumer-services", label: "Consumer & Services" },
+  { slug: "agriculture", label: "Agriculture" },
+  { slug: "cashmere-textile", label: "Cashmere & Textile" },
+  { slug: "conglomerate-soe", label: "Conglomerate & SOE" },
+  { slug: "healthcare", label: "Healthcare" },
+  { slug: "logistics", label: "Logistics" },
+  { slug: "services", label: "Services" },
+  { slug: "other", label: "Other" },
+] as const;
+
+export const SECTOR_SLUG_TO_LABEL: Record<string, string> = Object.fromEntries(
+  SECTOR_OPTIONS.map((s) => [s.slug, s.label]),
+);
+
+/** Backend uses uppercase enum, frontend uses lowercase. */
+export const ENTITY_TYPE_TO_BACKEND = {
+  public_company: "PUBLIC_COMPANY",
+  private_company: "PRIVATE_COMPANY",
+  project: "PROJECT",
+  service_provider: "SERVICE_PROVIDER",
+} as const satisfies Record<EntityType, string>;
+
 /* ── Rich entity spec (from Entity Fields Master, Apr 23) ── */
 
 export type DataSource = "AI-Sourced" | "AI-Generated" | "CMM Verified" | "CMM Curated" | "Company Submitted";
