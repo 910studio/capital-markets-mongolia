@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MOCK_EVENTS, MOCK_SPEAKERS, type MockEvent, type MockSpeaker, type MockEventAgendaItem } from "@/app/lib/mock-data";
-import { apiGet, path, ApiError } from "@/app/lib/api";
-import { adaptEventDetail, adaptEventSpeakers } from "@/app/lib/api-adapters";
+import { MOCK_SPEAKERS, type MockEventAgendaItem } from "@/app/lib/mock-data";
+import { getEventBySlug } from "@/app/lib/data/events";
 import { RegistrationForm } from "@/app/components/events/registration-form";
 import { SpeakerCard } from "@/app/components/events/speaker-card";
 import { formatDateRange, FORMAT_LABEL, STATUS_LABEL } from "@/app/components/events/event-card";
@@ -13,29 +12,9 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-async function loadEvent(
-  slug: string,
-): Promise<{ event: MockEvent; speakers: MockSpeaker[] } | null> {
-  try {
-    const dto = await apiGet(path("/api/events/{slug}", { slug }), {
-      next: { revalidate: 60, tags: [`event:${slug}`] },
-    });
-    return { event: adaptEventDetail(dto), speakers: adaptEventSpeakers(dto) };
-  } catch (err) {
-    if (err instanceof ApiError && err.status === 404) return null;
-    console.error(`[event:${slug}] API fetch failed, falling back to mocks:`, err);
-    const event = MOCK_EVENTS.find((e) => e.slug === slug);
-    if (!event) return null;
-    const speakers = event.speakerSlugs
-      .map((s) => MOCK_SPEAKERS.find((sp) => sp.slug === s))
-      .filter((s): s is NonNullable<typeof s> => Boolean(s));
-    return { event, speakers };
-  }
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const loaded = await loadEvent(slug);
+  const loaded = await getEventBySlug(slug);
   if (!loaded) return { title: "Event Not Found — MarketIQ" };
   return {
     title: `${loaded.event.title} — MarketIQ`,
@@ -45,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const loaded = await loadEvent(slug);
+  const loaded = await getEventBySlug(slug);
   if (!loaded) notFound();
   const { event, speakers } = loaded;
 

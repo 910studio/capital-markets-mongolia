@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MOCK_EVENTS, MOCK_SPEAKERS } from "@/app/lib/mock-data";
+import { getEvents, getSpeakerBySlug } from "@/app/lib/data/events";
 import { Avatar } from "@/app/components/events/speaker-card";
 import { EventCard } from "@/app/components/events/event-card";
 
@@ -11,7 +11,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const speaker = MOCK_SPEAKERS.find((s) => s.slug === slug);
+  const speaker = await getSpeakerBySlug(slug);
   if (!speaker) return { title: "Speaker — MarketIQ" };
   return {
     title: `${speaker.name} — MarketIQ`,
@@ -21,12 +21,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SpeakerProfilePage({ params }: PageProps) {
   const { slug } = await params;
-  const speaker = MOCK_SPEAKERS.find((s) => s.slug === slug);
+  const speaker = await getSpeakerBySlug(slug);
   if (!speaker) notFound();
 
-  const eventsBySpeaker = MOCK_EVENTS.filter((e) =>
-    e.speakerSlugs.includes(speaker.slug)
-  ).sort((a, b) => +new Date(b.startDate) - +new Date(a.startDate));
+  const events = await getEvents();
+  const eventsBySpeaker = events
+    .filter((e) => e.speakerSlugs.includes(speaker.slug))
+    .sort((a, b) => +new Date(b.startDate) - +new Date(a.startDate));
 
   const upcomingEvents = eventsBySpeaker.filter((e) => e.status !== "past");
   const pastEvents = eventsBySpeaker.filter((e) => e.status === "past");

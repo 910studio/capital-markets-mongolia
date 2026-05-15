@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { apiGet } from "@/app/lib/api";
-import { adaptEventListItem } from "@/app/lib/api-adapters";
+import { getEvents } from "@/app/lib/data/events";
 import { EventCard } from "@/app/components/events/event-card";
 
 export const metadata: Metadata = {
@@ -13,16 +12,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {
-  let events: ReturnType<typeof adaptEventListItem>[] = [];
-  try {
-    const res = await apiGet("/api/events", {
-      query: { limit: 100 },
-      next: { revalidate: 60, tags: ["events"] },
-    });
-    events = res.items.map(adaptEventListItem);
-  } catch (err) {
-    console.error("[events] API fetch failed:", err);
-  }
+  const events = await getEvents();
 
   const upcoming = events
     .filter((e) => e.status !== "past")

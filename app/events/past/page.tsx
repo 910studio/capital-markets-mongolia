@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MOCK_EVENTS } from "@/app/lib/mock-data";
+import { getEvents } from "@/app/lib/data/events";
 import { EventCard } from "@/app/components/events/event-card";
 
 export const metadata: Metadata = {
@@ -8,10 +8,13 @@ export const metadata: Metadata = {
   description: "Archive of CMM-hosted forums, briefings, and conferences.",
 };
 
-export default function PastEventsPage() {
-  const past = MOCK_EVENTS.filter((e) => e.status === "past").sort(
-    (a, b) => +new Date(b.startDate) - +new Date(a.startDate)
-  );
+export const dynamic = "force-dynamic";
+
+export default async function PastEventsPage() {
+  const events = await getEvents();
+  const past = events
+    .filter((e) => e.status === "past")
+    .sort((a, b) => +new Date(b.startDate) - +new Date(a.startDate));
 
   const grouped = past.reduce<Record<string, typeof past>>((acc, e) => {
     const year = new Date(e.startDate).getFullYear().toString();
