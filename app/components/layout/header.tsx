@@ -22,30 +22,62 @@ export function Header() {
     setMobileOpen(false);
   }, [pathname]);
 
+  // Transparent + white-on-dark variant for routes that own the top of the
+  // viewport (e.g. /events with its full-bleed brutalist hero).
+  const transparent = pathname === "/events";
+
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 h-[var(--header-h)] border-b border-border"
-      style={{ background: "var(--bg)" }}
+      data-transparent={transparent || undefined}
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 h-[var(--header-h)]",
+        transparent ? "border-b-0" : "border-b border-border",
+      )}
+      style={{ background: transparent ? "transparent" : "var(--bg)" }}
     >
       <div className="content-max h-full flex items-center justify-between">
         {/* Left: logo + nav */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="font-display text-lg font-[800] tracking-tight text-fg no-underline">
+          <Link
+            href="/"
+            className={cn(
+              "font-display text-lg font-[800] tracking-tight no-underline",
+              transparent ? "text-white" : "text-fg",
+            )}
+          >
             MarketIQ
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand ml-0.5 align-super" />
+            <span
+              className={cn(
+                "inline-block w-1.5 h-1.5 rounded-full ml-0.5 align-super",
+                transparent ? "bg-white" : "bg-brand",
+              )}
+            />
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
               const active = pathname.startsWith(link.href);
+              if (transparent) {
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "inline-flex items-center px-3 h-[34px] rounded-[var(--tab-r)] no-underline font-display text-sm transition-colors",
+                      active
+                        ? "text-white font-semibold bg-white/10"
+                        : "text-white/70 font-medium hover:text-white hover:bg-white/10",
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              }
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={cn(
-                    "tab",
-                    active && "tab-active"
-                  )}
+                  className={cn("tab", active && "tab-active")}
                 >
                   {link.label}
                 </Link>
@@ -57,7 +89,12 @@ export function Header() {
         {/* Right: search + hamburger (mobile) + sign in */}
         <div className="flex items-center gap-2">
           <button
-            className="btn btn-ghost w-[44px] h-[44px] p-0"
+            className={cn(
+              "w-[44px] h-[44px] p-0 inline-flex items-center justify-center transition-colors",
+              transparent
+                ? "text-white hover:bg-white/10 rounded-[var(--btn-r)]"
+                : "btn btn-ghost",
+            )}
             aria-label="Search"
           >
             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -67,7 +104,12 @@ export function Header() {
 
           {/* Mobile hamburger */}
           <button
-            className="btn btn-ghost w-[44px] h-[44px] p-0 !hidden max-[440px]:!inline-flex"
+            className={cn(
+              "w-[44px] h-[44px] p-0 !hidden max-[440px]:!inline-flex items-center justify-center transition-colors",
+              transparent
+                ? "text-white hover:bg-white/10 rounded-[var(--btn-r)]"
+                : "btn btn-ghost",
+            )}
             aria-label="Menu"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
@@ -84,11 +126,33 @@ export function Header() {
             <div className="hidden sm:flex items-center gap-1">
               <Link
                 href="/sign-in"
-                className="px-3 h-[34px] inline-flex items-center font-display font-semibold text-sm text-fg hover:text-brand transition-colors no-underline"
+                className={cn(
+                  "px-3 h-[34px] inline-flex items-center font-display font-semibold text-sm transition-colors no-underline",
+                  transparent
+                    ? "text-white/80 hover:text-white"
+                    : "text-fg hover:text-brand",
+                )}
               >
                 Sign In
               </Link>
-              <Link href="/sign-up" className="btn btn-primary">
+              <Link
+                href="/sign-up"
+                className={cn(
+                  transparent
+                    ? "inline-flex items-center px-4 h-[34px] font-display font-bold text-sm no-underline transition-colors"
+                    : "btn btn-primary",
+                )}
+                style={
+                  transparent
+                    ? {
+                        background: "var(--signal)",
+                        color: "var(--fg)",
+                        borderRadius: 2,
+                        letterSpacing: "0.04em",
+                      }
+                    : undefined
+                }
+              >
                 Get started
               </Link>
             </div>

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getEvents } from "@/app/lib/data/events";
-import { EventCard } from "@/app/components/events/event-card";
+import { EventTabs } from "@/app/components/events/event-tabs";
+import { EventHero } from "@/app/components/events/event-hero";
+import { EventsRail } from "@/app/components/events/events-rail";
+import { ScrollSnap } from "@/app/components/events/scroll-snap";
 
 export const metadata: Metadata = {
   title: "Events — MarketIQ",
@@ -19,96 +21,166 @@ export default async function EventsPage() {
     .sort((a, b) => +new Date(a.startDate) - +new Date(b.startDate));
   const past = events
     .filter((e) => e.status === "past")
-    .sort((a, b) => +new Date(b.startDate) - +new Date(a.startDate))
-    .slice(0, 3);
+    .sort((a, b) => +new Date(b.startDate) - +new Date(a.startDate));
 
   const featured = upcoming[0];
-  const rest = upcoming.slice(1);
 
   return (
-    <div className="content-max px-6">
-      <div className="pt-8 pb-6">
-        <div className="font-mono text-[11px] uppercase tracking-badge text-brand mb-2">
-          Events
-        </div>
-        <h1 className="font-display font-extrabold text-2xl tracking-tight leading-heading">
-          Capital markets events, in person and virtual
-        </h1>
-        <p className="text-base text-fg-2 mt-2 max-w-[560px]">
-          CMM-hosted forums, member briefings, and curated industry conferences. Register early — most fill up.
-        </p>
-      </div>
+    <div data-mode="dark" style={{ marginTop: "calc(-1 * var(--header-h))", background: "var(--bg)", color: "var(--fg)" }}>
+      <ScrollSnap />
+      {/* Subtle black top-to-bottom gradient — darkens hero behind the
+          transparent nav. zIndex:30 so tabs (z-40) and nav (z-50) stay clear. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0"
+        style={{
+          height: 140,
+          background:
+            "linear-gradient(to bottom, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.08) 55%, rgba(0,0,0,0) 100%)",
+          zIndex: 30,
+        }}
+      />
 
-      {/* Featured upcoming */}
       {featured && (
-        <section className="mb-12">
-          <div
-            className="sticky z-20 -mx-2 px-2 py-2 backdrop-blur-md bg-[var(--header-blur)] border-b border-border-s flex items-baseline justify-between mb-4"
-            style={{ top: "var(--header-h)" }}
-          >
-            <h2 className="font-display font-extrabold text-md tracking-tight">
-              Next up
-            </h2>
-            <span className="font-mono text-[11px] text-fg-3 uppercase tracking-badge">
-              {upcoming.length} upcoming
-            </span>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-2">
-              <EventCard event={featured} variant="featured" />
-            </div>
-            <div className="flex flex-col gap-3">
-              {rest.slice(0, 3).map((e) => (
-                <EventCard key={e.slug} event={e} variant="compact" />
-              ))}
-            </div>
-          </div>
-        </section>
+        <EventHero
+          event={featured}
+          index={1}
+          total={upcoming.length}
+          sectionId="featured"
+          topRightLabel="FEATURED"
+          bottomRightSubLabel="UPCOMING EVENTS"
+        />
       )}
 
-      {/* All upcoming grid */}
-      {rest.length > 0 && (
-        <section className="mb-12">
-          <div
-            className="sticky z-20 -mx-2 px-2 py-2 backdrop-blur-md bg-[var(--header-blur)] border-b border-border-s mb-4"
-            style={{ top: "var(--header-h)" }}
-          >
-            <h2 className="font-display font-extrabold text-md tracking-tight">
-              All upcoming
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {rest.map((e) => (
-              <EventCard key={e.slug} event={e} />
-            ))}
-          </div>
-        </section>
+      <EventTabs
+        tabs={[
+          { id: "featured", label: "Featured", count: featured ? 1 : 0 },
+          { id: "upcoming", label: "Upcoming", count: upcoming.length },
+          { id: "past", label: "Past", count: past.length },
+        ]}
+        meta="Season II · 2026"
+      />
+
+      {/* Upcoming events rail */}
+      {upcoming.length > 0 && (
+        <RailSection
+          id="upcoming"
+          ariaLabel="Upcoming events"
+          eyebrow={`/ Calendar · ${shortYear(upcoming[0].startDate)}`}
+          title="Upcoming"
+          titleSecondLine="Events"
+          countLabel={`Featuring ${pad2(upcoming.length)} sessions`}
+          tickCount={upcoming.length}
+        >
+          <EventsRail
+            events={upcoming}
+            cardCtaLabel="RSVP →"
+            featuredSlug={featured?.slug}
+          />
+        </RailSection>
       )}
 
-      {/* Past events teaser */}
+      {/* Past events rail */}
       {past.length > 0 && (
-        <section className="mb-16">
-          <div
-            className="sticky z-20 -mx-2 px-2 py-2 backdrop-blur-md bg-[var(--header-blur)] border-b border-border-s flex items-baseline justify-between mb-4"
-            style={{ top: "var(--header-h)" }}
-          >
-            <h2 className="font-display font-extrabold text-md tracking-tight">
-              Recent past events
-            </h2>
-            <Link
-              href="/events/past"
-              className="text-sm font-display font-semibold text-brand hover:text-brand-h no-underline"
-            >
-              View archive →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {past.map((e) => (
-              <EventCard key={e.slug} event={e} />
-            ))}
-          </div>
-        </section>
+        <RailSection
+          id="past"
+          ariaLabel="Past events"
+          eyebrow={`/ Archive · ${minYear(past)}—${maxYear(past)}`}
+          title="Past"
+          titleSecondLine="Events"
+          countLabel={`Featuring ${pad2(past.length)} sessions`}
+          tickCount={past.length}
+        >
+          <EventsRail events={past} cardCtaLabel="Recap →" />
+        </RailSection>
       )}
     </div>
   );
+}
+
+/* ── Reusable section shell that wraps a rail with brutalist head ─── */
+
+function RailSection({
+  id,
+  ariaLabel,
+  eyebrow,
+  title,
+  titleSecondLine,
+  countLabel,
+  children,
+}: {
+  id: string;
+  ariaLabel: string;
+  eyebrow: string;
+  title: string;
+  titleSecondLine?: string;
+  countLabel: string;
+  tickCount: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      data-snap
+      aria-label={ariaLabel}
+      className="border-t border-border"
+      style={{ paddingTop: 120, paddingBottom: 64, background: "var(--bg)" }}
+    >
+      <div
+        className="grid items-end gap-8 mb-14 px-6 pb-6 border-b border-border max-md:grid-cols-1 max-md:gap-3"
+        style={{ gridTemplateColumns: "auto 1fr auto" }}
+      >
+        <div>
+          <div
+            className="font-mono text-[12px] uppercase tracking-[0.1em] font-bold"
+            style={{ color: "var(--brand)" }}
+          >
+            {eyebrow}
+          </div>
+          <div
+            className="font-display font-extrabold uppercase mt-3"
+            style={{
+              fontSize: "clamp(40px, 7vw, 96px)",
+              lineHeight: 0.9,
+              letterSpacing: "var(--ls-hero)",
+            }}
+          >
+            {title}
+            {titleSecondLine && (
+              <>
+                <br />
+                {titleSecondLine}
+              </>
+            )}
+          </div>
+        </div>
+        <div />
+        <div className="font-mono text-[12px] uppercase tracking-[0.08em] text-fg-3 text-right max-md:text-left">
+          {countLabel}
+        </div>
+      </div>
+
+      {children}
+    </section>
+  );
+}
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function shortYear(dateStr: string): string {
+  return String(new Date(dateStr).getFullYear()).slice(-2);
+}
+
+function minYear(events: { startDate: string }[]): string {
+  if (events.length === 0) return "—";
+  const years = events.map((e) => new Date(e.startDate).getFullYear());
+  return String(Math.min(...years)).slice(-2);
+}
+
+function maxYear(events: { startDate: string }[]): string {
+  if (events.length === 0) return "—";
+  const years = events.map((e) => new Date(e.startDate).getFullYear());
+  return String(Math.max(...years)).slice(-2);
 }

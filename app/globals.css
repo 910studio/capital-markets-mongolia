@@ -382,6 +382,45 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Lock horizontal overscroll without setting overflow:hidden on html/body. */
+html,
+body {
+  overscroll-behavior-x: none;
+}
+body {
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+/* Scoped scroll-snap (added by <ScrollSnap />). Sections inside opt in via
+   `scroll-snap-align: start` to become snap points. Proximity (not
+   mandatory) lets the user free-scroll mid-flick without being yanked. */
+html.events-snap {
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+  scroll-padding-top: 0;
+}
+html.events-snap [data-snap] {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Hide all scrollbars app-wide — brutalist aesthetic.
+   Pages and scroll containers stay scrollable via wheel, keys, touch. */
+html,
+body,
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-d);
   letter-spacing: var(--ls-heading);
