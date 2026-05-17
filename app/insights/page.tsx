@@ -4,7 +4,6 @@ import { InsightsControls } from "./insights-controls";
 import { FeedSidebar } from "@/app/components/insights/feed-sidebar";
 import { getInsights } from "@/app/lib/data/insights";
 import { getNewsItems } from "@/app/lib/data/feed";
-import { MOCK_ARTICLES } from "@/app/lib/mock-data";
 
 export const metadata: Metadata = {
   title: "Insights — MarketIQ",
@@ -15,16 +14,14 @@ export const dynamic = "force-dynamic";
 
 export default async function InsightsPage() {
   const [base, newsItems] = await Promise.all([getInsights(), getNewsItems()]);
-  // Decorate with featured flag + cover image element. Mock articles carry
-  // coverImage; live articles' image URL is added by the live branch's adapter
-  // — for now, pull the cover from the mock-data by slug lookup.
-  const mockBySlug = new Map(MOCK_ARTICLES.map((a) => [a.slug, a]));
+  // Decorate with featured flag + wrap coverImage URL in <Image> JSX.
+  // coverImage is now plumbed through the data layer for both mock + live.
   const articles = base.map((a, i) => ({
     ...a,
     featured: i === 0,
-    image: mockBySlug.get(a.slug)?.coverImage ? (
+    image: a.coverImage ? (
       <Image
-        src={mockBySlug.get(a.slug)!.coverImage!}
+        src={a.coverImage}
         alt={a.title}
         fill
         className="object-cover"

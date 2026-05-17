@@ -27,6 +27,8 @@ export interface Article {
   readTime?: string;
   featured?: boolean;
   image?: React.ReactNode;
+  /** Direct URL of the cover image — server-rendered into <Image> by pages. */
+  coverImage?: string;
   topics?: string[];
 }
 
@@ -174,24 +176,36 @@ function Hero({
         </div>
       </Link>
 
-      {/* Rundown — moved BELOW the headliner; horizontal wire-grid */}
+      {/* Rundown — horizontal scroll rail below the headliner.
+          Fixed-width cards (~280px) so the layout stays readable even
+          when the content column is tight (filter+feed sidebars eat space). */}
       {rail.length > 0 && (
         <div className="mt-10 pt-5 border-t border-fg">
-          <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg mb-5">
-            The Rundown
-          </p>
-          <ol className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-0">
-            {rail.slice(0, 4).map((a, i) => (
-              <RailItem
-                key={a.slug}
-                article={a}
-                index={i}
-                number={i + 1}
-                horizontal
-                onBadgeClick={onBadgeClick}
-              />
-            ))}
-          </ol>
+          <div className="flex items-end justify-between mb-5">
+            <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg">
+              The Rundown
+            </p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-fg-3">
+              ↔ scroll
+            </p>
+          </div>
+          <div
+            className="overflow-x-auto scrollbar-none -mx-1"
+            style={{ scrollSnapType: "x proximity" }}
+          >
+            <ol className="flex gap-0 min-w-fit">
+              {rail.map((a, i) => (
+                <RailItem
+                  key={a.slug}
+                  article={a}
+                  index={i}
+                  number={i + 1}
+                  horizontal
+                  onBadgeClick={onBadgeClick}
+                />
+              ))}
+            </ol>
+          </div>
         </div>
       )}
     </Reveal>
@@ -218,13 +232,18 @@ function RailItem({
   onBadgeClick?: (variant: string) => void;
 }) {
   const liClass = horizontal
-    ? "px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-4 max-lg:first:border-t-0 max-lg:first:pt-0 max-lg:px-0"
+    ? "shrink-0 w-[280px] px-5 first:pl-1 last:pr-1 border-l border-border-s first:border-l-0"
     : "border-b border-border-s last:border-b-0 py-4 first:pt-3";
+
+  const liStyle: React.CSSProperties = {
+    ["--stagger-i" as string]: index,
+    ...(horizontal ? { scrollSnapAlign: "start" } : {}),
+  };
 
   return (
     <li
       data-reveal="stagger"
-      style={{ ["--stagger-i" as string]: index } as React.CSSProperties}
+      style={liStyle}
       className={liClass}
     >
       <Link href={`/insights/${article.slug}`} className="group no-underline flex gap-3 min-w-0">

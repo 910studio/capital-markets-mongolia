@@ -40,6 +40,7 @@ function mockArticleToArticle(a: MockArticle): Article {
     date: formatDate(a.publishedAt),
     readTime: `${a.readTime} min`,
     topics: a.topics,
+    coverImage: a.coverImage,
   };
 }
 
@@ -52,7 +53,10 @@ export async function getInsights(): Promise<Article[]> {
       query: { limit: 50, page: 1 },
       next: { revalidate: 60, tags: ["insights"] },
     });
-    return res.items.map(adaptInsightToArticle);
+    return res.items.map((dto) => ({
+      ...adaptInsightToArticle(dto),
+      coverImage: dto.coverImageUrl,
+    }));
   } catch (err) {
     console.error("[data:insights] live fetch failed:", err);
     return [];
