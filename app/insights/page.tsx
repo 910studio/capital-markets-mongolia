@@ -35,7 +35,7 @@ export default async function InsightsPage() {
 
   return (
     <div className="max-w-[var(--content-max)] mx-auto px-6 w-full">
-      <div className="grid gap-10 grid-cols-[minmax(0,1fr)_300px] max-xl:grid-cols-1 max-xl:gap-6">
+      <div className="grid gap-8 grid-cols-[minmax(0,1fr)_240px] max-xl:grid-cols-1 max-xl:gap-6">
         <div className="min-w-0">
           <InsightsControls articles={articles} />
         </div>

@@ -180,8 +180,8 @@ function Hero({
           <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg mb-5">
             The Rundown
           </p>
-          <ol className="grid grid-cols-5 gap-0 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
-            {rail.map((a, i) => (
+          <ol className="grid grid-cols-4 gap-0 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-2 2xl:grid-cols-5">
+            {rail.slice(0, 5).map((a, i) => (
               <RailItem
                 key={a.slug}
                 article={a}
