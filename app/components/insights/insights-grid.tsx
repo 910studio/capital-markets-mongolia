@@ -134,8 +134,8 @@ function Hero({
   onBadgeClick?: (variant: string) => void;
 }) {
   return (
-    <Reveal className="grid grid-cols-[1fr_320px] gap-12 max-lg:grid-cols-1 max-lg:gap-8 pb-12 border-b-2 border-fg">
-      {/* Lead — huge serif, image floats right of body */}
+    <Reveal className="flex flex-col pb-12 border-b-2 border-fg">
+      {/* Lead — full width: huge serif, image floats right of body */}
       <Link href={`/insights/${article.slug}`} className="group no-underline min-w-0 block">
         <Tag label={article.badge.label} variant={article.badge.variant} onClick={() => onBadgeClick?.(article.badge.variant)} />
         <h1
@@ -143,14 +143,14 @@ function Hero({
           className="mt-4 font-bold tracking-[-0.02em] leading-[1.02] text-fg group-hover:text-brand transition-colors"
           style={{
             fontFamily: "var(--font-s)",
-            fontSize: "clamp(1.6rem, 3.52vw, 2.88rem)",
+            fontSize: "clamp(1.8rem, 4.4vw, 3.6rem)",
           }}
         >
           <span>{article.title}</span>
         </h1>
 
         {article.image && (
-          <div className="float-right ml-7 mt-5 mb-2 w-[44%] max-md:float-none max-md:ml-0 max-md:w-full max-md:mt-5">
+          <div className="float-right ml-8 mt-5 mb-2 w-[42%] max-md:float-none max-md:ml-0 max-md:w-full max-md:mt-5">
             <div className="relative aspect-[4/3] overflow-hidden bg-surface">
               <div className="insight-img absolute inset-0" data-reveal="image">
                 {article.image}
@@ -163,8 +163,8 @@ function Hero({
         )}
 
         <p
-          className="mt-6 text-fg-2 leading-[1.55]"
-          style={{ fontFamily: "var(--font-s)", fontSize: "1.125rem" }}
+          className="mt-6 text-fg-2 leading-[1.55] max-w-[760px]"
+          style={{ fontFamily: "var(--font-s)", fontSize: "1.1875rem" }}
         >
           {article.excerpt}
         </p>
@@ -174,17 +174,26 @@ function Hero({
         </div>
       </Link>
 
-      {/* Right rail — vertical hairline left, stacked top stories */}
-      <aside className="lg:border-l lg:border-fg lg:pl-8 max-lg:border-t max-lg:border-fg max-lg:pt-6">
-        <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg pb-3 border-b border-fg mb-1">
-          The Rundown
-        </p>
-        <ol className="flex flex-col">
-          {rail.map((a, i) => (
-            <RailItem key={a.slug} article={a} index={i} number={i + 1} onBadgeClick={onBadgeClick} />
-          ))}
-        </ol>
-      </aside>
+      {/* Rundown — moved BELOW the headliner; horizontal wire-grid */}
+      {rail.length > 0 && (
+        <div className="mt-10 pt-5 border-t border-fg">
+          <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg mb-5">
+            The Rundown
+          </p>
+          <ol className="grid grid-cols-5 gap-0 max-md:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3">
+            {rail.map((a, i) => (
+              <RailItem
+                key={a.slug}
+                article={a}
+                index={i}
+                number={i + 1}
+                horizontal
+                onBadgeClick={onBadgeClick}
+              />
+            ))}
+          </ol>
+        </div>
+      )}
     </Reveal>
   );
 }
@@ -197,18 +206,26 @@ function RailItem({
   article,
   index,
   number,
+  horizontal,
   onBadgeClick,
 }: {
   article: Article;
   index: number;
   number?: number;
+  /** If true, item is rendered as a grid cell with vertical hairlines
+      between columns instead of horizontal rules between rows. */
+  horizontal?: boolean;
   onBadgeClick?: (variant: string) => void;
 }) {
+  const liClass = horizontal
+    ? "px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-4 max-lg:first:border-t-0 max-lg:first:pt-0 max-lg:px-0"
+    : "border-b border-border-s last:border-b-0 py-4 first:pt-3";
+
   return (
     <li
       data-reveal="stagger"
       style={{ ["--stagger-i" as string]: index } as React.CSSProperties}
-      className="border-b border-border-s last:border-b-0 py-4 first:pt-3"
+      className={liClass}
     >
       <Link href={`/insights/${article.slug}`} className="group no-underline flex gap-3 min-w-0">
         {number !== undefined && (
