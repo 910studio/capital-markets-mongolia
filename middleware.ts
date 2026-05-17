@@ -12,6 +12,7 @@ const isPublicRoute = createRouteMatcher([
   "/feed(.*)",
   "/events(.*)",
   "/contributors(.*)",
+  "/about(.*)",
   "/terms",
   "/privacy",
 ]);

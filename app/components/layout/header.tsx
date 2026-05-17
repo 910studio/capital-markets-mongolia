@@ -2,16 +2,45 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { cn } from "@/app/lib/cn";
 
-const NAV_LINKS = [
-  { label: "Directory", href: "/directory" },
+type NavChild = { label: string; href: string; description?: string };
+type NavItem =
+  | { label: string; href: string }
+  | { label: string; children: readonly NavChild[]; rootHref?: string };
+
+const NAV_LINKS: readonly NavItem[] = [
+  {
+    label: "Directory",
+    rootHref: "/directory",
+    children: [
+      { label: "Public Companies", href: "/directory?type=public_company" },
+      { label: "Private Companies", href: "/directory?type=private_company" },
+      { label: "Projects", href: "/directory?type=project" },
+      { label: "Service Providers", href: "/directory?type=service_provider" },
+    ],
+  },
   { label: "Insights", href: "/insights" },
   { label: "Market Feed", href: "/feed" },
   { label: "Events", href: "/events" },
+  {
+    label: "About",
+    rootHref: "/about",
+    children: [
+      { label: "About", href: "/about" },
+      { label: "Consulting", href: "/about#consulting" },
+      { label: "Contact", href: "/about#contact" },
+    ],
+  },
 ] as const;
+
+function isDropdown(
+  item: NavItem,
+): item is { label: string; children: readonly NavChild[]; rootHref?: string } {
+  return "children" in item;
+}
 
 export function Header() {
   const pathname = usePathname();
@@ -55,13 +84,25 @@ export function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => {
-              const active = pathname.startsWith(link.href);
+            {NAV_LINKS.map((item) => {
+              if (isDropdown(item)) {
+                const targetHref = item.rootHref ?? item.children[0].href;
+                const active = pathname.startsWith(targetHref.split("?")[0]);
+                return (
+                  <NavDropdown
+                    key={item.label}
+                    item={item}
+                    transparent={transparent}
+                    active={active}
+                  />
+                );
+              }
+              const active = pathname.startsWith(item.href);
               if (transparent) {
                 return (
                   <Link
-                    key={link.href}
-                    href={link.href}
+                    key={item.href}
+                    href={item.href}
                     className={cn(
                       "inline-flex items-center px-3 h-[34px] rounded-[var(--tab-r)] no-underline font-display text-sm transition-colors",
                       active
@@ -69,17 +110,17 @@ export function Header() {
                         : "text-white/70 font-medium hover:text-white hover:bg-white/10",
                     )}
                   >
-                    {link.label}
+                    {item.label}
                   </Link>
                 );
               }
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={item.href}
+                  href={item.href}
                   className={cn("tab", active && "tab-active")}
                 >
-                  {link.label}
+                  {item.label}
                 </Link>
               );
             })}
@@ -172,22 +213,50 @@ export function Header() {
           style={{ background: "var(--bg)" }}
         >
           <div className="content-max flex flex-col py-2">
-            {NAV_LINKS.map((link) => {
-              const active = pathname.startsWith(link.href);
-              return (
+            {NAV_LINKS.flatMap((item): React.ReactNode[] => {
+              if (isDropdown(item)) {
+                // Flatten dropdown into individual links + a small group label
+                return [
+                  <div
+                    key={`${item.label}-label`}
+                    className="text-[10px] font-display font-bold uppercase tracking-[0.1em] text-fg-3 px-3 pt-3 pb-1"
+                  >
+                    {item.label}
+                  </div>,
+                  ...item.children.map((child) => {
+                    const active = pathname.startsWith(child.href.split("?")[0]);
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className={cn(
+                          "py-2.5 px-3 rounded-[var(--btn-r)] text-sm font-medium no-underline transition-colors",
+                          active
+                            ? "text-brand bg-brand-m"
+                            : "text-fg-2 hover:text-fg hover:bg-surface",
+                        )}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  }),
+                ];
+              }
+              const active = pathname.startsWith(item.href);
+              return [
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={item.href}
+                  href={item.href}
                   className={cn(
                     "py-2.5 px-3 rounded-[var(--btn-r)] text-sm font-medium no-underline transition-colors",
                     active
                       ? "text-brand bg-brand-m"
-                      : "text-fg-2 hover:text-fg hover:bg-surface"
+                      : "text-fg-2 hover:text-fg hover:bg-surface",
                   )}
                 >
-                  {link.label}
-                </Link>
-              );
+                  {item.label}
+                </Link>,
+              ];
             })}
             {isLoaded && !isSignedIn && (
               <div className="mt-2 sm:hidden flex flex-col gap-2">
@@ -208,5 +277,97 @@ export function Header() {
         </nav>
       )}
     </header>
+  );
+}
+
+/* ── NavDropdown — hover/focus-open menu with grace-period close ─── */
+
+function NavDropdown({
+  item,
+  transparent,
+  active,
+}: {
+  item: { label: string; children: readonly NavChild[]; rootHref?: string };
+  transparent: boolean;
+  active: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function show() {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpen(true);
+  }
+  function scheduleHide() {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => setOpen(false), 120);
+  }
+
+  // Trigger looks identical to a regular nav link in either variant.
+  const triggerClass = transparent
+    ? cn(
+        "inline-flex items-center gap-1.5 px-3 h-[34px] rounded-[var(--tab-r)] no-underline font-display text-sm transition-colors cursor-pointer bg-transparent border-0",
+        active
+          ? "text-white font-semibold bg-white/10"
+          : "text-white/70 font-medium hover:text-white hover:bg-white/10",
+      )
+    : cn("tab inline-flex items-center gap-1.5 bg-transparent border-0 cursor-pointer", active && "tab-active");
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={show}
+      onMouseLeave={scheduleHide}
+      onFocus={show}
+      onBlur={scheduleHide}
+    >
+      <button
+        type="button"
+        className={triggerClass}
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        {item.label}
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0)", transition: "transform .15s" }}
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute left-0 top-full pt-2 min-w-[220px] z-50"
+          // pt-2 gives a non-clickable gap visually but the wrapper still
+          // catches mouseenter so the menu stays open across the trigger→menu jump.
+        >
+          <div
+            className="rounded-[var(--card-r,8px)] border border-border-s shadow-lg overflow-hidden py-1"
+            style={{ background: "var(--bg)" }}
+          >
+            {item.children.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href}
+                role="menuitem"
+                className="block px-4 py-2.5 text-sm font-display font-medium text-fg-2 hover:text-brand hover:bg-surface no-underline transition-colors"
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

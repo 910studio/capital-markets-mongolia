@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { InsightsGrid } from "@/app/components/insights/insights-grid";
 import type { Article, GridLayout } from "@/app/components/insights/insights-grid";
-import { PaywallCounter } from "@/app/components/ui/paywall-counter";
+// import { PaywallCounter } from "@/app/components/ui/paywall-counter"; // disabled: free reads feature off
 import { cn } from "@/app/lib/cn";
 
 const LAYOUT_OPTIONS: { value: GridLayout; label: string }[] = [
@@ -164,7 +164,7 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
               ))}
             </div>
             <span className="text-[11px] text-fg-3 font-mono whitespace-nowrap">{total} results</span>
-            <PaywallCounter used={2} total={3} />
+            {/* <PaywallCounter used={2} total={3} />  // disabled: free reads feature off */}
           </div>
         </header>
 
