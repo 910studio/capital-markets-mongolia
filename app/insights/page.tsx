@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { InsightsControls } from "./insights-controls";
-import type { Article } from "@/app/components/insights/insights-grid";
-import { apiGet } from "@/app/lib/api";
-import { adaptInsightToArticle } from "@/app/lib/api-adapters";
+import { getInsights } from "@/app/lib/data/insights";
+import { MOCK_ARTICLES } from "@/app/lib/mock-data";
 
 export const metadata: Metadata = {
   title: "Insights — MarketIQ",
@@ -13,28 +12,24 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function InsightsPage() {
-  let articles: Article[] = [];
-  try {
-    const res = await apiGet("/api/insights", {
-      query: { limit: 50, page: 1 },
-      next: { revalidate: 60, tags: ["insights"] },
-    });
-    articles = res.items.map((dto, i) => ({
-      ...adaptInsightToArticle(dto),
-      featured: i === 0,
-      image: dto.coverImageUrl ? (
-        <Image
-          src={dto.coverImageUrl}
-          alt={dto.title}
-          fill
-          className="object-cover"
-          sizes="(max-width: 640px) 100vw, 50vw"
-        />
-      ) : undefined,
-    }));
-  } catch (err) {
-    console.error("[insights] BFF fetch failed:", err);
-  }
+  const base = await getInsights();
+  // Decorate with featured flag + cover image element. Mock articles carry
+  // coverImage; live articles' image URL is added by the live branch's adapter
+  // — for now, pull the cover from the mock-data by slug lookup.
+  const mockBySlug = new Map(MOCK_ARTICLES.map((a) => [a.slug, a]));
+  const articles = base.map((a, i) => ({
+    ...a,
+    featured: i === 0,
+    image: mockBySlug.get(a.slug)?.coverImage ? (
+      <Image
+        src={mockBySlug.get(a.slug)!.coverImage!}
+        alt={a.title}
+        fill
+        className="object-cover"
+        sizes="(max-width: 640px) 100vw, 50vw"
+      />
+    ) : undefined,
+  }));
 
   return (
     <div className="max-w-[var(--content-max)] mx-auto px-6 w-full">

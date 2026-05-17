@@ -24,33 +24,19 @@ import {
   ENTITY_TYPE_LABELS,
   type MockEntity,
 } from "@/app/lib/mock-data";
-import { apiGet, path, ApiError } from "@/app/lib/api";
-import { adaptEntityDetail } from "@/app/lib/api-adapters";
+import { getEntityBySlug } from "@/app/lib/data/directory";
 import { ProfileVariants } from "./profile-variants";
 
 /**
- * Hybrid loader: tries live API first, then mock by slug, merges API basics
- * (name/description/sector/ticker/website) over mock rich fields (financials,
- * sustainability, deals, etc.) so detail page renders both real + designed
- * content during the integration ramp.
+ * Loader: routes through the data layer which branches on DATA_MODE.
+ * In live mode, the live entity (from BFF) is merged with the mock so the
+ * detail page renders both real basics + designed rich fields (financials,
+ * sustainability, deals, etc.) during the integration ramp.
  */
 async function loadEntity(slug: string): Promise<MockEntity | null> {
-  let apiEntity: MockEntity | null = null;
-  try {
-    const dto = await apiGet(path("/api/entities/{slug}", { slug }), {
-      next: { revalidate: 60, tags: [`entity:${slug}`] },
-    });
-    apiEntity = adaptEntityDetail(dto);
-  } catch (err) {
-    if (err instanceof ApiError && err.status === 404) {
-      // fall through to mock
-    } else {
-      console.error(`[entity:${slug}] API fetch failed, mock-only:`, err);
-    }
-  }
+  const apiEntity = await getEntityBySlug(slug);
   const mockEntity = MOCK_ENTITIES.find((e) => e.slug === slug);
-  if (apiEntity && mockEntity) {
-    // API basics override mock; mock retains rich fields the DTO doesn't expose.
+  if (apiEntity && mockEntity && apiEntity !== mockEntity) {
     return {
       ...mockEntity,
       name: apiEntity.name,

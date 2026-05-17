@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { apiGet } from "@/app/lib/api";
-import { adaptNewsItem } from "@/app/lib/api-adapters";
+import { getNewsItems } from "@/app/lib/data/feed";
 import { FeedStream } from "./feed-stream";
 
 export const metadata: Metadata = {
@@ -12,17 +11,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
-  let items: ReturnType<typeof adaptNewsItem>[] = [];
-  try {
-    const res = await apiGet("/api/news/feed", {
-      query: { limit: 50 },
-      next: { revalidate: 60, tags: ["news"] },
-    });
-    items = res.items.map(adaptNewsItem);
-  } catch (err) {
-    console.error("[feed] API fetch failed:", err);
-  }
-
+  const items = await getNewsItems();
   return (
     <div className="content-max px-6">
       <FeedStream items={items} />

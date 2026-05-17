@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
 import { DirectoryControls } from "./directory-controls";
-import { apiGet } from "@/app/lib/api";
-import { adaptEntityListItem } from "@/app/lib/api-adapters";
-import {
-  ENTITY_TYPE_TO_BACKEND,
-  type EntityType,
-  type MockEntity,
-} from "@/app/lib/mock-data";
+import { getEntities } from "@/app/lib/data/directory";
+import { type EntityType, type MockEntity } from "@/app/lib/mock-data";
 
 export const metadata: Metadata = {
   title: "Directory — MarketIQ",
@@ -53,28 +48,15 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
   };
 
   if (!hasFilters) {
-    // Default landing — fetch each type's first slice in parallel for the
-    // section preview view.
+    // Default landing — fetch each type's first slice in parallel.
     const sections = await Promise.all(
       SECTION_TYPES.map(async (t) => {
-        try {
-          const res = await apiGet("/api/entities", {
-            query: {
-              entityType: ENTITY_TYPE_TO_BACKEND[t],
-              limit: SECTION_PREVIEW,
-              offset: 0,
-            },
-            next: { revalidate: 60, tags: ["entities"] },
-          });
-          return {
-            type: t,
-            items: res.items.map(adaptEntityListItem),
-            total: res.total,
-          };
-        } catch (err) {
-          console.error(`[directory] section ${t} fetch failed:`, err);
-          return { type: t, items: [] as MockEntity[], total: 0 };
-        }
+        const page = await getEntities({
+          entityType: t,
+          limit: SECTION_PREVIEW,
+          offset: 0,
+        });
+        return { type: t, items: page.items, total: page.total };
       }),
     );
 
@@ -89,29 +71,17 @@ export default async function DirectoryPage({ searchParams }: PageProps) {
     );
   }
 
-  // Filtered view — single paginated fetch.
-  let items: MockEntity[] = [];
-  let total = 0;
-  try {
-    const res = await apiGet("/api/entities", {
-      query: {
-        q,
-        entityType: type ? ENTITY_TYPE_TO_BACKEND[type] : undefined,
-        sectorSlug: sector,
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
-      },
-      next: { revalidate: 60, tags: ["entities"] },
-    });
-    items = res.items.map(adaptEntityListItem);
-    total = res.total;
-    // `raising` isn't a backend filter yet — narrow the page locally.
-    if (raising) {
-      items = items.filter((e) => e.isRaising);
-    }
-  } catch (err) {
-    console.error("[directory] filtered fetch failed:", err);
-  }
+  // Filtered view — single paginated fetch through the data layer.
+  const pageResult = await getEntities({
+    q,
+    entityType: type,
+    sectorSlug: sector,
+    raising,
+    limit: PAGE_SIZE,
+    offset: (page - 1) * PAGE_SIZE,
+  });
+  const items: MockEntity[] = pageResult.items;
+  const total = pageResult.total;
 
   return (
     <div className="max-w-[var(--content-max)] mx-auto px-6 w-full">
