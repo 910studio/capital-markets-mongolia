@@ -131,7 +131,7 @@ export function adaptNewsItem(dto: NewsFeedItemDto): MockNewsItem {
       ? (NEWS_CATEGORY_MAP[dto.signalCategory] ?? "markets")
       : "markets",
     entitySlugs,
-    confidence: dto.signalScore ?? 0.8,
+    aiTranslated: dto.aiTranslated === true,
     reviewed: true,
   };
 }

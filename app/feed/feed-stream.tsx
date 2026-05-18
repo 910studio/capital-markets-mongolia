@@ -19,15 +19,12 @@ const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "macro", label: NEWS_CATEGORY_LABELS.macro },
 ];
 
-type SourceFilter = "all" | "verified" | "unverified";
-
 interface FeedStreamProps {
   items: MockNewsItem[];
 }
 
 export function FeedStream({ items }: FeedStreamProps) {
   const [category, setCategory] = useState<NewsCategory | "all">("all");
-  const [source, setSource] = useState<SourceFilter>("all");
   const [activeSource, setActiveSource] = useState<string | null>(null);
 
   const sources = useMemo(() => {
@@ -39,11 +36,9 @@ export function FeedStream({ items }: FeedStreamProps) {
   const filtered = useMemo(() => {
     let result = items;
     if (category !== "all") result = result.filter((i) => i.category === category);
-    if (source === "verified") result = result.filter((i) => i.confidence >= 0.75);
-    if (source === "unverified") result = result.filter((i) => i.confidence < 0.75);
     if (activeSource) result = result.filter((i) => i.source === activeSource);
     return result;
-  }, [items, category, source, activeSource]);
+  }, [items, category, activeSource]);
 
   const grouped = useMemo(() => groupByDay(filtered), [filtered]);
 
@@ -112,7 +107,6 @@ export function FeedStream({ items }: FeedStreamProps) {
               <button
                 onClick={() => {
                   setCategory("all");
-                  setSource("all");
                   setActiveSource(null);
                 }}
                 className="btn btn-secondary text-sm mt-4"
@@ -152,28 +146,6 @@ export function FeedStream({ items }: FeedStreamProps) {
           className="flex flex-col gap-4 lg:sticky lg:self-start"
           style={{ top: "calc(var(--header-h) + 24px)" }}
         >
-          <div className="card !p-4">
-            <div className="font-mono text-[10px] uppercase tracking-badge text-fg-3 mb-3">
-              Confidence
-            </div>
-            <div className="flex flex-col gap-1">
-              {(["all", "verified", "unverified"] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSource(s)}
-                  className={cn(
-                    "text-left px-2 py-1.5 rounded-[var(--btn-r)] text-sm font-medium cursor-pointer transition-colors border-none",
-                    source === s
-                      ? "bg-brand-m text-brand font-semibold"
-                      : "bg-transparent text-fg-2 hover:bg-surface hover:text-fg"
-                  )}
-                >
-                  {s === "all" ? "All items" : s === "verified" ? "Analyst-reviewed" : "Pending review"}
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="card !p-4">
             <div className="font-mono text-[10px] uppercase tracking-badge text-fg-3 mb-3">
               Sources
