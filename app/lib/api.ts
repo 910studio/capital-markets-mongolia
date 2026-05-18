@@ -107,6 +107,22 @@ function buildUrl(path: string, query?: Record<string, unknown>): string {
   return url.toString();
 }
 
+/** HTTP statuses we'll retry once before giving up. Cloudflare/Nginx in
+ *  front of the BFF return these during deploy races (FE container boots
+ *  faster than BFF). A single backoff retry hides the blip from users. */
+const TRANSIENT_STATUSES = new Set([502, 503, 504, 521, 522, 524]);
+
+/** Statuses we never want Next's data cache to remember. Without this,
+ *  a 5xx during a deploy gets cached for the full `revalidate` window
+ *  and serves an empty page until a visitor triggers revalidation. */
+const UNCACHEABLE_STATUSES = new Set([
+  408, 429, 500, 502, 503, 504, 521, 522, 524,
+]);
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function request<T>(
   method: Method,
   path: string,
@@ -128,29 +144,61 @@ async function request<T>(
     init.token ?? (shouldAutoInject ? await getClerkToken() : null);
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  // Next.js augments RequestInit with `next` (revalidate/tags). Cast to any
-  // so this file compiles in environments where Next's lib types haven't loaded.
-  const res = await fetch(buildUrl(path, init.query), {
-    method,
-    headers,
-    body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
-    cache: init.cache ?? "no-store",
-    next: init.next,
-  } as RequestInit & { next?: { revalidate?: number; tags?: string[] } });
+  const url = buildUrl(path, init.query);
+  const body = init.body !== undefined ? JSON.stringify(init.body) : undefined;
 
-  if (!res.ok) {
+  // Two-pass attempt loop: try with the caller's caching prefs first.
+  // On a transient 5xx, retry once with cache: no-store so we don't
+  // poison Next's data cache with the failure (the cached failure
+  // would otherwise serve an empty page until the revalidate window
+  // expires — exactly the deploy-race bug we keep hitting).
+  let lastErr: ApiError | null = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const isRetry = attempt > 0;
+    // Next.js augments RequestInit with `next` (revalidate/tags). Cast
+    // so this file compiles in environments where Next's lib types
+    // haven't loaded.
+    const res = await fetch(url, {
+      method,
+      headers,
+      body,
+      cache: isRetry ? "no-store" : (init.cache ?? "no-store"),
+      next: isRetry ? undefined : init.next,
+    } as RequestInit & { next?: { revalidate?: number; tags?: string[] } });
+
+    if (res.ok) {
+      // 204 No Content
+      if (res.status === 204) return undefined as T;
+      return (await res.json()) as T;
+    }
+
     let payload: unknown = null;
     try {
       payload = await res.json();
     } catch {
       // body wasn't JSON
     }
-    throw new ApiError(res.status, path, payload);
+    lastErr = new ApiError(res.status, path, payload);
+
+    // Retry once on transient 5xx, with backoff. After the retry,
+    // either we have a fresh result OR we throw the original error.
+    if (!isRetry && TRANSIENT_STATUSES.has(res.status)) {
+      // Also tell Next not to remember THIS response — without this,
+      // a fetch resolving to 502 still gets stored in the data cache
+      // and served back on the next revalidate window.
+      if (UNCACHEABLE_STATUSES.has(res.status)) {
+        // 250ms backoff. Deploy races usually clear in 1–3s; one fast
+        // retry catches the tail end without slowing the happy path.
+        await sleep(250);
+        continue;
+      }
+    }
+
+    throw lastErr;
   }
 
-  // 204 No Content
-  if (res.status === 204) return undefined as T;
-  return (await res.json()) as T;
+  // Both attempts failed.
+  throw lastErr ?? new ApiError(0, path, "request failed");
 }
 
 export async function apiGet<P extends keyof paths>(
