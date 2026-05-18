@@ -3,13 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   MOCK_NEWS,
-  MOCK_ENTITIES,
   NEWS_CATEGORY_COLORS,
   NEWS_CATEGORY_LABELS,
   type MockNewsItem,
 } from "@/app/lib/mock-data";
 import { NewsItemCard } from "@/app/components/feed/news-item-card";
-import { cn } from "@/app/lib/cn";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -27,7 +25,7 @@ interface NewsDetailDto {
   summary?: string;
   whyItMatters?: string;
   resolvedBody?: string;
-  entities?: { slug: string; name?: string }[];
+  entities?: { slug?: string | null; name?: string | null }[];
 }
 
 const NEWS_CATEGORY_MAP: Record<string, MockNewsItem["category"]> = {
@@ -49,6 +47,9 @@ async function fetchNews(id: string): Promise<MockNewsItem | undefined> {
       dto.summary?.trim() ||
       dto.whyItMatters?.trim() ||
       extractBodyExcerpt(dto.resolvedBody);
+    const entities = (dto.entities ?? []).flatMap((e) =>
+      e.slug && e.name ? [{ slug: e.slug, name: e.name }] : [],
+    );
     return {
       id: dto.id,
       headline: dto.title,
@@ -58,9 +59,8 @@ async function fetchNews(id: string): Promise<MockNewsItem | undefined> {
       publishedAt: dto.publishedAt,
       category: NEWS_CATEGORY_MAP[dto.signalCategory ?? ""] ?? "markets",
       topics: [],
-      entitySlugs: (dto.entities ?? [])
-        .map((e) => e.slug)
-        .filter((s): s is string => typeof s === "string"),
+      entitySlugs: entities.map((e) => e.slug),
+      entities,
       aiTranslated: dto.aiTranslated === true,
       reviewed: Boolean(dto.isIncludedInBrief),
     };
@@ -123,9 +123,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
   const item = live ?? MOCK_NEWS.find((n) => n.id === id);
   if (!item) notFound();
 
-  const entities = item.entitySlugs
-    .map((slug) => MOCK_ENTITIES.find((e) => e.slug === slug))
-    .filter((e): e is NonNullable<typeof e> => Boolean(e));
+  const entities = item.entities ?? [];
 
   const related = MOCK_NEWS.filter(
     (n) =>
