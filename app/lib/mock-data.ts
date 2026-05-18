@@ -1254,6 +1254,15 @@ export interface MockEvent {
   recapUrl?: string;
   replayUrl?: string;
   topics?: string[];
+  /** Optional per-event custom HTML theme. Rendered in a sandboxed iframe
+   *  on the event page. URL points at the uploaded asset (R2 via Payload). */
+  themeHtmlUrl?: string;
+  /** Iframe height in vh (30–500). Defaults to 100 if themeHtmlUrl is set. */
+  themeHeightVh?: number;
+  /** When true, the theme fully replaces the default event layout (only
+   *  breadcrumb + registration CTA remain). When false (default), the
+   *  theme renders as a hero section above the standard layout. */
+  themeReplacesChrome?: boolean;
 }
 
 export const MOCK_EVENTS: MockEvent[] = [
@@ -1277,6 +1286,9 @@ export const MOCK_EVENTS: MockEvent[] = [
     registrationDeadline: "2026-05-10",
     ticketPrice: "MNT 1,200,000",
     coverImage: "/events/mif-2026.png",
+    themeHtmlUrl: "/event-themes/mif-2026.html",
+    themeHeightVh: 100,
+    themeReplacesChrome: true,
     speakerSlugs: ["uchral-n", "byambasaikhan-b", "khan-bank-ceo", "rio-tinto-cfo", "namkhaidorj-b-speaker"],
     sponsors: [
       { name: "Khan Bank", tier: "platinum" },
@@ -1314,6 +1326,12 @@ export const MOCK_EVENTS: MockEvent[] = [
     venue: "Grand Hyatt Shanghai",
     city: "Shanghai",
     coverImage: "/events/mif-shanghai-2026.png",
+    themeHtmlUrl: "/event-themes/mif-shanghai-2026.html",
+    // Fallback only — the theme posts its own height via the
+    // event-theme-height postMessage convention, so the iframe will
+    // grow to fit content automatically.
+    themeHeightVh: 400,
+    themeReplacesChrome: true,
     speakerSlugs: [
       "zolbayar-e-speaker",
       "denzendash-g-speaker",
@@ -1352,6 +1370,9 @@ export const MOCK_EVENTS: MockEvent[] = [
     registrationCount: 64,
     ticketPrice: "MNT 800,000",
     coverImage: "/events/mining-summit-2026.jpg",
+    themeHtmlUrl: "/event-themes/mining-summit-2026.html",
+    themeHeightVh: 120,
+    themeReplacesChrome: true,
     speakerSlugs: ["damdinnyam-g", "rio-tinto-cfo", "ariunzaya-o-speaker"],
     sponsors: [
       { name: "Rio Tinto", tier: "platinum" },

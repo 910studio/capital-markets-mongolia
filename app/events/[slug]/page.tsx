@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { MOCK_SPEAKERS, type MockEventAgendaItem, type MockSpeaker } from "@/app/lib/mock-data";
+import { MOCK_SPEAKERS, type MockEvent, type MockEventAgendaItem, type MockSpeaker } from "@/app/lib/mock-data";
 import { getEventBySlug } from "@/app/lib/data/events";
 import { RegistrationForm } from "@/app/components/events/registration-form";
 import { Avatar } from "@/app/components/events/speaker-card";
+import { EventThemeFrame } from "@/app/components/events/event-theme-frame";
 import { formatDateRange, FORMAT_LABEL, STATUS_LABEL } from "@/app/components/events/event-card";
 import { cn } from "@/app/lib/cn";
 
@@ -39,9 +40,29 @@ export default async function EventDetailPage({ params }: PageProps) {
   const isPast = event.status === "past";
 
   return (
-    <div className="content-max px-6 pb-20">
-      {/* Breadcrumb */}
-      <div className="pt-6 pb-3">
+    <div
+      data-mode="dark"
+      style={{
+        // Full-bleed dark wrapper — pulls the page up under the transparent
+        // navbar (matches /events index). No max-width here so the theme
+        // iframe + hero run edge-to-edge.
+        marginTop: "calc(-1 * var(--header-h))",
+        background: "var(--bg)",
+        color: "var(--fg)",
+      }}
+    >
+      {/* Breadcrumb — floats over the theme/hero area, clears the navbar.
+          Centered via the same content-max constraint so it lines up with
+          the page body below. */}
+      <div
+        className="content-max px-6"
+        style={{
+          paddingTop: "calc(var(--header-h) + 1rem)",
+          paddingBottom: 12,
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
         <Link
           href="/events"
           className="text-[11px] uppercase tracking-[0.14em] font-display font-bold text-fg-3 hover:text-brand no-underline transition-colors"
@@ -50,7 +71,20 @@ export default async function EventDetailPage({ params }: PageProps) {
         </Link>
       </div>
 
+      {/* Custom HTML theme — full bleed under the navbar */}
+      {event.themeHtmlUrl && (
+        <EventThemeFrame
+          src={event.themeHtmlUrl}
+          heightVh={event.themeHeightVh ?? 100}
+          title={event.title}
+        />
+      )}
+
+      {/* Centered body wrapper — standard hero + bottom CTA + grid all sit here */}
+      <div className="content-max px-6 pb-20">
+
       {/* Hero */}
+      {!event.themeReplacesChrome && (
       <header className="pb-10 border-b-[2px] border-fg">
         <p
           className={cn(
@@ -137,8 +171,12 @@ export default async function EventDetailPage({ params }: PageProps) {
           </div>
         )}
       </header>
+      )}
 
-      {/* Body */}
+      {/* Body — full layout when no theme replace, minimal CTA strip when theme owns the page */}
+      {event.themeReplacesChrome ? (
+        <ThemeBottomCta event={event} speakersCount={speakers.length} isPast={isPast} />
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-x-14 gap-y-10 pt-12">
         <div className="min-w-0 flex flex-col gap-14">
           {/* About */}
@@ -298,7 +336,116 @@ export default async function EventDetailPage({ params }: PageProps) {
           )}
         </aside>
       </div>
+      )}
+      </div>
     </div>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   ThemeBottomCta — minimal registration strip below
+   a full-page custom HTML theme. Keeps the form +
+   meta accessible without competing with the theme.
+   ════════════════════════════════════════════════ */
+
+function ThemeBottomCta({
+  event,
+  speakersCount,
+  isPast,
+}: {
+  event: MockEvent;
+  speakersCount: number;
+  isPast: boolean;
+}) {
+  return (
+    <section className="max-w-[640px] mx-auto pt-16 pb-24">
+      <div className="border-t-[2px] border-fg pt-8">
+        <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg-3 mb-3">
+          {isPast ? "This event has concluded" : "Reserve your seat"}
+        </p>
+        <h2
+          className="font-bold leading-[1.05] text-fg mb-4"
+          style={{ fontFamily: "var(--font-s)", fontSize: "clamp(1.5rem, 3vw, 2rem)", letterSpacing: "-0.02em" }}
+        >
+          {event.title}
+        </h2>
+
+        {/* Meta strip */}
+        <div
+          className="text-[13px] text-fg-3 italic flex items-center gap-2 flex-wrap mb-8"
+          style={{ fontFamily: "var(--font-s)" }}
+        >
+          <span className="not-italic font-display font-semibold text-[11px] tracking-[0.1em] uppercase text-fg-2">
+            {formatDateRange(event.startDate, event.endDate)}
+          </span>
+          <span className="meta-dot inline-block w-[3px] h-[3px] rounded-full bg-fg-3" />
+          <span>{event.location}</span>
+          <span className="meta-dot inline-block w-[3px] h-[3px] rounded-full bg-fg-3" />
+          <span className="not-italic font-display font-medium text-[11px] tracking-[0.1em] uppercase text-fg-3">
+            {FORMAT_LABEL[event.format]}
+          </span>
+        </div>
+
+        {/* Registration form — editorial variant: no card chrome, underlined
+            inputs, brand-yellow accent. Native to the dark themed page. */}
+        {!isPast && (
+          <RegistrationForm
+            slug={event.slug}
+            eventTitle={event.shortName ?? event.title}
+            ticketPrice={event.ticketPrice}
+            registrationDeadline={event.registrationDeadline}
+            variant="editorial"
+          />
+        )}
+
+        {/* Past event recap CTAs */}
+        {isPast && (event.recapUrl || event.replayUrl) && (
+          <div className="flex flex-wrap gap-3">
+            {event.recapUrl && (
+              <Link href={event.recapUrl} className="btn btn-primary text-sm">
+                Read recap
+              </Link>
+            )}
+            {event.replayUrl && (
+              <Link href={event.replayUrl} className="btn btn-secondary text-sm">
+                Watch replay
+              </Link>
+            )}
+          </div>
+        )}
+
+        {/* Live registration count */}
+        {event.registrationCount && !isPast && (
+          <div className="border-t border-border-s mt-6 pt-4 flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-pos animate-pulse" />
+            <div className="text-[12px] text-fg-2">
+              <span className="font-bold text-fg" style={{ fontFamily: "var(--font-s)" }}>
+                {event.registrationCount}
+              </span>{" "}
+              <span className="italic" style={{ fontFamily: "var(--font-s)" }}>
+                registered so far
+                {speakersCount > 0 ? ` · ${speakersCount} speakers confirmed` : ""}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Venue */}
+        {event.venue && (
+          <div className="border-t border-border-s mt-6 pt-4">
+            <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg-3 mb-2">
+              Venue
+            </p>
+            <div className="font-bold text-fg text-[15px] mb-1 leading-tight" style={{ fontFamily: "var(--font-s)" }}>
+              {event.venue}
+            </div>
+            <div className="text-[12px] text-fg-3 italic leading-[1.5]" style={{ fontFamily: "var(--font-s)" }}>
+              {event.location}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 

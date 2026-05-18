@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MIF Shanghai 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      :root {
+        --ink: #efe9da;
+        --paper: #1a1410;
+        --paper-deep: #100c0a;
+        --jade: #4d9b8f;
+        --vermillion: #d63b2f;
+        --gold: #d4a04a;
+        --line: rgba(239, 233, 218, 0.14);
+        --line-strong: rgba(239, 233, 218, 0.32);
+      }
+      /* No internal scroll — this page lives inside a parent-resized iframe.
+         The parent reads our scrollHeight via postMessage and grows the
+         iframe element to match, so any internal scroll would create a
+         double scrollbar. */
+      html, body {
+        overflow: hidden;
+        height: auto;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Inter", system-ui, sans-serif;
+        line-height: 1.55;
+      }
+      .container { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 56px); }
+
+      /* —— Section dividers —— */
+      .rule { height: 1px; background: var(--line); width: 100%; }
+      .rule-strong { background: var(--line-strong); }
+
+      /* —— Hero ——
+         IMPORTANT: don't use 100vh — the page renders inside an
+         auto-resizing iframe, so vh tracks the iframe's height which
+         the parent keeps growing to fit content (infinite loop). */
+      .hero {
+        min-height: clamp(540px, 80vh, 720px);
+        max-height: 720px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: clamp(28px, 4vw, 44px) 0;
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(60% 50% at 80% 20%, rgba(212, 160, 74, 0.22), transparent 60%),
+          radial-gradient(50% 50% at 10% 90%, rgba(77, 155, 143, 0.20), transparent 60%);
+        pointer-events: none;
+      }
+      .hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .hero-top .slug {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+      }
+      .hero-top .slug .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--vermillion);
+        border-radius: 50%;
+        animation: blink 1.6s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+      .hero-mid {
+        display: flex;
+        align-items: center;
+      }
+      .hero h1 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: clamp(48px, 8.5vw, 132px);
+        line-height: 0.94;
+        letter-spacing: -0.02em;
+        max-width: 14ch;
+      }
+      .hero h1 .ital { font-style: italic; color: var(--gold); }
+      .hero h1 .small {
+        display: block;
+        font-size: clamp(16px, 1.6vw, 22px);
+        letter-spacing: 0;
+        line-height: 1.45;
+        font-style: italic;
+        margin-top: 16px;
+        opacity: 0.7;
+        max-width: 48ch;
+        color: var(--ink);
+      }
+      .hero-bottom {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 32px;
+        border-top: 1px solid var(--line-strong);
+        padding-top: 24px;
+      }
+      @media (max-width: 720px) {
+        .hero-bottom { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      }
+      .hero-bottom .col .l {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.5;
+        margin-bottom: 8px;
+      }
+      .hero-bottom .col .v {
+        font-family: "Instrument Serif", serif;
+        font-size: clamp(22px, 2.2vw, 32px);
+        line-height: 1.15;
+      }
+
+      /* —— Section primitive —— */
+      .section {
+        padding: clamp(48px, 6vw, 88px) 0;
+        position: relative;
+      }
+      .section-head {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: end;
+        gap: 24px;
+        margin-bottom: clamp(32px, 4vw, 56px);
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line-strong);
+      }
+      .section-head .num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.4;
+      }
+      .section-head h2 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: clamp(36px, 4.5vw, 64px);
+        line-height: 0.94;
+        letter-spacing: -0.015em;
+      }
+      .section-head h2 .ital { font-style: italic; color: var(--gold); }
+      .section-head .right {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.5;
+        text-align: right;
+      }
+      @media (max-width: 720px) {
+        .section-head { grid-template-columns: 1fr; gap: 12px; }
+        .section-head .right { text-align: left; }
+      }
+
+      /* —— About narrative —— */
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: clamp(32px, 4vw, 64px);
+        align-items: start;
+      }
+      @media (max-width: 880px) { .about-grid { grid-template-columns: 1fr; gap: 24px; } }
+      .about-grid .lead {
+        font-family: "Instrument Serif", serif;
+        font-size: clamp(20px, 1.9vw, 26px);
+        line-height: 1.35;
+        letter-spacing: -0.005em;
+      }
+      .about-grid .lead em { color: var(--gold); }
+      .about-grid .body {
+        font-size: 15px;
+        line-height: 1.65;
+        opacity: 0.78;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* —— Speaker grid —— */
+      .speakers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+      }
+      @media (max-width: 880px) { .speakers { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 520px) { .speakers { grid-template-columns: 1fr; } }
+      .speaker {
+        background: var(--paper);
+        padding: 22px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        transition: background 0.3s ease;
+      }
+      .speaker:hover { background: var(--paper-deep); }
+      .speaker .avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold), var(--vermillion));
+        margin-bottom: 10px;
+        display: grid;
+        place-items: center;
+        font-family: "Instrument Serif", serif;
+        font-size: 18px;
+        color: var(--paper);
+        font-style: italic;
+      }
+      .speaker .name {
+        font-family: "Instrument Serif", serif;
+        font-size: 19px;
+        line-height: 1.2;
+      }
+      .speaker .title {
+        font-size: 12px;
+        opacity: 0.6;
+        margin-top: 2px;
+      }
+
+      /* —— Schedule —— */
+      .schedule {
+        display: flex;
+        flex-direction: column;
+      }
+      .agenda-item {
+        display: grid;
+        grid-template-columns: 88px 1fr auto;
+        gap: 24px;
+        padding: 16px 0;
+        border-top: 1px solid var(--line);
+        align-items: start;
+      }
+      @media (max-width: 720px) {
+        .agenda-item { grid-template-columns: 72px 1fr; }
+        .agenda-item .kind { grid-column: 1 / -1; }
+      }
+      .agenda-item:hover .title { color: var(--gold); }
+      .agenda-item .time {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding-top: 4px;
+      }
+      .agenda-item .title {
+        font-family: "Instrument Serif", serif;
+        font-size: clamp(18px, 1.6vw, 22px);
+        line-height: 1.25;
+        transition: color 0.2s ease;
+      }
+      .agenda-item .desc {
+        margin-top: 4px;
+        font-size: 13px;
+        opacity: 0.6;
+        max-width: 56ch;
+      }
+      .agenda-item .kind {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        align-self: start;
+        opacity: 0.7;
+      }
+      .agenda-item .kind.keynote { color: var(--gold); border-color: var(--gold); }
+      .agenda-item .kind.panel { color: var(--jade); border-color: var(--jade); }
+      .agenda-item .kind.break { opacity: 0.4; }
+
+      /* —— Pillars / why attend —— */
+      .pillars {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      @media (max-width: 880px) { .pillars { grid-template-columns: 1fr; } }
+      .pillar {
+        padding: 24px 22px;
+        border: 1px solid var(--line);
+        position: relative;
+      }
+      .pillar .icon {
+        font-family: "Instrument Serif", serif;
+        font-style: italic;
+        font-size: 40px;
+        color: var(--gold);
+        line-height: 1;
+        margin-bottom: 14px;
+      }
+      .pillar h3 {
+        font-family: "Instrument Serif", serif;
+        font-size: 20px;
+        margin-bottom: 8px;
+        line-height: 1.2;
+        font-weight: 400;
+      }
+      .pillar p {
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.7;
+      }
+
+      /* —— FAQ —— */
+      .faq-item {
+        border-top: 1px solid var(--line);
+        padding: 16px 0;
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        gap: 24px;
+      }
+      @media (max-width: 720px) { .faq-item { grid-template-columns: 1fr; gap: 8px; padding: 12px 0; } }
+      .faq-item .q {
+        font-family: "Instrument Serif", serif;
+        font-size: clamp(17px, 1.4vw, 20px);
+        line-height: 1.25;
+      }
+      .faq-item .a {
+        font-size: 14px;
+        line-height: 1.6;
+        opacity: 0.75;
+      }
+
+      /* —— Footer marquee —— */
+      .footer-marquee {
+        border-top: 1px solid var(--line-strong);
+        border-bottom: 1px solid var(--line-strong);
+        overflow: hidden;
+        margin-top: 48px;
+      }
+      .footer-marquee-track {
+        display: flex;
+        gap: 64px;
+        padding: 18px 0;
+        white-space: nowrap;
+        font-family: "Instrument Serif", serif;
+        font-size: clamp(28px, 4vw, 56px);
+        font-style: italic;
+        animation: marquee 28s linear infinite;
+        color: var(--gold);
+      }
+      .footer-marquee-track .star { color: var(--ink); opacity: 0.3; }
+      @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+      }
+
+      .footer-meta {
+        padding: 28px 0 32px;
+        display: flex;
+        justify-content: space-between;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.5;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      /* —— Soft entrance on first paint ——
+         Note: we can't use an IntersectionObserver inside an auto-sized
+         iframe because the iframe itself doesn't scroll (the parent
+         page does), so the IO inside never sees viewport changes.
+         Instead, do a single staggered fade-up on load via CSS animation.
+         Content is visible by default — animation only enhances. */
+      .reveal {
+        animation: rise-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+      @keyframes rise-in {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .reveal { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-top">
+        <span class="slug"><span class="dot"></span>Mongolia Investment Forum · Shanghai 2026</span>
+        <span>September 18 — 19 · 浦东</span>
+      </div>
+
+      <div class="container hero-mid">
+        <h1>
+          The <span class="ital">Steppe</span><br />
+          meets the <span class="ital">Bund.</span>
+          <span class="small">
+            A two-day private gathering bringing Mongolia's listed issuers and
+            sovereign holdings face-to-face with Asian institutional capital
+            on the 38th floor overlooking the Huangpu.
+          </span>
+        </h1>
+      </div>
+
+      <div class="container hero-bottom">
+        <div class="col"><div class="l">Date</div><div class="v">Sep 18 — 19</div></div>
+        <div class="col"><div class="l">City</div><div class="v">Shanghai</div></div>
+        <div class="col"><div class="l">Format</div><div class="v">In-person · Invite</div></div>
+        <div class="col"><div class="l">Attendees</div><div class="v">120 capped</div></div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="num">— 01</span>
+          <h2>A room of <span class="ital">eighty</span> allocators.</h2>
+          <span class="right">About the forum</span>
+        </div>
+        <div class="about-grid">
+          <p class="lead reveal">
+            The Shanghai chapter exists for one reason: to put Mongolia's
+            <em>actually-investable</em> stories — copper off-takes, hydropower
+            concessions, fintech rails — in front of the people who can write
+            the cheques. No theatre. No mass tourism.
+          </p>
+          <div class="body reveal">
+            <p>
+              Hosted in partnership with the Shanghai Stock Exchange and the
+              CMM Research desk, the forum is invite-only. The 120 seats
+              cap is a constraint, not a marketing line — we won't oversubscribe.
+            </p>
+            <p>
+              Day one is structured presentations from operators with
+              capital-raising mandates in the next 18 months. Day two is
+              entirely private 1:1s arranged by the CMM analyst team based
+              on stated allocation appetite.
+            </p>
+            <p>
+              The bar to present: a real project, a real CFO in the room,
+              real DD materials ready to share. No "tell me about
+              Mongolia." We assume you've done the reading.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule rule-strong"></div>
+
+    <!-- WHY -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="num">— 02</span>
+          <h2>Why <span class="ital">Shanghai.</span></h2>
+          <span class="right">Three pillars</span>
+        </div>
+        <div class="pillars">
+          <div class="pillar reveal">
+            <div class="icon">i</div>
+            <h3>Institutional density.</h3>
+            <p>
+              Eight of Asia's ten largest sovereign and quasi-sovereign pools
+              are headquartered or anchored within a 90-minute radius of the
+              venue. We've already confirmed mandates from six.
+            </p>
+          </div>
+          <div class="pillar reveal">
+            <div class="icon">ii</div>
+            <h3>Off-take leverage.</h3>
+            <p>
+              Mongolia's copper, coking coal, and rare-earth flow predominantly
+              south. The forum places Mongolian operators across the table
+              from the buyers writing the actual purchase contracts.
+            </p>
+          </div>
+          <div class="pillar reveal">
+            <div class="icon">iii</div>
+            <h3>Currency efficiency.</h3>
+            <p>
+              CNY-denominated structures, panda bond pathways, and CIPS
+              clearing are first-order topics — not afterthoughts. The
+              regulatory desk briefings are co-led by Shanghai-side legal.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule rule-strong"></div>
+
+    <!-- SPEAKERS -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="num">— 03</span>
+          <h2>The <span class="ital">room.</span></h2>
+          <span class="right">9 confirmed · more pending</span>
+        </div>
+        <div class="speakers reveal">
+          <div class="speaker">
+            <div class="avatar">N</div>
+            <div class="name">N. Uchral</div>
+            <div class="title">CEO · Mongolian Stock Exchange</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">B</div>
+            <div class="name">B. Byambasaikhan</div>
+            <div class="title">Chairman · Business Council of Mongolia</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">K</div>
+            <div class="name">Khan Bank CEO</div>
+            <div class="title">President · Khan Bank</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">R</div>
+            <div class="name">Rio Tinto CFO</div>
+            <div class="title">Group CFO · Rio Tinto Mongolia</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">L</div>
+            <div class="name">Liu Wenshu</div>
+            <div class="title">Head of Cross-Border · CICC</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">Z</div>
+            <div class="name">Zhang Hai</div>
+            <div class="title">MD · CSC Asset Management</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">D</div>
+            <div class="name">D. Damdinnyam</div>
+            <div class="title">Director · Erdenes Mongol</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">A</div>
+            <div class="name">A. Ariunzaya</div>
+            <div class="title">Partner · Sant Capital</div>
+          </div>
+          <div class="speaker">
+            <div class="avatar">W</div>
+            <div class="name">Wang Yifei</div>
+            <div class="title">Head of Frontier · Foresight Capital</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule rule-strong"></div>
+
+    <!-- AGENDA -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="num">— 04</span>
+          <h2>Two <span class="ital">days,</span> tight.</h2>
+          <span class="right">Sep 18 — 19</span>
+        </div>
+        <div class="schedule">
+          <div class="agenda-item reveal">
+            <div class="time">09:00</div>
+            <div>
+              <div class="title">Opening — Mongolia 2026 in numbers</div>
+              <p class="desc">A 12-minute read of GDP, capital flows, and the calendar of listed issuances ahead.</p>
+            </div>
+            <span class="kind keynote">Keynote</span>
+          </div>
+          <div class="agenda-item reveal">
+            <div class="time">09:40</div>
+            <div>
+              <div class="title">The copper decade — operator briefings</div>
+              <p class="desc">Three CFOs present project-level economics for assets coming to market.</p>
+            </div>
+            <span class="kind panel">Panel</span>
+          </div>
+          <div class="agenda-item reveal">
+            <div class="time">11:30</div>
+            <div>
+              <div class="title">CNY-denominated capital — pathways</div>
+              <p class="desc">Panda bonds, dim-sum structures, CIPS clearing — what's working and what's stuck.</p>
+            </div>
+            <span class="kind panel">Panel</span>
+          </div>
+          <div class="agenda-item reveal">
+            <div class="time">12:45</div>
+            <div>
+              <div class="title">Lunch — by allocation table</div>
+              <p class="desc">Seating curated; you eat next to capital that matches your mandate.</p>
+            </div>
+            <span class="kind break">Break</span>
+          </div>
+          <div class="agenda-item reveal">
+            <div class="time">14:00</div>
+            <div>
+              <div class="title">Energy transition — power & off-take</div>
+              <p class="desc">Hydro, wind, transmission grid expansion. Buyers and operators face-to-face.</p>
+            </div>
+            <span class="kind panel">Panel</span>
+          </div>
+          <div class="agenda-item reveal">
+            <div class="time">15:30</div>
+            <div>
+              <div class="title">Fintech rails — Khan, TDB, Golomt deep dive</div>
+              <p class="desc">Three CEOs on payment infrastructure, cross-border rails, and the digital sub.</p>
+            </div>
+            <span class="kind panel">Panel</span>
+          </div>
+          <div class="agenda-item reveal">
+            <div class="time">17:00</div>
+            <div>
+              <div class="title">Day-1 close + reception at the Bund</div>
+              <p class="desc">Drinks and views. The reception line replaces a fourth panel — by design.</p>
+            </div>
+            <span class="kind break">Break</span>
+          </div>
+          <div class="agenda-item reveal">
+            <div class="time">DAY 2</div>
+            <div>
+              <div class="title">Private 1:1s — CMM-arranged</div>
+              <p class="desc">25-minute slots, full day. Our analysts hand-match attendees to operators based on stated appetite.</p>
+            </div>
+            <span class="kind keynote">Curated</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule rule-strong"></div>
+
+    <!-- FAQ -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="num">— 05</span>
+          <h2>Common <span class="ital">questions.</span></h2>
+          <span class="right">FAQ</span>
+        </div>
+        <div class="faq">
+          <div class="faq-item reveal">
+            <div class="q">Is this open to first-time attendees?</div>
+            <div class="a">
+              Yes — but invites are vetted. If you're an institutional allocator without prior Mongolia exposure, drop us a note via the registration form below and we'll review within 48 hours.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="q">Do operators pay to present?</div>
+            <div class="a">
+              No. Presenting slots are awarded by the CMM Research desk based on issuance calendar and DD readiness. The forum is funded by allocator seat fees and the venue partner.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="q">What's the dress code?</div>
+            <div class="a">
+              Business. Shanghai-formal — the Bund reception leans toward a jacket.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="q">Can I bring my analyst?</div>
+            <div class="a">
+              One +1 per registered principal. Analysts attend all panels and meals; private 1:1 slots are principal-only by default but exceptions are negotiated case-by-case.
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <div class="q">Translation?</div>
+            <div class="a">
+              Simultaneous EN ↔ MN ↔ ZH throughout the forum. Day 2 private 1:1s ship with a CMM-staffed interpreter on request.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER MARQUEE -->
+    <div class="footer-marquee" aria-hidden="true">
+      <div class="footer-marquee-track">
+        <span><em>The Steppe meets the Bund</em></span>
+        <span class="star">★</span>
+        <span>Shanghai · September 18 — 19, 2026</span>
+        <span class="star">★</span>
+        <span><em>120 seats. No theatre.</em></span>
+        <span class="star">★</span>
+        <span><em>The Steppe meets the Bund</em></span>
+        <span class="star">★</span>
+        <span>Shanghai · September 18 — 19, 2026</span>
+        <span class="star">★</span>
+        <span><em>120 seats. No theatre.</em></span>
+      </div>
+    </div>
+
+    <div class="container footer-meta">
+      <span>Capital Markets Mongolia · Shanghai chapter</span>
+      <span>Scroll for registration ↓</span>
+    </div>
+
+    <script>
+      // Auto-resize: tell the parent how tall we actually are so the
+      // iframe matches the content height (no internal scrollbar).
+      const post = () => {
+        try {
+          parent.postMessage({
+            type: "event-theme-height",
+            height: document.documentElement.scrollHeight,
+          }, "*");
+        } catch (_) { /* sandboxed parent — ignore */ }
+      };
+      window.addEventListener("load", post);
+      new ResizeObserver(post).observe(document.documentElement);
+    </script>
+  </body>
+</html>

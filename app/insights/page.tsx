@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { InsightsControls } from "./insights-controls";
-import { FeedSidebar } from "@/app/components/insights/feed-sidebar";
 import { getInsights } from "@/app/lib/data/insights";
 import { getNewsItems } from "@/app/lib/data/feed";
 
@@ -30,14 +29,12 @@ export default async function InsightsPage() {
     ) : undefined,
   }));
 
+  // Layout (classic vs live), feed sidebar visibility, and floating variant
+  // switcher all live inside InsightsControls so the variant can swap them
+  // together client-side.
   return (
     <div className="max-w-[var(--content-max)] mx-auto px-6 w-full">
-      <div className="grid gap-8 grid-cols-[minmax(0,1fr)_240px] max-xl:grid-cols-1 max-xl:gap-6">
-        <div className="min-w-0">
-          <InsightsControls articles={articles} />
-        </div>
-        <FeedSidebar items={newsItems} />
-      </div>
+      <InsightsControls articles={articles} newsItems={newsItems} />
     </div>
   );
 }

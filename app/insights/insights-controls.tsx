@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { InsightsGrid } from "@/app/components/insights/insights-grid";
-import type { Article, GridLayout } from "@/app/components/insights/insights-grid";
+import type { Article, GridLayout, HeroVariant } from "@/app/components/insights/insights-grid";
+import { FeedSidebar } from "@/app/components/insights/feed-sidebar";
+import type { MockNewsItem } from "@/app/lib/mock-data";
 // import { PaywallCounter } from "@/app/components/ui/paywall-counter"; // disabled: free reads feature off
 import { cn } from "@/app/lib/cn";
+
+const VARIANT_STORAGE_KEY = "insights:variant";
 
 const LAYOUT_OPTIONS: { value: GridLayout; label: string }[] = [
   { value: "default", label: "Default" },
@@ -39,12 +43,31 @@ const TOPICS = [
 
 interface InsightsControlsProps {
   articles: Article[];
+  newsItems: MockNewsItem[];
 }
 
-export function InsightsControls({ articles }: InsightsControlsProps) {
+export function InsightsControls({ articles, newsItems }: InsightsControlsProps) {
   const [filter, setFilter] = useState("all");
   const [topic, setTopic] = useState<string | null>(null);
   const [layout, setLayout] = useState<GridLayout>("default");
+  // Page layout variant: "live" (current — feed sidebar + horizontal rundown)
+  // vs "classic" (no feed sidebar, rundown as a right-column rail).
+  // Persisted to localStorage; defaults to "live" on first visit.
+  const [variant, setVariant] = useState<HeroVariant>("live");
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(VARIANT_STORAGE_KEY);
+      if (saved === "live" || saved === "classic") setVariant(saved);
+    } catch {
+      // localStorage blocked (private mode, sandbox) — fall through to default
+    }
+  }, []);
+
+  const handleVariantChange = useCallback((next: HeroVariant) => {
+    setVariant(next);
+    try { window.localStorage.setItem(VARIANT_STORAGE_KEY, next); } catch {}
+  }, []);
 
   const filtered = useMemo(() => {
     let result = articles;
@@ -65,7 +88,17 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
     window.scrollTo({ top: 0 });
   }, []);
 
+  // Outer page grid: variant "live" gets a right-rail feed sidebar; "classic"
+  // drops it and gives the content column the full width.
+  const outerGridClass =
+    variant === "live"
+      ? "grid gap-8 grid-cols-[minmax(0,1fr)_240px] max-xl:grid-cols-1 max-xl:gap-6"
+      : "block";
+
   return (
+    <>
+    <div className={outerGridClass}>
+      <div className="min-w-0">
     <div className="grid grid-cols-[220px_1fr] gap-10 max-lg:grid-cols-1 max-lg:gap-6">
       {/* ── Sticky sidebar ─────────────────────────────── */}
       <aside
@@ -195,6 +228,7 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
               onBadgeClick={handleBadgeClick}
               activeFilter={filter}
               layout={layout}
+              heroVariant={variant}
               showTags
             />
           ) : (
@@ -211,6 +245,65 @@ export function InsightsControls({ articles }: InsightsControlsProps) {
           )}
         </div>
       </div>
+    </div>
+      </div>
+      {variant === "live" && <FeedSidebar items={newsItems} />}
+    </div>
+    <FloatingVariantSwitch variant={variant} onChange={handleVariantChange} />
+    </>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   FloatingVariantSwitch — bottom-right pill toggle
+   ════════════════════════════════════════════════ */
+
+function FloatingVariantSwitch({
+  variant,
+  onChange,
+}: {
+  variant: HeroVariant;
+  onChange: (next: HeroVariant) => void;
+}) {
+  return (
+    <div
+      className="fixed bottom-5 right-5 z-50 flex items-center gap-0.5 p-1 rounded-full border border-border bg-[var(--white)] shadow-md"
+      role="group"
+      aria-label="Insights layout variant"
+    >
+      <button
+        onClick={() => onChange("classic")}
+        aria-pressed={variant === "classic"}
+        className={cn(
+          "px-3 py-1.5 rounded-full text-[11px] font-display font-bold uppercase tracking-[0.1em] cursor-pointer transition-all duration-[180ms] border-none",
+          variant === "classic"
+            ? "bg-fg text-[var(--white)]"
+            : "bg-transparent text-fg-3 hover:text-fg",
+        )}
+        title="Rundown as a column next to the lead. No market feed."
+      >
+        Classic
+      </button>
+      <button
+        onClick={() => onChange("live")}
+        aria-pressed={variant === "live"}
+        className={cn(
+          "px-3 py-1.5 rounded-full text-[11px] font-display font-bold uppercase tracking-[0.1em] cursor-pointer transition-all duration-[180ms] border-none flex items-center gap-1.5",
+          variant === "live"
+            ? "bg-fg text-[var(--white)]"
+            : "bg-transparent text-fg-3 hover:text-fg",
+        )}
+        title="Live market feed sidebar + horizontal rundown."
+      >
+        <span
+          className="inline-block w-1.5 h-1.5 rounded-full"
+          style={{
+            background: variant === "live" ? "var(--pos)" : "var(--fg-3)",
+            animation: variant === "live" ? "feed-live-pulse 1.6s infinite" : undefined,
+          }}
+        />
+        Live
+      </button>
     </div>
   );
 }

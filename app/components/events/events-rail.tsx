@@ -310,6 +310,32 @@ function RailCard({
             />
           )}
 
+          {/* Themed pill — shows when an event has a custom HTML theme so
+              editors + readers spot it at a glance. The full theme renders
+              on the detail page; the card stays a clean cover image. */}
+          {event.themeHtmlUrl && (
+            <div
+              className="absolute"
+              style={{
+                top: 8,
+                left: 8,
+                padding: "3px 8px",
+                background: "rgba(0,0,0,0.7)",
+                color: "#fff",
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: 9,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                fontWeight: 700,
+                zIndex: 1,
+                borderRadius: 2,
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              ▸ Themed
+            </div>
+          )}
+
           {/* top ticker overlay — solid white text + subtle text-shadow
               for legibility. mix-blend-mode would force a composite layer
               per ticker × per card on scroll, which tanks framerate. */}

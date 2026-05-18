@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MIF 2026 — Custom Theme</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      /* No internal scroll — parent iframe is auto-sized via postMessage. */
+      html, body {
+        overflow: hidden;
+        height: auto;
+        min-height: 100%;
+      }
+      body {
+        font-family: "Fraunces", serif;
+        color: #f5efe6;
+        background: radial-gradient(120% 80% at 20% 0%, #2a1a4a 0%, #0d0820 60%, #050213 100%);
+        position: relative;
+      }
+      .stage {
+        position: relative;
+        height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: clamp(24px, 4vw, 56px);
+        z-index: 2;
+      }
+      .eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: #ffb74d;
+        opacity: 0;
+        animation: rise 1.4s 0.1s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+      }
+      .eyebrow span { display: inline-block; transform: translateY(8px); }
+      h1 {
+        font-size: clamp(48px, 8.4vw, 144px);
+        font-weight: 900;
+        line-height: 0.92;
+        letter-spacing: -0.04em;
+        margin-top: clamp(16px, 3vh, 36px);
+        max-width: 12ch;
+      }
+      h1 .word {
+        display: inline-block;
+        overflow: hidden;
+        padding-bottom: 0.08em;
+      }
+      h1 .word span {
+        display: inline-block;
+        transform: translateY(108%);
+        animation: rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+      }
+      h1 .word:nth-child(1) span { animation-delay: 0.25s; }
+      h1 .word:nth-child(2) span { animation-delay: 0.35s; color: #ffb74d; font-style: italic; font-weight: 500; }
+      h1 .word:nth-child(3) span { animation-delay: 0.45s; }
+      h1 .word:nth-child(4) span { animation-delay: 0.55s; }
+      .meta {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 32px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0;
+        animation: rise 1.4s 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+      }
+      .meta .col { display: flex; flex-direction: column; gap: 4px; }
+      .meta .label { opacity: 0.45; }
+      .meta .val { font-size: 14px; letter-spacing: 0.08em; }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 32px;
+        border: 1px solid rgba(255, 183, 77, 0.5);
+        border-radius: 999px;
+        color: #ffb74d;
+        text-decoration: none;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        background: rgba(255, 183, 77, 0.06);
+        backdrop-filter: blur(6px);
+        transition: background 240ms ease, transform 240ms ease;
+      }
+      .cta:hover { background: rgba(255, 183, 77, 0.16); transform: translateY(-2px); }
+      .cta .dot {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: #ffb74d; box-shadow: 0 0 12px #ffb74d;
+        animation: pulse 1.8s infinite ease-in-out;
+      }
+      .orbit {
+        position: absolute; inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0.55;
+      }
+      .orbit::before, .orbit::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 140vmax;
+        height: 140vmax;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 183, 77, 0.06);
+        transform: translate(-50%, -50%);
+        animation: spin 90s linear infinite;
+      }
+      .orbit::after {
+        width: 90vmax; height: 90vmax;
+        border-color: rgba(255, 183, 77, 0.12);
+        animation-duration: 60s;
+        animation-direction: reverse;
+      }
+      .grain {
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0);
+        background-size: 3px 3px;
+        mix-blend-mode: overlay;
+        opacity: 0.4;
+        pointer-events: none;
+        z-index: 1;
+      }
+      @keyframes rise {
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(0.6); opacity: 0.5; }
+      }
+      @keyframes spin {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="orbit"></div>
+    <div class="grain"></div>
+    <script>
+      // Tell parent how tall we actually are; iframe resizes to fit.
+      const post = () => {
+        try {
+          parent.postMessage({ type: "event-theme-height",
+            height: document.documentElement.scrollHeight }, "*");
+        } catch (_) { /* no-op */ }
+      };
+      window.addEventListener("load", post);
+      // Defer ResizeObserver wiring until DOM is parsed.
+      document.addEventListener("DOMContentLoaded", () =>
+        new ResizeObserver(post).observe(document.documentElement)
+      );
+    </script>
+    <div class="stage">
+      <div class="eyebrow"><span>Mongolia Investment Forum &mdash; March 2026</span></div>
+      <h1>
+        <span class="word"><span>Capital,</span></span>
+        <span class="word"><span>Reframed.</span></span>
+        <span class="word"><span>Ulaanbaatar,</span></span>
+        <span class="word"><span>March 14th.</span></span>
+      </h1>
+      <div class="meta">
+        <div class="col">
+          <div class="label">Format</div>
+          <div class="val">In-person + livestream</div>
+        </div>
+        <div class="col">
+          <div class="label">Venue</div>
+          <div class="val">Shangri-La Ulaanbaatar</div>
+        </div>
+        <div class="col">
+          <div class="label">Capacity</div>
+          <div class="val">450 attendees</div>
+        </div>
+        <a href="#register" class="cta"><span class="dot"></span>Reserve your seat</a>
+      </div>
+    </div>
+  </body>
+</html>

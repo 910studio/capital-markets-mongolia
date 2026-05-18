@@ -59,7 +59,10 @@ export async function EventHero({
       className="relative w-full overflow-hidden bg-[var(--bg)]"
       style={{ height: "100vh", minHeight: 600 }}
     >
-      {/* Media bg — image if present, else brand-tinted conic gradient */}
+      {/* Media bg — cover image if present, else brand-tinted conic
+          gradient. The themed iframe is reserved for the event DETAIL
+          page; the hero on the listing uses a clean cover image so the
+          page reads as an index, not a chaos of mini themes. */}
       <div
         className="absolute inset-0 overflow-hidden"
         style={{

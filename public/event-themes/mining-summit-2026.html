@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MMES 2026 — Industrial Theme</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      :root {
+        --ink: #0a0a0a;
+        --bone: #f4efe6;
+        --copper: #c97b3c;
+        --copper-deep: #a04d1c;
+        --rust: #d96d3b;
+        --line: rgba(10, 10, 10, 0.15);
+      }
+      /* No internal scroll — parent iframe auto-sizes via postMessage. */
+      html, body {
+        overflow: hidden;
+        height: auto;
+        min-height: 100%;
+        background: var(--bone);
+        color: var(--ink);
+      }
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        position: relative;
+      }
+
+      /* Marquee header */
+      .marquee {
+        border-top: 2px solid var(--ink);
+        border-bottom: 2px solid var(--ink);
+        background: var(--ink);
+        color: var(--bone);
+        overflow: hidden;
+        position: relative;
+      }
+      .marquee-track {
+        display: flex;
+        gap: 56px;
+        padding: 14px 0;
+        white-space: nowrap;
+        animation: marquee 28s linear infinite;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+      .marquee-track .copper { color: var(--copper); }
+      .marquee-track span::before {
+        content: "■";
+        margin-right: 14px;
+        color: var(--copper);
+      }
+      @keyframes marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+      }
+
+      .stage {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: clamp(40px, 5vw, 80px) clamp(24px, 4vw, 56px) 0;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(32px, 4vw, 64px);
+        align-items: end;
+      }
+      @media (max-width: 720px) {
+        .grid { grid-template-columns: 1fr; gap: 32px; }
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        padding: 8px 14px;
+        background: var(--ink);
+        color: var(--bone);
+        margin-bottom: 28px;
+      }
+      .eyebrow .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--copper);
+        border-radius: 50%;
+      }
+
+      h1 {
+        font-family: "Archivo Black", sans-serif;
+        font-size: clamp(56px, 11vw, 184px);
+        line-height: 0.86;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+      h1 .line { display: block; }
+      h1 .line.indent { padding-left: clamp(40px, 6vw, 96px); }
+      h1 .copper { color: var(--copper); font-style: italic; }
+
+      .lead {
+        font-family: "Inter", sans-serif;
+        font-size: clamp(15px, 1.4vw, 18px);
+        line-height: 1.5;
+        max-width: 38ch;
+        font-weight: 500;
+        color: var(--ink);
+        opacity: 0.85;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 2px solid var(--ink);
+        margin-top: clamp(40px, 5vw, 64px);
+      }
+      .stat {
+        padding: 32px clamp(16px, 2vw, 28px);
+        border-right: 1px solid var(--line);
+        position: relative;
+      }
+      .stat:last-child { border-right: 0; }
+      .stat-num {
+        font-family: "Archivo Black", sans-serif;
+        font-size: clamp(48px, 6vw, 96px);
+        line-height: 1;
+        letter-spacing: -0.04em;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+      }
+      .stat-num.copper { color: var(--copper); }
+      .stat-unit {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        margin-top: 8px;
+        opacity: 0.6;
+      }
+      .stat-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        margin-top: 6px;
+        opacity: 0.9;
+      }
+
+      .cta-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 40px;
+        flex-wrap: wrap;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 28px;
+        background: var(--ink);
+        color: var(--bone);
+        text-decoration: none;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        font-weight: 700;
+        transition: background 200ms ease, transform 200ms ease;
+      }
+      .cta:hover { background: var(--copper); transform: translateY(-2px); }
+      .cta .arrow {
+        display: inline-block;
+        transition: transform 200ms ease;
+      }
+      .cta:hover .arrow { transform: translateX(6px); }
+      .cta-ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 2px solid var(--ink);
+      }
+      .cta-ghost:hover { background: var(--ink); color: var(--bone); transform: translateY(-2px); }
+
+      /* Crosshair corners — industrial diagrammatic feel */
+      .corner {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-color: var(--ink);
+        border-style: solid;
+      }
+      .corner-tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+      .corner-tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+      .corner-bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+      .corner-br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+      .footer {
+        margin-top: clamp(40px, 5vw, 64px);
+        padding: 24px 0 clamp(40px, 5vw, 64px);
+        border-top: 2px solid var(--ink);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .footer .right { opacity: 0.6; }
+
+      /* Subtle copper underline scroll indicator */
+      .scroll-bar {
+        position: absolute;
+        right: clamp(24px, 4vw, 56px);
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1px;
+        height: 80px;
+        background: var(--line);
+      }
+      .scroll-bar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -1px;
+        width: 3px;
+        height: 24px;
+        background: var(--copper);
+        animation: scroll-pulse 2.4s ease-in-out infinite;
+      }
+      @keyframes scroll-pulse {
+        0%, 100% { top: 0; opacity: 1; }
+        50% { top: 56px; opacity: 0.4; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Critical Minerals</span>
+        <span class="copper">Cu · Au · Coal · Rare Earths</span>
+        <span>Off-take Negotiations</span>
+        <span>Operator Briefings</span>
+        <span class="copper">June 12 · Ulaanbaatar</span>
+        <span>Energy Transition</span>
+        <!-- Duplicate for seamless loop -->
+        <span>Critical Minerals</span>
+        <span class="copper">Cu · Au · Coal · Rare Earths</span>
+        <span>Off-take Negotiations</span>
+        <span>Operator Briefings</span>
+        <span class="copper">June 12 · Ulaanbaatar</span>
+        <span>Energy Transition</span>
+      </div>
+    </div>
+
+    <main class="stage">
+      <div class="grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span>Mongolia Mining & Energy Summit · 2026</div>
+          <h1>
+            <span class="line">Move the</span>
+            <span class="line indent"><span class="copper">copper.</span></span>
+            <span class="line">Move the</span>
+            <span class="line indent">market.</span>
+          </h1>
+        </div>
+        <div>
+          <p class="lead">
+            A single-day, single-room summit. Operator presentations, off-take negotiations,
+            and policy briefings from the Ministry of Mining. No keynote theatre — just
+            people who actually move tonnage.
+          </p>
+          <div class="cta-row">
+            <a href="#register" class="cta">
+              Reserve a seat <span class="arrow">→</span>
+            </a>
+            <a href="#agenda" class="cta cta-ghost">View agenda</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="stat-num copper">120</div>
+          <div class="stat-unit">attendees</div>
+          <div class="stat-label">Decision-makers only</div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+        </div>
+        <div class="stat">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="stat-num">18</div>
+          <div class="stat-unit">operators</div>
+          <div class="stat-label">Presenting projects</div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+        </div>
+        <div class="stat">
+          <div class="corner corner-tl"></div>
+          <div class="corner corner-tr"></div>
+          <div class="stat-num">1</div>
+          <div class="stat-unit">day</div>
+          <div class="stat-label">06.12 · 09:00–18:00</div>
+          <div class="corner corner-bl"></div>
+          <div class="corner corner-br"></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span>Blue Sky Tower · Ulaanbaatar · MNT 800,000</span>
+        <span class="right">Hosted by Capital Markets Mongolia</span>
+      </div>
+
+      <div class="scroll-bar"></div>
+    </main>
+    <script>
+      // Auto-size: tell parent our real height so the iframe matches and
+      // no double-scroll appears.
+      const post = () => {
+        try {
+          parent.postMessage({ type: "event-theme-height",
+            height: document.documentElement.scrollHeight }, "*");
+        } catch (_) { /* no-op */ }
+      };
+      window.addEventListener("load", post);
+      document.addEventListener("DOMContentLoaded", () =>
+        new ResizeObserver(post).observe(document.documentElement)
+      );
+    </script>
+  </body>
+</html>

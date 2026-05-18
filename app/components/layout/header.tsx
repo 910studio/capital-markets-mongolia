@@ -52,8 +52,10 @@ export function Header() {
   }, [pathname]);
 
   // Transparent + white-on-dark variant for routes that own the top of the
-  // viewport (e.g. /events with its full-bleed brutalist hero).
-  const transparent = pathname === "/events";
+  // viewport (e.g. /events index AND /events/[slug] detail — themed event
+  // pages run an iframe right under the navbar and the cover-image hero on
+  // standard events also needs the dark-bg treatment).
+  const transparent = pathname === "/events" || pathname.startsWith("/events/");
 
   return (
     <header

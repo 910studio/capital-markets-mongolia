@@ -284,6 +284,39 @@
 
 /* ── 3. Dark Mode ───────────────────────────────────────────── */
 
+/* Explicit light-mode reset — used when a section nested inside
+   [data-mode="dark"] needs the default light palette (e.g. forms with
+   hardcoded white card chrome on themed event pages). */
+[data-mode="light"] {
+  --bg: #FAFAFD;
+  --bg-alt: #F4F2FA;
+  --white: #FFFFFF;
+  --fg: #0C0A1D;
+  --fg-2: #44415A;
+  --fg-3: #7A7793;
+  --surface: #F0EEF7;
+  --surface-el: #EAE8F3;
+  --surface-down: #FCFBFE;
+  --border: #DDDBE8;
+  --border-s: #EDEBF5;
+  --brand: #3E149C;
+  --brand-h: #2E0F75;
+  --brand-l: #6B4CC0;
+  --brand-m: rgba(62, 20, 156, 0.07);
+  --brand-t: #FFFFFF;
+  --signal-m: rgba(252, 163, 17, 0.1);
+  --pos: #059669;
+  --pos-t: #065F46;
+  --pos-m: rgba(5, 150, 105, 0.08);
+  --neg: #DC2626;
+  --neg-t: #991B1B;
+  --neg-m: rgba(220, 38, 38, 0.08);
+  --info: #0891B2;
+  --info-m: rgba(8, 145, 178, 0.08);
+  color: var(--fg);
+  background: transparent;
+}
+
 [data-mode="dark"] {
   --bg: #0A0720;
   --bg-alt: #0F0B2C;
@@ -392,17 +425,14 @@ body {
   overflow-x: clip;
 }
 
-/* Scoped scroll-snap (added by <ScrollSnap />). Sections inside opt in via
-   `scroll-snap-align: start` to become snap points. Proximity (not
-   mandatory) lets the user free-scroll mid-flick without being yanked. */
+/* Deck-style scroll snap is owned by <ScrollSnap /> (JS controller) — it
+   listens for wheel/key/touch and smooth-scrolls to the next [data-snap]
+   section with a cooldown. Native CSS snap is explicitly disabled here
+   so it doesn't fight the JS animation mid-flight. */
 html.events-snap {
-  scroll-snap-type: y proximity;
+  scroll-snap-type: none;
   scroll-behavior: smooth;
   scroll-padding-top: 0;
-}
-html.events-snap [data-snap] {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 /* Hide all scrollbars app-wide — brutalist aesthetic.

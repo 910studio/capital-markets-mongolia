@@ -34,12 +34,17 @@ export interface Article {
 
 export type GridLayout = "default" | "featured" | "editorial";
 
+export type HeroVariant = "live" | "classic";
+
 interface InsightsGridProps {
   articles: Article[];
   onBadgeClick?: (variant: string) => void;
   activeFilter?: string;
   layout?: GridLayout;
   showTags?: boolean;
+  /** Controls hero layout. "live" = horizontal rundown below (current
+   *  default), "classic" = right-column rundown (pre-feed-sidebar). */
+  heroVariant?: HeroVariant;
 }
 
 const TYPE_ORDER: { variant: string; label: string }[] = [
@@ -129,53 +134,91 @@ function Tag({ label, variant, onClick }: { label: string; variant: BadgeVariant
 function Hero({
   article,
   rail,
+  variant = "live",
   onBadgeClick,
 }: {
   article: Article;
   rail: Article[];
+  /** "live" — horizontal rundown below the headliner (current default,
+   *           pairs with the right-rail market feed sidebar).
+   *  "classic" — rundown as a vertical column to the right of the lead
+   *              (the pre-feed-sidebar layout). */
+  variant?: "live" | "classic";
   onBadgeClick?: (variant: string) => void;
 }) {
+  const Lead = (
+    <Link href={`/insights/${article.slug}`} className="group no-underline min-w-0 block">
+      <Tag label={article.badge.label} variant={article.badge.variant} onClick={() => onBadgeClick?.(article.badge.variant)} />
+      <h1
+        data-reveal="title"
+        className="mt-4 font-bold tracking-[-0.02em] leading-[1.02] text-fg group-hover:text-brand transition-colors"
+        style={{
+          fontFamily: "var(--font-s)",
+          fontSize:
+            variant === "classic"
+              ? "clamp(1.6rem, 3.52vw, 2.88rem)"
+              : "clamp(1.8rem, 4.4vw, 3.6rem)",
+        }}
+      >
+        <span>{article.title}</span>
+      </h1>
+
+      {article.image && (
+        <div
+          className={
+            variant === "classic"
+              ? "float-right ml-7 mt-5 mb-2 w-[44%] max-md:float-none max-md:ml-0 max-md:w-full max-md:mt-5"
+              : "float-right ml-8 mt-5 mb-2 w-[42%] max-md:float-none max-md:ml-0 max-md:w-full max-md:mt-5"
+          }
+        >
+          <div className="relative aspect-[4/3] overflow-hidden bg-surface">
+            <div className="insight-img absolute inset-0" data-reveal="image">
+              {article.image}
+            </div>
+          </div>
+          <p className="mt-2 text-[11px] text-fg-3 italic" style={{ fontFamily: "var(--font-s)" }}>
+            Photo · {article.author}
+          </p>
+        </div>
+      )}
+
+      <p
+        className="mt-6 text-fg-2 leading-[1.55] max-w-[760px]"
+        style={{
+          fontFamily: "var(--font-s)",
+          fontSize: variant === "classic" ? "1.125rem" : "1.1875rem",
+        }}
+      >
+        {article.excerpt}
+      </p>
+
+      <div className="clear-both pt-6 mt-6 border-t border-border-s">
+        <Byline author={article.author} date={article.date} readTime={article.readTime} />
+      </div>
+    </Link>
+  );
+
+  if (variant === "classic") {
+    return (
+      <Reveal className="grid grid-cols-[1fr_320px] gap-12 max-lg:grid-cols-1 max-lg:gap-8 pb-12 border-b-2 border-fg">
+        {Lead}
+        <aside className="lg:border-l lg:border-fg lg:pl-8 max-lg:border-t max-lg:border-fg max-lg:pt-6">
+          <p className="font-display font-extrabold text-[10px] tracking-[0.18em] uppercase text-fg pb-3 border-b border-fg mb-1">
+            The Rundown
+          </p>
+          <ol className="flex flex-col">
+            {rail.map((a, i) => (
+              <RailItem key={a.slug} article={a} index={i} number={i + 1} onBadgeClick={onBadgeClick} />
+            ))}
+          </ol>
+        </aside>
+      </Reveal>
+    );
+  }
+
   return (
     <Reveal className="flex flex-col pb-12 border-b-2 border-fg">
-      {/* Lead — full width: huge serif, image floats right of body */}
-      <Link href={`/insights/${article.slug}`} className="group no-underline min-w-0 block">
-        <Tag label={article.badge.label} variant={article.badge.variant} onClick={() => onBadgeClick?.(article.badge.variant)} />
-        <h1
-          data-reveal="title"
-          className="mt-4 font-bold tracking-[-0.02em] leading-[1.02] text-fg group-hover:text-brand transition-colors"
-          style={{
-            fontFamily: "var(--font-s)",
-            fontSize: "clamp(1.8rem, 4.4vw, 3.6rem)",
-          }}
-        >
-          <span>{article.title}</span>
-        </h1>
-
-        {article.image && (
-          <div className="float-right ml-8 mt-5 mb-2 w-[42%] max-md:float-none max-md:ml-0 max-md:w-full max-md:mt-5">
-            <div className="relative aspect-[4/3] overflow-hidden bg-surface">
-              <div className="insight-img absolute inset-0" data-reveal="image">
-                {article.image}
-              </div>
-            </div>
-            <p className="mt-2 text-[11px] text-fg-3 italic" style={{ fontFamily: "var(--font-s)" }}>
-              Photo · {article.author}
-            </p>
-          </div>
-        )}
-
-        <p
-          className="mt-6 text-fg-2 leading-[1.55] max-w-[760px]"
-          style={{ fontFamily: "var(--font-s)", fontSize: "1.1875rem" }}
-        >
-          {article.excerpt}
-        </p>
-
-        <div className="clear-both pt-6 mt-6 border-t border-border-s">
-          <Byline author={article.author} date={article.date} readTime={article.readTime} />
-        </div>
-      </Link>
-
+      {Lead}
       {/* Rundown — horizontal scroll rail below the headliner.
           Fixed-width cards (~280px) so the layout stays readable even
           when the content column is tight (filter+feed sidebars eat space). */}
@@ -331,14 +374,16 @@ function WireRow({
   cols?: 3 | 4 | 5;
 }) {
   const gridCols = cols === 5 ? "grid-cols-5" : cols === 3 ? "grid-cols-3" : "grid-cols-4";
+  // Symmetric px-5 + parent -mx-5 keeps every cell's content width equal
+  // (no first/last 20px squeeze) while leftmost/rightmost still align flush.
   return (
-    <Reveal className={`grid ${gridCols} gap-0 max-md:grid-cols-1 max-lg:grid-cols-2`}>
+    <Reveal className={`grid ${gridCols} gap-0 lg:-mx-5 max-md:grid-cols-1 max-lg:grid-cols-2`}>
       {articles.map((a, i) => (
         <article
           key={a.slug}
           data-reveal="stagger"
           style={{ ["--stagger-i" as string]: i } as React.CSSProperties}
-          className="px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0 max-lg:first:pt-0"
+          className="lg:px-5 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0 max-lg:first:pt-0"
         >
           <Link href={`/insights/${a.slug}`} className="group no-underline flex flex-col gap-2 min-w-0">
             <Tag label={a.badge.label} variant={a.badge.variant} onClick={() => onBadgeClick?.(a.badge.variant)} />
@@ -411,11 +456,11 @@ function SectionBody({
   return (
     <div className="flex flex-col gap-8">
       {top.length > 0 && (
-        <Reveal className="grid grid-cols-3 gap-0 max-md:grid-cols-1 max-lg:grid-cols-2">
+        <Reveal className="grid grid-cols-3 gap-0 lg:-mx-5 max-md:grid-cols-1 max-lg:grid-cols-2">
           {top.map((a, i) => (
             <div
               key={a.slug}
-              className="px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0 max-lg:first:pt-0"
+              className="lg:px-5 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0 max-lg:first:pt-0"
             >
               <TextCard article={a} index={i} showImage onBadgeClick={onBadgeClick} />
             </div>
@@ -439,6 +484,7 @@ export function InsightsGrid({
   articles,
   onBadgeClick,
   activeFilter,
+  heroVariant = "live",
 }: InsightsGridProps) {
   if (articles.length === 0) return null;
 
@@ -450,11 +496,11 @@ export function InsightsGrid({
     return (
       <div className="flex flex-col gap-8">
         {top.length > 0 && (
-          <Reveal className="grid grid-cols-3 gap-0 max-md:grid-cols-1 max-lg:grid-cols-2">
+          <Reveal className="grid grid-cols-3 gap-0 lg:-mx-5 max-md:grid-cols-1 max-lg:grid-cols-2">
             {top.map((a, i) => (
               <div
                 key={a.slug}
-                className="px-5 first:pl-0 last:pr-0 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0"
+                className="lg:px-5 lg:border-l lg:border-border-s lg:first:border-l-0 max-lg:border-t max-lg:border-border-s max-lg:py-5 max-lg:first:border-t-0"
               >
                 <TextCard article={a} index={i} onBadgeClick={onBadgeClick} />
               </div>
@@ -489,7 +535,7 @@ export function InsightsGrid({
 
   return (
     <div className="flex flex-col gap-14">
-      {lead && <Hero article={lead} rail={rail} onBadgeClick={onBadgeClick} />}
+      {lead && <Hero article={lead} rail={rail} variant={heroVariant} onBadgeClick={onBadgeClick} />}
 
       {TYPE_ORDER.map(({ variant, label }) => {
         const items = grouped.get(variant);
