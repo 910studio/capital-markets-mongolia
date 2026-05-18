@@ -21,9 +21,9 @@ interface NewsDetailDto {
   url?: string;
   source: string;
   publishedAt: string;
-  signalScore?: number;
   signalCategory?: string;
   isIncludedInBrief?: boolean;
+  aiTranslated?: boolean;
   summary?: string;
   whyItMatters?: string;
   resolvedBody?: string;
@@ -61,7 +61,7 @@ async function fetchNews(id: string): Promise<MockNewsItem | undefined> {
       entitySlugs: (dto.entities ?? [])
         .map((e) => e.slug)
         .filter((s): s is string => typeof s === "string"),
-      confidence: typeof dto.signalScore === "number" ? dto.signalScore : 0.7,
+      aiTranslated: dto.aiTranslated === true,
       reviewed: Boolean(dto.isIncludedInBrief),
     };
   } catch {
@@ -136,7 +136,6 @@ export default async function NewsDetailPage({ params }: PageProps) {
     .sort((a, b) => +new Date(b.publishedAt) - +new Date(a.publishedAt))
     .slice(0, 4);
 
-  const lowConfidence = item.confidence < 0.75;
   const categoryColor = NEWS_CATEGORY_COLORS[item.category];
   const categoryLabel = NEWS_CATEGORY_LABELS[item.category];
 
@@ -180,15 +179,12 @@ export default async function NewsDetailPage({ params }: PageProps) {
                   Breaking
                 </span>
               )}
-              {lowConfidence && (
+              {item.aiTranslated && (
                 <span
-                  className={cn(
-                    "inline-flex items-center font-mono text-[10px] uppercase tracking-badge font-semibold",
-                    "text-fg-3 border border-border bg-[var(--surface-down)] px-1.5 py-0.5 rounded-[var(--btn-r)]"
-                  )}
-                  title="Low-confidence AI tagging — pending analyst review"
+                  className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-badge font-semibold text-fg-3 border border-border bg-[var(--surface-down)] px-1.5 py-0.5 rounded-[var(--btn-r)]"
+                  title="Headline and summary translated from the source language by AI (Sonnet)"
                 >
-                  Unverified
+                  AI Translated
                 </span>
               )}
             </div>
@@ -245,20 +241,6 @@ export default async function NewsDetailPage({ params }: PageProps) {
           className="flex flex-col gap-4 lg:sticky lg:self-start"
           style={{ top: "calc(var(--header-h) + 24px)" }}
         >
-          <div className="card !p-4">
-            <div className="font-mono text-[10px] uppercase tracking-badge text-fg-3 mb-3">
-              Confidence
-            </div>
-            <div className="flex items-baseline gap-2">
-              <div className="font-display font-extrabold text-2xl">
-                {Math.round(item.confidence * 100)}%
-              </div>
-              <div className="font-mono text-[10px] uppercase tracking-badge text-fg-3">
-                {item.reviewed ? "Analyst-reviewed" : lowConfidence ? "Pending review" : "Auto-tagged"}
-              </div>
-            </div>
-          </div>
-
           {entities.length > 0 && (
             <div className="card !p-4">
               <div className="font-mono text-[10px] uppercase tracking-badge text-fg-3 mb-3">

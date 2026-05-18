@@ -40,7 +40,6 @@ export function NewsItemCard({
     .map((slug) => MOCK_ENTITIES.find((e) => e.slug === slug))
     .filter((e): e is NonNullable<typeof e> => Boolean(e));
 
-  const lowConfidence = item.confidence < 0.75;
   const categoryColor = NEWS_CATEGORY_COLORS[item.category];
 
   const detailHref = `/feed/${item.id}`;
@@ -58,7 +57,7 @@ export function NewsItemCard({
               {NEWS_CATEGORY_LABELS[item.category]}
             </span>
             {item.isBreaking && <BreakingBadge />}
-            {lowConfidence && <LowConfidenceBadge />}
+            {item.aiTranslated && <AITranslatedBadge />}
           </div>
           <h3 className="line-clamp-2 font-display text-[13px] font-semibold leading-[1.35] text-fg transition-colors group-hover:text-brand">
             {item.headline}
@@ -79,7 +78,7 @@ export function NewsItemCard({
         <div className="flex items-center gap-2 mb-2">
           {showCategory && <CategoryDot color={categoryColor} withLabel category={item.category} />}
           {item.isBreaking && <BreakingBadge />}
-          {lowConfidence && <LowConfidenceBadge />}
+          {item.aiTranslated && <AITranslatedBadge />}
         </div>
         <h3 className="font-display text-sm font-bold leading-[1.35] line-clamp-3 text-fg group-hover:text-brand transition-colors">
           {item.headline}
@@ -105,7 +104,7 @@ export function NewsItemCard({
       <div className="relative z-10 flex items-center gap-2 flex-wrap pointer-events-none">
         {showCategory && <CategoryDot color={categoryColor} withLabel category={item.category} />}
         {item.isBreaking && <BreakingBadge />}
-        {lowConfidence && <LowConfidenceBadge />}
+        {item.aiTranslated && <AITranslatedBadge />}
         <span className="ml-auto font-mono text-[10px] text-fg-3">
           {relativeTime(item.publishedAt)}
         </span>
@@ -180,13 +179,16 @@ function BreakingBadge() {
   );
 }
 
-function LowConfidenceBadge() {
+/** Disclosure badge: shown when headline+summary are Sonnet translations of a
+ * non-English source. Replaces the legacy "Unverified" / Low-confidence badge,
+ * which conflated AI translation with story untrustworthiness. */
+function AITranslatedBadge() {
   return (
     <span
       className="inline-flex items-center font-body font-medium text-[11px] py-0.5 px-2 rounded-[var(--btn-r)] bg-surface text-fg-2"
-      title="Low-confidence AI tagging — pending analyst review"
+      title="Headline and summary translated from the source language by AI (Sonnet)"
     >
-      Unverified
+      AI Translated
     </span>
   );
 }

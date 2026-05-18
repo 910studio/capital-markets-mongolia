@@ -1090,15 +1090,16 @@ export interface components {
         NewsFeedItemDto: {
             id: string;
             title: string;
+            titleOriginal?: string;
             url: string;
             source: string;
             sourceType: string;
             publishedAt: string;
             summary?: string;
             whyItMatters?: string;
-            signalScore?: number;
             signalCategory?: string;
             language: string;
+            aiTranslated: boolean;
             isIncludedInBrief: boolean;
             entities: components["schemas"]["NewsEntityRefDto"][];
         };
@@ -1110,15 +1111,16 @@ export interface components {
         NewsArticleDetailDto: {
             id: string;
             title: string;
+            titleOriginal?: string;
             url: string;
             source: string;
             sourceType: string;
             publishedAt: string;
             summary?: string;
             whyItMatters?: string;
-            signalScore?: number;
             signalCategory?: string;
             language: string;
+            aiTranslated: boolean;
             isIncludedInBrief: boolean;
             entities: components["schemas"]["NewsEntityRefDto"][];
             resolvedBody?: string;

@@ -1636,12 +1636,16 @@ export interface MockNewsItem {
   category: NewsCategory;
   topics?: string[];
   entitySlugs: string[];
-  /** AI confidence score 0-1 from entity-matching pipeline */
-  confidence: number;
+  /** AI confidence score 0-1 from entity-matching pipeline. Legacy mock field
+   * — not surfaced in the UI; kept optional so existing fixtures still type-check. */
+  confidence?: number;
   /** True when analyst has reviewed the AI tagging */
   reviewed?: boolean;
   isBreaking?: boolean;
   imageUrl?: string;
+  /** True when headline + summary are Sonnet translations of a non-English source.
+   * UI shows an "AI Translated" badge so readers know the wording isn't the publisher's. */
+  aiTranslated?: boolean;
 }
 
 export const MOCK_NEWS: MockNewsItem[] = [
