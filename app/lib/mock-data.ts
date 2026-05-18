@@ -1636,6 +1636,9 @@ export interface MockNewsItem {
   category: NewsCategory;
   topics?: string[];
   entitySlugs: string[];
+  /** Full entity records when available from the live API (mock items only
+   * carry slugs; live items carry the resolved name for direct rendering). */
+  entities?: { slug: string; name: string; ticker?: string }[];
   /** AI confidence score 0-1 from entity-matching pipeline. Legacy mock field
    * — not surfaced in the UI; kept optional so existing fixtures still type-check. */
   confidence?: number;
