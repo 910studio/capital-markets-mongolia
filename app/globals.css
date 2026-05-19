@@ -89,13 +89,15 @@
   --grad-pro: linear-gradient(160deg, #0A0720, #1A1048, #3E149C);
 
   /* —— Fonts —— */
-  /* Display + body both use Inter (the open Helvetica). System Helvetica
-     comes first in the fallback so platforms with real Helvetica installed
-     (macOS/iOS) get it instantly even before the webfont loads. */
+  /* Single typeface site-wide: Inter (open Helvetica). System Helvetica
+     leads the fallback stack so macOS/iOS render real Helvetica before
+     the webfont paints. The mono and serif slots also point here — no
+     more JetBrains Mono / Newsreader. tabular-nums on mono usage gives
+     ticker labels the consistent-width feel without a separate font. */
   --font-d: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-b: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-m: var(--font-jetbrains-mono), monospace;
-  --font-s: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-m: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-s: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* —— Type Scale — 16px base, divisible by 4 —— */
   --text-xs: 0.75rem;      /* 12px */

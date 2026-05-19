@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Newsreader } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { clerkAppearance } from "./lib/clerk-appearance";
 import "./globals.css";
@@ -7,26 +7,13 @@ import { Header } from "./components/layout/header";
 import { Footer } from "./components/layout/footer";
 import { OfflineScreen } from "./components/layout/offline-screen";
 
-// Inter — the open Helvetica clone. Replaces Plus Jakarta + DM Sans;
-// it covers both display and body roles with the full weight range.
-// Newsreader (serif) and JetBrains Mono stay for the insights serif
-// headlines + monospace meta labels.
+// Single font: Inter — the open Helvetica clone. Used everywhere:
+// display, body, serif slot (no more Newsreader), mono slot (no more
+// JetBrains Mono). One typeface, all surfaces.
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
 });
 
@@ -45,7 +32,7 @@ export default function RootLayout({
     <ClerkProvider appearance={clerkAppearance}>
       <html
         lang="en"
-        className={`${inter.variable} ${jetbrainsMono.variable} ${newsreader.variable} h-full antialiased`}
+        className={`${inter.variable} h-full antialiased`}
       >
         <body className="min-h-screen">
           <OfflineScreen />
