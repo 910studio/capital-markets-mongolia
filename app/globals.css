@@ -89,8 +89,11 @@
   --grad-pro: linear-gradient(160deg, #0A0720, #1A1048, #3E149C);
 
   /* —— Fonts —— */
-  --font-d: var(--font-plus-jakarta-sans), system-ui, sans-serif;
-  --font-b: var(--font-dm-sans), system-ui, sans-serif;
+  /* Display + body both use Inter (the open Helvetica). System Helvetica
+     comes first in the fallback so platforms with real Helvetica installed
+     (macOS/iOS) get it instantly even before the webfont loads. */
+  --font-d: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-b: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-m: var(--font-jetbrains-mono), monospace;
   --font-s: var(--font-newsreader), Georgia, "Times New Roman", serif;
 
