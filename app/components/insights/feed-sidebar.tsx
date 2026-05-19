@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { MockNewsItem } from "@/app/lib/mock-data";
+import { formatSourceLabel } from "@/app/lib/format-source";
 
 /**
  * Right-rail "live" market feed for /insights. Shows the most recent news
@@ -96,7 +97,7 @@ function FeedItem({ item }: { item: MockNewsItem }) {
             {rel}
           </span>
           <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-fg-3 ml-auto">
-            {item.source}
+            {formatSourceLabel(item.source)}
           </span>
         </div>
         <h3 className="font-display font-bold text-[13px] leading-[1.3] text-fg group-hover:text-brand transition-colors line-clamp-3">

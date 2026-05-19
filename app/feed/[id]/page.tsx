@@ -8,6 +8,7 @@ import {
   type MockNewsItem,
 } from "@/app/lib/mock-data";
 import { NewsItemCard } from "@/app/components/feed/news-item-card";
+import { formatSourceLabel } from "@/app/lib/format-source";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -192,7 +193,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
             </h1>
 
             <div className="flex items-center gap-2 mt-4 font-mono text-[11px] text-fg-3">
-              <span className="font-semibold text-fg-2">{item.source}</span>
+              <span className="font-semibold text-fg-2">{formatSourceLabel(item.source)}</span>
               <span>·</span>
               <span>{publishedDate}</span>
             </div>
@@ -204,7 +205,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
                 {item.summary}
               </p>
               <p className="text-sm text-fg-3 leading-[1.6] mt-4 max-w-[680px]">
-                Full coverage and analyst commentary will appear here once linked from {item.source}.
+                Full coverage and analyst commentary will appear here once linked from {formatSourceLabel(item.source)}.
                 {item.sourceUrl && (
                   <>
                     {" "}

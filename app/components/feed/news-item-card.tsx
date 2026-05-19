@@ -5,6 +5,7 @@ import {
   NEWS_CATEGORY_COLORS,
   NEWS_CATEGORY_LABELS,
 } from "@/app/lib/mock-data";
+import { formatSourceLabel } from "@/app/lib/format-source";
 
 interface NewsItemCardProps {
   item: MockNewsItem;
@@ -63,7 +64,7 @@ export function NewsItemCard({
             {item.headline}
           </h3>
           <div className="flex items-center gap-1.5 font-mono text-[10px] text-fg-3 mt-1">
-            <span className="font-semibold text-fg-2">{item.source}</span>
+            <span className="font-semibold text-fg-2">{formatSourceLabel(item.source)}</span>
             <span>·</span>
             <span>{relativeTime(item.publishedAt)}</span>
           </div>
@@ -84,7 +85,7 @@ export function NewsItemCard({
           {item.headline}
         </h3>
         <div className="flex items-center gap-1.5 font-mono text-[10px] text-fg-3 mt-2">
-          <span className="font-semibold text-fg-2">{item.source}</span>
+          <span className="font-semibold text-fg-2">{formatSourceLabel(item.source)}</span>
           <span>·</span>
           <span>{relativeTime(item.publishedAt)}</span>
         </div>
@@ -122,7 +123,7 @@ export function NewsItemCard({
 
       <div className="relative z-10 flex items-center justify-between gap-3 mt-auto pt-2 border-t border-border-s pointer-events-none">
         <div className="font-mono text-[11px] text-fg-2 font-semibold">
-          {item.source}
+          {formatSourceLabel(item.source)}
         </div>
         {showEntities && entityRefs.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap justify-end pointer-events-auto">

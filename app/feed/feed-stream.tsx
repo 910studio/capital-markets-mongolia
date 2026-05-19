@@ -8,6 +8,7 @@ import {
 } from "@/app/lib/mock-data";
 import { NewsItemCard } from "@/app/components/feed/news-item-card";
 import { cn } from "@/app/lib/cn";
+import { formatSourceLabel } from "@/app/lib/format-source";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -173,7 +174,7 @@ export function FeedStream({ items }: FeedStreamProps) {
                       : "bg-transparent text-fg-2 hover:bg-surface hover:text-fg"
                   )}
                 >
-                  {s}
+                  {formatSourceLabel(s)}
                 </button>
               ))}
             </div>
